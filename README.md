@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # interpreterai
 
 An Electron application with React
@@ -32,3 +33,7 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+=======
+# InterpreterAI
+A subtitle and live-translation system to help interpreters with their job.
+>>>>>>> f26ffd4c45910beea0fc03290eeed8ef2e617adf
