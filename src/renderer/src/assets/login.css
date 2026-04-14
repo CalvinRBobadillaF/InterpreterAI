@@ -1,0 +1,204 @@
+/* ════════════════════════════════════════════════════
+   LOGIN COMPONENT STYLES
+   Minimalist & Premium Glassmorphism
+════════════════════════════════════════════════════ */
+
+.login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(ellipse at top, var(--surface-soft) 0%, var(--bg) 100%);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.login-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 340px;
+    padding: 32px;
+    background: rgba(17, 17, 19, 0.8); /* Basado en --surface con transparencia */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.login-icon-container {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    margin-bottom: 16px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    color: var(--accent);
+}
+
+.login-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.login-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.login-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.login-field label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-faint);
+}
+
+.login-field input {
+    padding: 10px 12px;
+    background: rgba(9, 9, 11, 0.5); /* Basado en --bg */
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.login-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-ring);
+}
+
+.login-field input[type="password"] {
+    letter-spacing: 0.3em;
+}
+
+.login-field input::placeholder {
+    letter-spacing: normal;
+    color: var(--text-faint);
+}
+
+/* Instructions / Disclosure */
+.login-instructions {
+    margin-top: -4px;
+    overflow-x: scroll;
+}
+
+.instructions-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 11px;
+    color: var(--text-faint);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.instructions-toggle:hover {
+    color: var(--accent);
+}
+
+.instructions-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.instructions-content.is-open {
+    max-height: 100px;
+    opacity: 1;
+    margin-top: 12px;
+}
+
+.instructions-content p {
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    background: rgba(24, 24, 27, 0.5); /* Basado en --surface-soft */
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-soft);
+}
+
+/* Submit Button */
+.login-submit-btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px;
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-submit-btn:hover {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 20px var(--accent-ring);
+}
+
+.login-submit-btn:active {
+    transform: scale(0.98);
+}
+
+/* Credits Footer */
+.login-credits {
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-faint);
+}
+
+.login-credits a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--text-faint);
+    transition: color 0.2s ease;
+}
+
+.login-credits a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
