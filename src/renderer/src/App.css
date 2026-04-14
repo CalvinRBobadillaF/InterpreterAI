@@ -66,17 +66,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Electron drag regions ── */
 .drag    { -webkit-app-region: drag; }
 .no-drag { -webkit-app-region: no-drag; }
 
-/* ── Scrollbar ── */
 ::-webkit-scrollbar       { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
 
-/* ── Spinner keyframe (used by Loader2 icon) ── */
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ════════════════════════════════════════════════════
@@ -110,7 +107,6 @@ body {
 .app-footer__text {
   font-weight: bolder;
 }
-/* Brand */
 .header-brand__title {
   font-size: 14px;
   font-weight: 700;
@@ -120,13 +116,11 @@ body {
   flex-shrink: 0;
 }
 
-/* Source selector wrapper (for dropdown positioning) */
 .header-source-wrap {
   position: relative;
   flex-shrink: 0;
 }
 
-/* Source pill button */
 .header-source {
   display: flex;
   align-items: center;
@@ -158,8 +152,6 @@ body {
   color: var(--text-faint);
 }
 
-
-/* Log out */
 .log-out-button {
   padding: 10px;
   background: var(--border);
@@ -168,9 +160,6 @@ body {
   color:  var(--text);
 }
 
-
-
-/* Source dropdown */
 .source-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -242,7 +231,6 @@ html.light .source-dropdown {
   font-weight: 700;
 }
 
-/* Play / Stop button */
 .header-play {
   width: 32px;
   height: 32px;
@@ -261,7 +249,6 @@ html.light .source-dropdown {
 .header-play:hover          { opacity: 0.88; transform: scale(1.05); }
 .header-play.is-playing     { background: var(--red); }
 
-/* Waveform + timer */
 .header-wave-block {
   flex: 1;
   display: flex;
@@ -295,11 +282,9 @@ html.light .source-dropdown {
   border-radius: 99px;
   background: var(--waveform);
   flex-shrink: 0;
-  /* Idle: static bars */
   transition: height 0.3s ease;
 }
 
-/* Active: animate the bars */
 .waveform--active .waveform__bar {
   animation: waveBar 1.4s ease-in-out infinite;
 }
@@ -323,7 +308,6 @@ html.light .source-dropdown {
   border-radius: 99px;
 }
 
-/* Right controls */
 .header-right {
   display: flex;
   align-items: center;
@@ -353,33 +337,17 @@ html.light .source-dropdown {
 .app-main {
   flex: 1;
   display: flex;
-  gap: 1px;            /* gap color = border via background on .app-main */
+  gap: 1px;
   background: var(--border);
   overflow: hidden;
 }
 
-/* ─── Panel ─────────────────────────────────────── */
 .panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   background: var(--surface);
   overflow: hidden;
-}
-
-/* Confirmed (final) transcription */
-.panel__text--confirmed {
-  color: var(--text);
-  display: block; /* Obliga a comportarse como un bloque de texto, igual al textarea */
-  min-height: 80px; /* Igualamos la altura mínima del textarea */
-  word-wrap: break-word;
-}
-
-.panel__placeholder {
-  color: var(--text-faint);
-  font-size: 15px;
-  display: block; /* Para que ocupe el espacio incluso si está vacío */
-  min-height: 80px;
 }
 
 .panel__header {
@@ -414,49 +382,6 @@ html.light .source-dropdown {
   gap: 10px;
 }
 
-/* ════════════════════════════════════════════════════
-   TRANSLATION SPLIT (NEW)
-════════════════════════════════════════════════════ */
-
-.panel__dual {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* Cada bloque (original / translated) */
-.panel__section {
-  padding: 6px 0;
-}
-
-/* 🔹 ORIGINAL (más fuerte) */
-
-
-.panel__section--source {
-  color: var(--text);
-  font-weight: 500;
-  /* * Igualamos el comportamiento para ambos paneles. 
-   * 80px (min-height del textarea) + espacio extra para que la línea baje
-   */
-  min-height: 100px; 
-  display: flex;
-  flex-direction: column;
-}
-
-/* 🔹 TRANSLATED (más suave + separación visual) */
-.panel__section--translated {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-soft);
-  color: var(--text-muted);
-}
-
-/* Texto traducido */
-.panel__text--translated {
-  opacity: 0.85;
-}
-
-
 .panel__action-btn {
   background: none;
   border: none;
@@ -469,7 +394,6 @@ html.light .source-dropdown {
 }
 .panel__action-btn:hover { color: var(--text); }
 
-/* Panel body — scrollable text area */
 .panel__body {
   flex: 1;
   padding: 18px 20px;
@@ -479,18 +403,52 @@ html.light .source-dropdown {
 
 .panel__display {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   line-height: 1.7;
 }
 
-/* Confirmed (final) transcription */
-.panel__text--confirmed {
-  color: var(--text);
+.panel__dual {
+  display: flex;
+  flex-direction: column;
 }
 
-/* Interim/live preview — subtler */
+.panel__section {
+  padding: 6px 0;
+  flex-shrink: 0;
+}
+
+.panel__section--source {
+  color: var(--text);
+  font-weight: 500;
+  min-height: 100px; 
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+}
+
+.panel__section--translated {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--text-muted);
+}
+
+.panel__text--confirmed {
+  color: var(--text);
+  display: block; 
+  min-height: 80px; 
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.panel__text--translated {
+  opacity: 0.85;
+  white-space: pre-wrap;
+  display: block;
+}
+
 .panel__text--interim {
   color: var(--text-faint);
   font-style: italic;
@@ -499,9 +457,10 @@ html.light .source-dropdown {
 .panel__placeholder {
   color: var(--text-faint);
   font-size: 15px;
+  display: block;
+  min-height: 80px;
 }
 
-/* Editable textarea inside source panel */
 .panel__textarea {
   width: 100%;
   height: 100%;
@@ -514,12 +473,11 @@ html.light .source-dropdown {
   font-size: 15px;
   font-weight: 400;
   color: var(--text);
-  line-height: 1.7;
+  line-height: 1.8;
   caret-color: var(--accent);
 }
 .panel__textarea::placeholder { color: var(--text-faint); }
 
-/* Interim overlay below textarea */
 .panel__interim-overlay {
   padding: 4px 0 0;
   font-size: 14px;

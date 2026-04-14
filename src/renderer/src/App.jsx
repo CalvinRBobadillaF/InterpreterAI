@@ -1,17 +1,3 @@
-/**
- * App.jsx — Interpreter AI
- * ─────────────────────────────────────────────────────────────────
- * AUDIO PIPELINE (with Deepgram):
- *
- *  [mic]      → getUserMedia()         → stream → Deepgram WS → transcription
- *  [electron] → desktopCapturer stream → stream → Deepgram WS → transcription
- *  [tab]      → getDisplayMedia stream → stream → Deepgram WS → transcription
- *
- * Each mode feeds the same MediaStream into useTranscription.start(stream).
- * Deepgram handles the audio regardless of its source.
- * ─────────────────────────────────────────────────────────────────
- */
-
 import { useState, useRef, useCallback } from 'react'
 import './App.css'
 import { LogIn } from './components/LogIn'
@@ -24,7 +10,6 @@ import { startElectronCapture } from './client/startElectronCapture'
 import { startBrowserCapture }  from './client/startBrowserCapture'
 
 function App() {
-    // 🔥 Nuevo estado de autenticación (verifica si ya hay datos guardados)
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem('app_key') && !!localStorage.getItem('app_name')
   )
@@ -32,27 +17,20 @@ function App() {
   const [playing, setPlaying] = useState(false)
   const [source, setSource]   = useState('mic')
 
-  // 🔥 TEXTO FINAL
   const [englishText, setEnglishText] = useState('')
   const [spanishText, setSpanishText] = useState('')
 
-  // 🔥 INTERIM (LIVE)
   const [interimEnglish, setInterimEnglish] = useState('')
   const [interimSpanish, setInterimSpanish] = useState('')
 
   const [footerStatus, setFooterStatus] = useState('Idle')
   const [footerError, setFooterError]   = useState(null)
 
-
-
-
-
   const ACTIVE_LEFT_LANG = 'en'
   const ACTIVE_RIGHT_LANG = 'es'
 
   const streamRef = useRef(null)
 
-  // 🧹 CLEAR
   const handleClearLeft = () => {
     setEnglishText('')
     setInterimEnglish('')
@@ -63,21 +41,18 @@ function App() {
     setInterimSpanish('')
   }
 
-  // ── Translation EN → ES
   const { translatedText: enToEs } = useAutoTranslation(englishText, {
     from: 'en',
     to: 'es',
     debounceMs: 500,
   })
 
-  // ── Translation ES → EN
   const { translatedText: esToEn } = useAutoTranslation(spanishText, {
     from: 'es',
     to: 'en',
     debounceMs: 500,
   })
 
-  // ── Transcription
   const {
     start: startTranscription,
     stop: stopTranscription,
@@ -86,15 +61,27 @@ function App() {
     lang: 'multi',
 
     onFinal: useCallback(({ text, lang }) => {
-      // ✅ Usar startsWith previene fallos si llega "en-US" o "es-ES"
+      
+      const appendWithSpacing = (prevText, newText) => {
+        if (!prevText) return newText;
+        
+        const prevTrimmed = prevText.trim();
+        const newTrimmed = newText.trim();
+        
+        const hasPunctuation = /[.!?]$/.test(prevTrimmed);
+        const separator = hasPunctuation ? '\n\n' : ' ';
+        
+        return prevTrimmed + separator + newTrimmed;
+      };
+
       if (lang.startsWith('en')) {
         setInterimEnglish('')
-        setEnglishText(prev => (prev ? prev + ' ' : '') + text)
+        setEnglishText(prev => appendWithSpacing(prev, text))
       }
 
       if (lang.startsWith('es')) {
         setInterimSpanish('')
-        setSpanishText(prev => (prev ? prev + ' ' : '') + text)
+        setSpanishText(prev => appendWithSpacing(prev, text))
       }
     }, []),
 
@@ -108,7 +95,6 @@ function App() {
       }
     }, []),
 
-
     onError: useCallback((err) => {
       setFooterError(err)
       setPlaying(false)
@@ -116,75 +102,54 @@ function App() {
     }, []),
   })
 
-  // ── Play / Stop
   const handleTogglePlay = useCallback(async () => {
+    console.log('1️⃣ CLICK')
 
-  console.log('1️⃣ CLICK')
+    if (!playing) {
+      setFooterError(null)
+      let stream = null
 
-  if (!playing) {
-    setFooterError(null)
-
-    let stream = null
-
-    // 🔥 USA TU STATE, NO IPC AQUÍ
-    if (source === 'electron') {
-
-      console.log('🖥 SYSTEM AUDIO MODE')
-
-      stream = await startElectronCapture()
-
-      if (!stream) {
-        setFooterError('Could not capture system audio.')
-        return
+      if (source === 'electron') {
+        console.log('🖥 SYSTEM AUDIO MODE')
+        stream = await startElectronCapture()
+        if (!stream) {
+          setFooterError('Could not capture system audio.')
+          return
+        }
+        setFooterStatus('System Audio — Listening...')
+      } else if (source === 'tab') {
+        console.log('🌐 TAB AUDIO MODE')
+        stream = await startBrowserCapture()
+        if (!stream) {
+          setFooterError('Tab capture cancelled.')
+          return
+        }
+        setFooterStatus('Tab Audio — Listening...')
+      } else {
+        console.log('🎤 MIC MODE')
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false
+        })
+        setFooterStatus('Microphone — Listening...')
       }
 
-      setFooterStatus('System Audio — Listening...')
-
-    } else if (source === 'tab') {
-
-      console.log('🌐 TAB AUDIO MODE')
-
-      stream = await startBrowserCapture()
-
-      if (!stream) {
-        setFooterError('Tab capture cancelled.')
-        return
-      }
-
-      setFooterStatus('Tab Audio — Listening...')
+      streamRef.current = stream
+      await startTranscription(stream)
+      setPlaying(true)
 
     } else {
+      stopTranscription()
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
 
-      console.log('🎤 MIC MODE')
+      setInterimEnglish('')
+      setInterimSpanish('')
 
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false
-      })
-
-      setFooterStatus('Microphone — Listening...')
+      setPlaying(false)
+      setFooterStatus('Idle')
     }
-
-    streamRef.current = stream
-
-    await startTranscription(stream)
-
-    setPlaying(true)
-
-  } else {
-    stopTranscription()
-
-    streamRef.current?.getTracks().forEach(t => t.stop())
-    streamRef.current = null
-
-    setInterimEnglish('')
-    setInterimSpanish('')
-
-    setPlaying(false)
-    setFooterStatus('Idle')
-  }
-
-}, [playing, source, startTranscription, stopTranscription])
+  }, [playing, source, startTranscription, stopTranscription])
 
   const handleSourceChange = useCallback((s) => {
     if (!playing) setSource(s)
@@ -196,7 +161,6 @@ function App() {
 
   return (
     <div className="app-shell">
-
       <Header
         playing={playing}
         onTogglePlay={handleTogglePlay}
@@ -205,8 +169,6 @@ function App() {
       />
 
       <main className="app-main">
-
-        {/* 🔹 LEFT PANEL (EN → ES) */}
         <TranslationPanel
           fromLang="EN"
           toLang="ES"
@@ -218,7 +180,6 @@ function App() {
           onClear={handleClearLeft}
         />
 
-        {/* 🔹 RIGHT PANEL (ES → EN) */}
         <TranslationPanel
           fromLang="ES"
           toLang="EN"
@@ -228,7 +189,6 @@ function App() {
           interimText={interimSpanish}
           onClear={handleClearRight}
         />
-
       </main>
 
       <Footer

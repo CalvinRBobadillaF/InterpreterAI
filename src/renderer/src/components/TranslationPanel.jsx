@@ -1,10 +1,3 @@
-
-/*
-
-translation panel 
-
-*/
-
 import { Volume2, MoreHorizontal, ChevronDown, Loader2, Trash2 } from 'lucide-react'
 
 export function TranslationPanel({
@@ -17,21 +10,18 @@ export function TranslationPanel({
   interimText = '',
   loading     = false,
   onChange,
-  onClear, // 🔥 nuevo
+  onClear,
 }) {
 
-  // 🔥 Detecta qué idioma debe mostrarse arriba
   const isEnglishPanel = fromLang.toLowerCase().includes('english')
 
   return (
     <div className="panel">
-
       <div className="panel__header">
         <div className="panel__lang-selector">
           <span className="panel__lang-text">{fromLang}</span>
           <span className="panel__lang-arrow">→</span>
           <span className="panel__lang-text">{toLang}</span>
-          
         </div>
 
         <div className="panel__actions">
@@ -43,7 +33,6 @@ export function TranslationPanel({
             />
           )}
 
-          {/* 🔥 CLEAR BUTTON */}
           <button
             className="panel__action-btn"
             title="Clear text"
@@ -51,17 +40,13 @@ export function TranslationPanel({
           >
             <Trash2 size={14} />
           </button>
-
-          
-
-          
         </div>
       </div>
 
       <div className="panel__body">
         <div className="panel__display panel__dual">
 
-          {/* 🔹 ORIGINAL (filtrado por idioma) */}
+          {/* 🔹 ORIGINAL */}
           <div className="panel__section panel__section--source">
             {readOnly ? (
               <>
@@ -89,6 +74,17 @@ export function TranslationPanel({
                   value={value}
                   onChange={onChange}
                   spellCheck={false}
+                  style={{ overflow: 'hidden' }}
+                  onInput={(e) => {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = 'auto';
+                      el.style.height = el.scrollHeight + 'px';
+                    }
+                  }}
                 />
 
                 {interimText && (

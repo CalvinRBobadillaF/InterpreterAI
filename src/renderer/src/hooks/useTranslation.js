@@ -17,71 +17,81 @@
  * ─────────────────────────────────────────────────────────────────
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState, useEffect } from 'react'
 
-const MYMEMORY = 'https://api.mymemory.translated.net/get'
-
-// Optional: add your email to increase daily limit
-// const EMAIL = 'your@email.com'
+// El endpoint cambia si usas el plan Free o Pro
+const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate'
 
 export function useTranslation({ from = 'en', to = 'es' } = {}) {
-  const cacheRef    = useRef(new Map())
+  const cacheRef = useRef(new Map())
   const controllerRef = useRef(null)
 
-  // ── Core translate function ──
+  // Recuperamos la API Key que el usuario guardó en el Login
+  // Podrías crear un campo específico para DeepL en tu Login 
+  // o reutilizar uno por ahora para pruebas.
+  const DEEPL_AUTH_KEY = localStorage.getItem('deepl_key') 
+
   const translate = useCallback(async (text) => {
     const clean = text?.trim()
     if (!clean) return ''
 
-    // Check cache
     const key = `${from}|${to}:${clean}`
     if (cacheRef.current.has(key)) return cacheRef.current.get(key)
 
-    // Cancel previous in-flight request
     controllerRef.current?.abort()
     controllerRef.current = new AbortController()
 
-    try {
-      const url = `${MYMEMORY}?q=${encodeURIComponent(clean)}&langpair=${from}|${to}`
-      const res  = await fetch(url, { signal: controllerRef.current.signal })
-      const data = await res.json()
-
-      if (data.responseStatus === 200) {
-        const result = data.responseData.translatedText
-        cacheRef.current.set(key, result)
-        return result
-      }
-
-      console.warn('[Translation] API error:', data.responseStatus, data.responseDetails)
-      return clean
-
-    } catch (e) {
-      if (e.name === 'AbortError') return '' // request was cancelled, not an error
-      console.warn('[Translation] fetch error:', e)
+    if (!DEEPL_AUTH_KEY) {
+      console.warn('[DeepL] Missing Auth Key')
       return clean
     }
-  }, [from, to])
+
+    try {
+      // DeepL requiere los parámetros en el cuerpo o como URLSearchParams
+      const params = new URLSearchParams({
+        auth_key: DEEPL_AUTH_KEY,
+        text: clean,
+        source_lang: from.toUpperCase(),
+        target_lang: to.toUpperCase() === 'EN' ? 'EN-US' : to.toUpperCase(), // DeepL usa EN-US o EN-GB
+      })
+
+      const res = await fetch(DEEPL_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+        signal: controllerRef.current.signal
+      })
+
+      if (!res.ok) {
+        throw new Error(`DeepL error: ${res.status}`)
+      }
+
+      const data = await res.json()
+      const result = data.translations[0].text
+
+      cacheRef.current.set(key, result)
+      return result
+
+    } catch (e) {
+      if (e.name === 'AbortError') return ''
+      console.error('[DeepL] Translation error:', e)
+      return clean
+    }
+  }, [from, to, DEEPL_AUTH_KEY])
 
   return { translate }
 }
 
-/**
- * useAutoTranslation
- * ─────────────────────────────────────────────────────────────────
- * Watches `sourceText` and auto-translates it with a debounce delay.
- * Use this in App.jsx to auto-translate transcription output.
- *
- * @param {string}  sourceText - text to translate (e.g. transcription)
- * @param {object}  options    - { from, to, debounceMs }
- * @returns {{ translatedText, translating }}
- */
+// useAutoTranslation se mantiene igual, ya que solo consume 'translate'
 export function useAutoTranslation(sourceText, {
   from = 'en',
-  to   = 'es',
+  to = 'es',
   debounceMs = 600,
 } = {}) {
-  const { translate }    = useTranslation({ from, to })
-  const [result,      setResult]      = useState('')
+  const { translate } = useTranslation({ from, to })
+  const [result, setResult] = useState('')
   const [translating, setTranslating] = useState(false)
   const timerRef = useRef(null)
 
