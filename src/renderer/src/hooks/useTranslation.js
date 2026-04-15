@@ -1,102 +1,105 @@
 /**
  * hooks/useTranslation.js
  * ─────────────────────────────────────────────────────────────────
- * Automatic translation using the MyMemory API.
+ * WHY IPC:
+ *   DeepL rejects fetch() calls from Electron's renderer process due to
+ *   CORS restrictions. The solution is to route the HTTP request through
+ *   the main process via IPC — main process uses Electron's `net` module
+ *   which has no CORS restrictions.
  *
- * FREE TIER LIMITS:
- *   - 5,000 characters/day without an email
- *   - 10,000 characters/day if you add ?de=youremail@domain.com
- *   - No API key required for basic usage
- *
- * For production use, replace with DeepL, Google Translate, or LibreTranslate.
- *
- * FEATURES:
- *   - Translation cache (avoids re-translating the same text)
- *   - Debounced auto-translate (waits for a pause before firing)
- *   - Manual translate() function for on-demand calls
+ * KEY STORAGE:
+ *   The DeepL key is stored as 'deepl_key' in localStorage (set in LogIn).
+ *   The Deepgram key is stored separately as 'app_key'.
  * ─────────────────────────────────────────────────────────────────
  */
 
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-// El endpoint cambia si usas el plan Free o Pro
-const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate'
+const IS_ELECTRON = !!window.electronAPI?.isElectron
 
+// ── Core translate function ────────────────────────────────────────
+async function callTranslate({ text, from, to, apiKey }) {
+  const clean = text?.trim();
+  if (!clean || !apiKey) return clean || '';
+
+  if (IS_ELECTRON) {
+    try {
+      // ⚠️ ASEGÚRATE de que en tu preload.js el nombre sea 'translate'
+      // o cámbialo aquí al nombre que tengas en el preload.
+      const result = await window.electronAPI.translate({ text: clean, from, to, apiKey });
+      return result || clean;
+    } catch (e) {
+      console.error('[Translation] IPC error:', e);
+      return clean;
+    }
+  } else {
+    // 🌐 WEB FALLBACK (Aquí es donde el CSP suele molestar)
+    const url = `https://api-free.deepl.com/v2/translate`;
+    const body = new URLSearchParams({
+      auth_key: apiKey,
+      text: clean,
+      source_lang: from.toUpperCase(),
+      target_lang: to.toUpperCase() === 'EN' ? 'EN-US' : to.toUpperCase(),
+    });
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      });
+      const data = await res.json();
+      return data?.translations?.[0]?.text || clean;
+    } catch (e) {
+      // Si ves este error en la web, es el CSP bloqueando el fetch
+      console.error('[Translation] Web Fetch blocked by CSP or CORS', e);
+      return clean;
+    }
+  }
+}
+// ── useTranslation ────────────────────────────────────────────────
 export function useTranslation({ from = 'en', to = 'es' } = {}) {
   const cacheRef = useRef(new Map())
-  const controllerRef = useRef(null)
-
-  // Recuperamos la API Key que el usuario guardó en el Login
-  // Podrías crear un campo específico para DeepL en tu Login 
-  // o reutilizar uno por ahora para pruebas.
-  const DEEPL_AUTH_KEY = localStorage.getItem('deepl_key') 
 
   const translate = useCallback(async (text) => {
     const clean = text?.trim()
     if (!clean) return ''
 
-    const key = `${from}|${to}:${clean}`
-    if (cacheRef.current.has(key)) return cacheRef.current.get(key)
-
-    controllerRef.current?.abort()
-    controllerRef.current = new AbortController()
-
-    if (!DEEPL_AUTH_KEY) {
-      console.warn('[DeepL] Missing Auth Key')
+    // Read key fresh each call (user may have just logged in)
+    const apiKey = localStorage.getItem('deepl_key') || ''
+    if (!apiKey) {
+      console.warn('[Translation] deepl_key not found in localStorage')
       return clean
     }
 
-    try {
-      // DeepL requiere los parámetros en el cuerpo o como URLSearchParams
-      const params = new URLSearchParams({
-        auth_key: DEEPL_AUTH_KEY,
-        text: clean,
-        source_lang: from.toUpperCase(),
-        target_lang: to.toUpperCase() === 'EN' ? 'EN-US' : to.toUpperCase(), // DeepL usa EN-US o EN-GB
-      })
+    const cacheKey = `${from}|${to}:${clean}`
+    if (cacheRef.current.has(cacheKey)) return cacheRef.current.get(cacheKey)
 
-      const res = await fetch(DEEPL_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-        signal: controllerRef.current.signal
-      })
-
-      if (!res.ok) {
-        throw new Error(`DeepL error: ${res.status}`)
-      }
-
-      const data = await res.json()
-      const result = data.translations[0].text
-
-      cacheRef.current.set(key, result)
-      return result
-
-    } catch (e) {
-      if (e.name === 'AbortError') return ''
-      console.error('[DeepL] Translation error:', e)
-      return clean
-    }
-  }, [from, to, DEEPL_AUTH_KEY])
+    const result = await callTranslate({ text: clean, from, to, apiKey })
+    if (result && result !== clean) cacheRef.current.set(cacheKey, result)
+    return result
+  }, [from, to])
 
   return { translate }
 }
 
-// useAutoTranslation se mantiene igual, ya que solo consume 'translate'
+// ── useAutoTranslation ─────────────────────────────────────────────
+// Watches sourceText and auto-translates with debounce.
 export function useAutoTranslation(sourceText, {
-  from = 'en',
-  to = 'es',
+  from       = 'en',
+  to         = 'es',
   debounceMs = 600,
 } = {}) {
-  const { translate } = useTranslation({ from, to })
-  const [result, setResult] = useState('')
+  const { translate }             = useTranslation({ from, to })
+  const [result, setResult]       = useState('')
   const [translating, setTranslating] = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => {
-    if (!sourceText?.trim()) { setResult(''); return }
+    if (!sourceText?.trim()) {
+      setResult('')
+      return
+    }
 
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(async () => {

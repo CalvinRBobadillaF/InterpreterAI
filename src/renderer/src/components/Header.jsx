@@ -87,13 +87,6 @@ const SOURCES = [
     note:  'Works immediately with Web Speech API',
   },
   {
-    id:    'electron',
-    label: 'System Audio',
-    sub:   'Desktop capture',
-    Icon:  Monitor,
-    note:  'Electron only — captures computer audio',
-  },
-  {
     id:    'tab',
     label: 'Browser Tab',
     sub:   'Tab / screen',
@@ -224,11 +217,12 @@ export function Header({ playing, onTogglePlay, source, onSourceChange }) {
             {localStorage.getItem('app_name') || 'Guest'}
           </span>
           <button 
-          className="log-out-button" // Usamos tu clase base y ajustamos
+          className="log-out-button"
           onClick={() => {
-            // 1. Borrar las credenciales
+            // 1. Borrar TODAS las credenciales
             localStorage.removeItem('app_name')
             localStorage.removeItem('app_key')
+            localStorage.removeItem('deepl_key') // ⬅️ ¡Esta línea faltaba!
             
             // 2. Recargar la ventana para forzar a App.jsx a mostrar el LogIn
             window.location.reload()
@@ -241,3 +235,15 @@ export function Header({ playing, onTogglePlay, source, onSourceChange }) {
     </header>
   )
 }
+
+
+/*
+
+,
+  {
+    id:    'electron',
+    label: 'System Audio',
+    sub:   'Desktop capture',
+    Icon:  Monitor,
+    note:  'Electron only — captures computer audio',
+  },8*/

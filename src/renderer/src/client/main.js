@@ -1,108 +1,120 @@
+/**
+ * main.js — Electron Main Process
+ */
 
-
-/*
-Main.js
-
-*/
-
-
-
-
-const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron')
+const { app, BrowserWindow, session, ipcMain, desktopCapturer, net } = require('electron')
 const path = require('path')
 
-// ── IPC HANDLERS ─────────────────────────────────────────────────────────────
+// ── IPC: Desktop Capturer ───────────────────────────────────────────────────
 
-// 🔊 Obtener una pantalla (para audio del sistema)
 ipcMain.handle('get-audio-source', async () => {
-  try {
-    const sources = await desktopCapturer.getSources({
-      types: ['screen'],
-      thumbnailSize: { width: 0, height: 0 }
-    })
-
-    const source = sources.find(s => s.id.startsWith('screen')) || sources[0]
-
-    if (!source) return null
-
-    return {
-      id: source.id,
-      name: source.name
-    }
-
-  } catch (error) {
-    console.error('❌ desktopCapturer error:', error)
-    return null
-  }
+  const sources = await desktopCapturer.getSources({
+    types: ['screen'],
+    thumbnailSize: { width: 0, height: 0 },
+  })
+  return sources.find(s => s.id.startsWith('screen')) || sources[0] || null
 })
 
-// 🔥 FIX: ESTE FALTABA (muy importante)
 ipcMain.handle('get-all-sources', async () => {
-  try {
-    const sources = await desktopCapturer.getSources({
-      types: ['screen', 'window'],
-      thumbnailSize: { width: 0, height: 0 }
-    })
-
-    return sources.map(s => ({
-      id: s.id,
-      name: s.name
-    }))
-  } catch (err) {
-    console.error('❌ get-all-sources error:', err)
-    return []
-  }
+  return desktopCapturer.getSources({
+    types: ['screen', 'window'],
+    thumbnailSize: { width: 150, height: 100 },
+  })
 })
 
-// ── WINDOW ───────────────────────────────────────────────────────────────────
+// ── IPC: DeepL Translation ──────────────────────────────────────────────────
+ipcMain.handle('deepl-translate', async (_event, { text, from, to, apiKey }) => {
+  if (!text?.trim() || !apiKey) return text
 
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1100,
-    height: 680,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: false,
-    },
+  const targetLang = to.toUpperCase() === 'EN' ? 'EN-US' : to.toUpperCase()
+  const sourceLang = from.toUpperCase()
+
+  const body = new URLSearchParams({
+    auth_key:    apiKey,
+    text:        text.trim(),
+    source_lang: sourceLang,
+    target_lang: targetLang,
   })
 
-  const ses = win.webContents.session
+  return new Promise((resolve) => {
+    const request = net.request({
+      method: 'POST',
+      url:    'https://api-free.deepl.com/v2/translate',
+    })
 
-  // CSP
-  ses.webRequest.onHeadersReceived((details, callback) => {
+    request.setHeader('Content-Type', 'application/x-www-form-urlencoded')
+
+    let responseBody = ''
+    request.on('response', (response) => {
+      response.on('data', (chunk) => { responseBody += chunk })
+      response.on('end', () => {
+        try {
+          const data = JSON.parse(responseBody)
+          const result = data?.translations?.[0]?.text
+          resolve(result || text)
+        } catch (e) {
+          console.error('[DeepL IPC] Parse error:', e.message, responseBody)
+          resolve(text)
+        }
+      })
+    })
+
+    request.on('error', (e) => {
+      console.error('[DeepL IPC] Request error:', e.message)
+      resolve(text)
+    })
+
+    request.write(body.toString())
+    request.end()
+  })
+})
+
+// ── Window & Security ────────────────────────────────────────────────────────
+
+function createWindow() {
+  // Configuración de la sesión ANTES de crear la ventana
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src * blob:"
+          "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+          "connect-src 'self' wss://api.deepgram.com https://api.deepgram.com https://api-free.deepl.com https://api.deepl.com; " +
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+          "font-src 'self' https://fonts.gstatic.com; " +
+          "img-src 'self' data: blob:; " +
+          "media-src 'self' blob:;"
         ]
       }
     })
   })
 
-  // Permisos
-  ses.setPermissionCheckHandler((webContents, permission) => {
-    return ['media', 'microphone', 'camera', 'display-capture'].includes(permission)
+  const win = new BrowserWindow({
+    width: 1100,
+    height: 680,
+    minWidth: 800,
+    minHeight: 500,
+    frame: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+      // Si el error persiste, descomenta la siguiente línea para debuguear:
+      // webSecurity: false 
+    },
   })
 
-  ses.setPermissionRequestHandler((webContents, permission, callback) => {
+  // Manejo de permisos (Micrófono, etc.)
+  win.webContents.session.setPermissionCheckHandler((_wc, permission) =>
+    ['media', 'microphone', 'camera', 'display-capture'].includes(permission)
+  )
+  win.webContents.session.setPermissionRequestHandler((_wc, permission, callback) =>
     callback(['media', 'microphone', 'camera', 'display-capture'].includes(permission))
-  })
+  )
 
   win.loadURL('http://localhost:5173')
+  
+  // Abrir herramientas de desarrollo automáticamente para ver si el error cambia
   win.webContents.openDevTools()
 }
-
-// ── APP ─────────────────────────────────────────────────────────────
-
-app.whenReady().then(createWindow)
-
-app.on('window-all-closed', () => {
-  app.quit()
-})
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow()
-})

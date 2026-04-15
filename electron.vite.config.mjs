@@ -12,6 +12,16 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [react()]
+    plugins: [react()],
+    // ⬇️ AQUÍ AGREGAMOS LA CONFIGURACIÓN DEL PROXY ⬇️
+    server: {
+      proxy: {
+        '/deepl-api': {
+          target: 'https://api-free.deepl.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/deepl-api/, '')
+        }
+      }
+    }
   }
 })

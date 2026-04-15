@@ -18,7 +18,7 @@
 import { useCallback, useRef, useState } from 'react'
 
 const DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen'
-const API_KEY = localStorage.getItem('app_key')
+
 
     
 
@@ -45,7 +45,7 @@ export function useTranscription({
   const start = useCallback(async (stream = null) => {
 
     if (activeRef.current) return
-
+    const API_KEY = localStorage.getItem('app_key')
     if (!API_KEY) {
       emitError('Missing Deepgram API key')
       return
