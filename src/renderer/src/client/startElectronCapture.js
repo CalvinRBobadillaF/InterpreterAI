@@ -1,67 +1,68 @@
 /**
  * client/startElectronCapture.js
- * ─────────────────────────────────────────────────────────────────
- * Captures system audio via Electron's desktopCapturer.
  *
- * HOW IT WORKS:
- *   1. Main process calls desktopCapturer.getSources() and returns the source id.
- *   2. Renderer calls getUserMedia() with chromeMediaSource: 'desktop' + the source id.
- *   3. We strip the video track → pure audio MediaStream.
+ * Captura el audio del sistema (computadora) usando Electron's desktopCapturer.
  *
- * REQUIREMENT: electronAPI must be exposed via preload.js contextBridge.
- * ─────────────────────────────────────────────────────────────────
+ * FLUJO:
+ *   1. El renderer le pide al main process el source id via IPC
+ *      (desktopCapturer solo funciona en el proceso principal desde Electron 13+)
+ *   2. Con ese id, llamamos getUserMedia con chromeMediaSource: 'desktop'
+ *   3. Descartamos las pistas de video — solo necesitamos audio
+ *
+ * REQUISITO: preload.js debe exponer window.electronAPI.getAudioSource()
  */
 
 export const startElectronCapture = async () => {
+  // Verificamos que estamos en Electron y que el preload está cargado
   if (!window.electronAPI?.getAudioSource) {
-    console.error('[ElectronCapture] electronAPI.getAudioSource not found. Is preload.js loaded?')
+    console.error('[Electron] electronAPI no encontrado. ¿Está cargado el preload.js?')
     return null
   }
 
-  let source
+  // Pedimos al proceso principal el id de la fuente de pantalla
+  let fuente
   try {
-    source = await window.electronAPI.getAudioSource()
+    fuente = await window.electronAPI.getAudioSource()
   } catch (e) {
-    console.error('[ElectronCapture] IPC error:', e)
+    console.error('[Electron] Error IPC:', e)
     return null
   }
 
-  if (!source) {
-    console.error('[ElectronCapture] No desktop audio source returned from main process.')
+  if (!fuente) {
+    console.error('[Electron] El proceso principal no devolvió ninguna fuente de audio')
     return null
   }
 
   try {
-    // getUserMedia with chromeMediaSource works in Electron's Chromium
+    // getUserMedia con chromeMediaSource funciona en el Chromium de Electron
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: source.id,
-          // Disable audio processing — we want raw system audio
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
+          chromeMediaSource:   'desktop',
+          chromeMediaSourceId: fuente.id,
+          // Desactivamos el procesamiento de audio — queremos el sonido crudo del sistema
+          echoCancellation:  false,
+          noiseSuppression:  false,
+          autoGainControl:   false,
         },
       },
-      // We must request video alongside audio for desktop capture,
-      // then immediately discard the video tracks.
+      // Requerimos video aunque no lo usemos — es necesario para desktop capture
       video: {
         mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: source.id,
+          chromeMediaSource:   'desktop',
+          chromeMediaSourceId: fuente.id,
         },
       },
     })
 
-    // Drop video — we only need audio
-    stream.getVideoTracks().forEach(track => track.stop())
+    // Descartamos el video inmediatamente
+    stream.getVideoTracks().forEach(t => t.stop())
 
-    console.log('[ElectronCapture] System audio stream ready.')
+    console.log('[Electron] Stream de audio del sistema listo')
     return stream
 
   } catch (e) {
-    console.error('[ElectronCapture] getUserMedia failed:', e)
+    console.error('[Electron] getUserMedia falló:', e)
     return null
   }
 }

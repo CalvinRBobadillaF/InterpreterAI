@@ -120,7 +120,7 @@ export function LogIn({ onLogin }) {
           )}
 
           <button className="login-btn" type="submit">
-            Start Interpreting
+            Log in
           </button>
 
         </form>

@@ -1,50 +1,69 @@
 /**
  * client/startBrowserCapture.js
- * ─────────────────────────────────────────────────────────────────
- * Captures audio from a browser tab or screen using the
- * Screen Capture API (getDisplayMedia).
  *
- * HOW IT WORKS:
- *   - Browser shows a native picker: user selects a tab/window/screen.
- *   - If the user checks "Share tab audio", audio track is included.
- *   - We stop the video track immediately to avoid screen recording.
+ * Captura audio de una pestaña del navegador usando getDisplayMedia.
  *
- * LIMITATION: The user must manually click "Share" in the browser dialog.
- * This cannot be automated — it requires a user gesture.
- * ─────────────────────────────────────────────────────────────────
+ * LIMITACIÓN EN MAC:
+ *   macOS no permite capturar el audio del sistema vía getDisplayMedia.
+ *   Solo funciona si el usuario comparte una pestaña específica de Chrome
+ *   (no ventana ni pantalla completa) y marca "Compartir audio de la pestaña".
+ *   Para audio del sistema en Mac, usar el modo "Electron" (desktopCapturer).
+ *
+ * RETORNA: { stream, reason, userMessage }
+ *   - stream: MediaStream con audio, o null si falló
+ *   - reason: código del error ('cancelled', 'no-audio-track', 'mac-no-audio')
+ *   - userMessage: mensaje legible para mostrar al usuario
  */
 
+const ES_MAC = navigator.platform?.toUpperCase().includes('MAC') ||
+               navigator.userAgent?.includes('Mac')
+
 export const startBrowserCapture = async () => {
+  if (ES_MAC) {
+    console.info(
+      '[Captura] Estás en macOS.\n' +
+      'Para audio de pestaña: en el diálogo, elige una pestaña de Chrome específica\n' +
+      '(no "Pantalla" ni "Ventana"), y marca la casilla "Compartir audio de la pestaña".\n' +
+      'Para audio del sistema, usa la fuente "System Audio" en el encabezado.'
+    )
+  }
+
+  let stream
   try {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
+    stream = await navigator.mediaDevices.getDisplayMedia({
       audio: {
         echoCancellation: false,
         noiseSuppression: false,
-        sampleRate: 44100,
+        autoGainControl:  false,
+        // En Windows/Linux pedimos calidad más alta; en Mac se ignora
+        ...(ES_MAC ? {} : { channelCount: 2, sampleRate: 44100 }),
       },
-      // We request video so the dialog appears, but discard it.
-      // Some browsers require video: true for getDisplayMedia.
-      video: true,
+      video: {
+        // Pedimos la resolución mínima — descartamos el video de todas formas
+        width: { ideal: 1 }, height: { ideal: 1 }, frameRate: { ideal: 1 },
+      },
     })
-
-    // Discard video tracks immediately
-    stream.getVideoTracks().forEach(track => track.stop())
-
-    // Check if audio was actually shared (user may have left it unchecked)
-    if (stream.getAudioTracks().length === 0) {
-      console.warn('[BrowserCapture] No audio track — user may not have checked "Share tab audio".')
-      return null
-    }
-
-    console.log('[BrowserCapture] Tab audio stream ready.')
-    return stream
-
   } catch (e) {
     if (e.name === 'NotAllowedError') {
-      console.warn('[BrowserCapture] User cancelled the screen share dialog.')
-    } else {
-      console.error('[BrowserCapture] getDisplayMedia failed:', e)
+      return { stream: null, reason: 'cancelled' }
     }
-    return null
+    console.error('[Captura] getDisplayMedia falló:', e)
+    return { stream: null, reason: e.message }
   }
+
+  // Descartamos las pistas de video — solo necesitamos audio
+  stream.getVideoTracks().forEach(t => t.stop())
+
+  if (stream.getAudioTracks().length === 0) {
+    return {
+      stream: null,
+      reason: ES_MAC ? 'mac-no-audio' : 'no-audio-track',
+      userMessage: ES_MAC
+        ? 'Sin audio. En Mac, elige una pestaña de Chrome y marca "Compartir audio de la pestaña".'
+        : 'Sin audio. Asegúrate de marcar "Compartir audio de la pestaña" en el diálogo.',
+    }
+  }
+
+  console.log('[Captura] Stream de audio listo:', stream.getAudioTracks()[0].label)
+  return { stream, reason: null }
 }

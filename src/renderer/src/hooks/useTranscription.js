@@ -1,26 +1,23 @@
 /**
- * hooks/useTranscription.js  —  Deepgram WebSocket streaming
- * ─────────────────────────────────────────────────────────────────
- * ROOT CAUSE OF "listening but no text" bug:
+ * hooks/useTranscription.js  —  Transcripción en tiempo real con Deepgram
  *
- *   Previous version sent `encoding=linear16&sample_rate=16000` to Deepgram,
- *   but MediaRecorder actually outputs audio/webm;codecs=opus (compressed).
- *   Deepgram tried to decode a webm container as raw PCM → got garbage → dropped
- *   every packet silently. No error, no transcript.
+ * FLUJO:
+ *   1. Se abre un WebSocket a Deepgram con el API key del usuario
+ *   2. MediaRecorder divide el audio en chunks de 250ms y los envía al WS
+ *   3. Deepgram devuelve transcripciones interim (mientras habla) y finales
+ *   4. onInterim({ text, lang }) → texto provisional en pantalla
+ *   5. onFinal({ text, lang })   → texto confirmado, se guarda permanentemente
  *
- * FIX:
- *   Remove `encoding` and `sample_rate` params entirely.
- *   Deepgram auto-detects the container format from the first bytes of each chunk.
- *   audio/webm;codecs=opus is fully supported by Deepgram out of the box.
- * ─────────────────────────────────────────────────────────────────
+ * POR QUÉ NO usamos Web Speech API:
+ *   webkitSpeechRecognition necesita las claves internas de Chrome para
+ *   autenticarse con Google. Electron no las incluye → Error: -2 en cada intento.
+ *   Ver: https://github.com/electron/electron/issues/46143
  */
 
 import { useCallback, useRef, useState } from 'react'
 
 const DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen'
 
-
-    
 
 export function useTranscription({
   lang = 'en-US',
@@ -29,134 +26,139 @@ export function useTranscription({
   onError,
 } = {}) {
 
-  const socketRef   = useRef(null)
-  const recorderRef = useRef(null)
-  const activeRef   = useRef(false)
+  // Referencias persistentes (no causan re-renders al cambiar)
+  const socketRef   = useRef(null)   // WebSocket de Deepgram
+  const recorderRef = useRef(null)   // MediaRecorder activo
+  const activoRef   = useRef(false)  // estado de actividad sin stale-closure
 
   const [active, setActive] = useState(false)
-  const [error, setError]   = useState(null)
+  const [error,  setError]  = useState(null)
 
-  const emitError = useCallback((msg) => {
+  // Emite un error al estado local Y al callback externo
+  const emitirError = useCallback((msg) => {
     console.error('[Deepgram]', msg)
     setError(msg)
     onError?.(msg)
   }, [onError])
 
+
+  // ── Iniciar transcripción ─────────────────────────────────────
   const start = useCallback(async (stream = null) => {
 
-    if (activeRef.current) return
+    // Evita abrir dos conexiones si ya está activo
+    if (activoRef.current) return
+
     const API_KEY = localStorage.getItem('app_key')
     if (!API_KEY) {
-      emitError('Missing Deepgram API key')
+      emitirError('Falta el API key de Deepgram')
       return
     }
 
-    // ── Get mic if needed ──
+    // Si no recibimos un stream, pedimos el micrófono directamente
     if (!stream) {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        })
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       } catch (e) {
-        emitError('Mic access denied: ' + e.message)
+        emitirError('Micrófono denegado: ' + e.message)
         return
       }
     }
 
-    // Reemplaza tu bloque de params por este:
+    // Parámetros del WebSocket de Deepgram
+    // 'multi' = detección automática del idioma (EN/ES simultáneo)
     const params = new URLSearchParams({
-      model: 'nova-2',
-      language: lang, // 🔥 Esto tomará el valor 'multi' que le envías desde App.jsx
-      smart_format: 'true',
+      model:           'nova-2',
+      language:        lang,
+      smart_format:    'true',
       interim_results: 'true',
-      punctuate: 'true',
+      punctuate:       'true',
     })
 
-    // La inicialización del WebSocket se queda igual a la corrección anterior:
     const ws = new WebSocket(
-      `wss://api.deepgram.com/v1/listen?${params.toString()}`,
+      `${DEEPGRAM_URL}?${params}`,
       ['token', API_KEY]
     )
-
     socketRef.current = ws
 
-    
 
+    // ── Cuando el WebSocket abre ──────────────────────────────
     ws.onopen = () => {
-  activeRef.current = true
-  setActive(true)
+      activoRef.current = true
+      setActive(true)
+      console.log('✅ Deepgram conectado')
 
-  console.log('🎤 WS OPEN - starting recorder')
+      // Elegimos el mejor formato soportado por el navegador/Electron
+      // IMPORTANTE: NO pasamos encoding a Deepgram — él auto-detecta webm/opus
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm'
 
-  const recorder = new MediaRecorder(stream, {
-    mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/webm'
-  })
+      const recorder = new MediaRecorder(stream, { mimeType })
 
-  recorder.ondataavailable = (e) => {
-    console.log('📦 chunk:', e.data.size)
-
-    if (e.data.size > 0 && ws.readyState === 1) {
-      ws.send(e.data)
-    }
-  }
-
-  recorder.onerror = (e) => console.log('recorder error', e)
-
-  recorder.start(250)
-  recorderRef.current = recorder
-}
-
-    
-
-    ws.onmessage = (msg) => {
-      const data = JSON.parse(msg.data)
-
-      if (!data.channel?.alternatives?.length) return
-
-      const alt = data.channel.alternatives[0]
-      const text = alt.transcript?.trim()
-      const langDetected = alt.languages?.[0] || 'unknown'
-
-      if (!text) return
-
-      const payload = {
-        text,
-        lang: langDetected,
-        isFinal: data.is_final,
+      // Enviamos cada chunk de audio al WebSocket
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+          ws.send(e.data)
+        }
       }
+
+      recorder.start(250) // un chunk cada 250ms → ~4 paquetes por segundo
+      recorderRef.current = recorder
+    }
+
+
+    // ── Cuando llega un mensaje de Deepgram ───────────────────
+    ws.onmessage = (msg) => {
+      let data
+      try { data = JSON.parse(msg.data) } catch { return }
+
+      // Solo procesamos mensajes de tipo "Results" (ignoramos metadatos)
+      if (data.type !== 'Results') return
+
+      const alt            = data.channel?.alternatives?.[0]
+      const texto          = alt?.transcript?.trim()
+      const idiomaDetectado = alt?.languages?.[0] || 'en'
+
+      if (!texto) return  // silencio o fragmento vacío
+
+      const payload = { text: texto, lang: idiomaDetectado }
 
       if (data.is_final) {
-        onFinal?.(payload)
+        onFinal?.(payload)    // oración completa y confirmada
       } else {
-        onInterim?.(payload)
+        onInterim?.(payload)  // texto en progreso mientras habla
       }
     }
 
-    ws.onerror = (e) => {
-      emitError('WebSocket error')
-    }
+
+    ws.onerror = () => emitirError('Error en el WebSocket de Deepgram')
 
     ws.onclose = (e) => {
-  console.log('CLOSE CODE:', e.code)
-  console.log('REASON:', e.reason)
-}
+      console.log(`🔌 Deepgram cerrado — código: ${e.code}`, e.reason || '')
+      // Código 1008 = API key inválido
+      if (e.code === 1008) emitirError('API key de Deepgram rechazado (código 1008)')
+      activoRef.current = false
+      setActive(false)
+    }
 
-  }, [lang, onFinal, onInterim, emitError])
+  }, [lang, onFinal, onInterim, emitirError])
 
+
+  // ── Detener transcripción ─────────────────────────────────────
   const stop = useCallback(() => {
+    activoRef.current = false
 
-    activeRef.current = false
-
+    // Detenemos el grabador y cerramos el socket limpiamente
     recorderRef.current?.stop()
     recorderRef.current = null
 
-    socketRef.current?.close(1000, 'stop')
+    socketRef.current?.close(1000, 'Usuario detuvo la grabación')
     socketRef.current = null
 
     setActive(false)
+    setError(null)
   }, [])
+
 
   return { start, stop, active, error }
 }

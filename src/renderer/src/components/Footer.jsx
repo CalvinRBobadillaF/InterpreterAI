@@ -6,7 +6,7 @@ export function Footer({ status = 'Idle', error = null }) {
   return (
     <footer className="app-footer">
       
-      <span className="app-footer__text">Interpreter AI beta 1.0</span>
+      <span className="app-footer__text">Interpreter AI release 1.1</span>
         
       <div className="app-footer__status">
         {error ? (
