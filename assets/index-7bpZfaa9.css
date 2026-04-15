@@ -473,6 +473,175 @@ html.light .source-dropdown {
   color: var(--red);
   font-size: 10px;
   font-weight: 600;
+}
+.panel__body--split {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+.panel__half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.panel__half-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-faint);
+  padding: 6px 16px 2px;
+  flex-shrink: 0;
+}
+.panel__half-divider {
+  height: 1px;
+  background: var(--border-soft);
+  flex-shrink: 0;
+  margin: 0;
+}
+/* ── Bubble list container ───────────────────────────── */
+.bubble-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px 12px;
+  scroll-behavior: smooth;
+}
+.bubble-list--editable {
+  /* same as bubble-list but allows the ghost textarea */
+}
+/* ── Individual bubble ───────────────────────────────── */
+.bubble {
+  display: inline-block;         /* shrink-wrap to text width */
+  align-self: flex-start;        /* left-align */
+  max-width: 92%;
+  padding: 7px 11px;
+  border-radius: 12px 12px 12px 3px;
+  font-size: 14px;
+  line-height: 1.55;
+  word-break: break-word;
+  white-space: pre-wrap;
+  transition: opacity 0.15s;
+}
+/* Source language bubble (top half) */
+.bubble--source {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+/* Translation bubble (bottom half) */
+.bubble--translated {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-ring);
+  color: var(--text);
+}
+/* Interim / live bubble — slightly faded, with blinking cursor */
+.bubble--interim {
+  opacity: 0.65;
+  font-style: italic;
+}
+/* Blinking cursor inside interim bubble */
+.bubble__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 13px;
+  background: var(--accent);
+  border-radius: 1px;
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+/* Ghost textarea (shown only when panel is empty and editable) */
+.panel__textarea--ghost {
+  flex: 1;
+  min-height: 60px;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  caret-color: var(--accent);
+  line-height: 1.55;
+}
+.panel__textarea--ghost::placeholder { color: var(--text-faint); }
+/* ════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS (Móviles y Tablets pequeñas)
+════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* 1. Apilar los paneles verticalmente en lugar de lado a lado */
+  .app-main {
+    flex-direction: column;
+  }
+
+  /* 2. Ajustar el header para que los controles no se desborden */
+  .app-header {
+    padding: 0 8px;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  /* Ocultar elementos no esenciales en pantallas muy pequeñas */
+  .header-brand__title {
+    display: none;
+  }
+  
+  .header-timer {
+    display: none;
+  }
+
+  /* Reducir el padding del selector de fuente (micro/audio) */
+  .header-source {
+    padding: 4px 6px;
+  }
+
+  /* El bloque de la onda de voz ocupa mucho, lo hacemos más flexible */
+  .header-wave-block {
+    flex: 0 1 auto;
+    width: 60px; /* Reducimos su tamaño máximo */
+  }
+
+  /* 3. Ajustar el padding interior de los paneles para ganar espacio de lectura */
+  .panel__body {
+    padding: 12px 14px;
+  }
+
+  .panel__header {
+    padding: 6px 10px;
+  }
+
+  /* 4. Burbujas de chat más legibles para pantallas táctiles */
+  .bubble {
+    max-width: 95%; /* Aprovechar más el ancho de la pantalla */
+    font-size: 15px; /* Un poco más grande para leer sin forzar la vista */
+    padding: 8px 12px;
+  }
+
+  /* 5. Asegurar que los botones tengan buen tamaño para los dedos (Touch Targets) */
+  .header-play, .header-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+/* Opcional: Ajustes extremos para teléfonos muy estrechos (Ej. iPhone SE) */
+@media (max-width: 400px) {
+  .header-source__sub {
+    display: none; /* Ocultar el subtítulo del micrófono para ahorrar espacio */
+  }
+  
+  .waveform {
+    display: none; /* Ocultar animación de audio si no cabe */
+  }
 }/* ════════════════════════════════════════════════════
    LOGIN  —  add these rules to the bottom of App.css
 ════════════════════════════════════════════════════ */

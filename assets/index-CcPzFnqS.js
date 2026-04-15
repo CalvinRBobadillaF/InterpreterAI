@@ -12692,7 +12692,7 @@ function LogIn({ onLogin }) {
         "⚠ ",
         error
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "login-btn", type: "submit", children: "Start Interpreting" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "login-btn", type: "submit", children: "Log in" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-credits", children: [
       "Developed by",
@@ -12880,7 +12880,7 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI beta 1.0" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.1" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12890,10 +12890,27 @@ function Footer({ status = "Idle", error = null }) {
     ] }) })
   ] });
 }
+function BubbleList({ text, interimText, placeholder, variant }) {
+  const anclaRef = reactExports.useRef(null);
+  reactExports.useEffect(() => {
+    anclaRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [text, interimText]);
+  const parrafos = text ? text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean) : [];
+  const hayContenido = parrafos.length > 0 || !!interimText;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble-list", children: [
+    !hayContenido && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__placeholder", children: placeholder }),
+    parrafos.map((para, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `bubble bubble--${variant}`, children: para }, i)),
+    interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `bubble bubble--${variant} bubble--interim`, children: [
+      interimText,
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bubble__cursor" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: anclaRef, style: { height: 1 } })
+  ] });
+}
 function TranslationPanel({
   fromLang,
   toLang,
-  placeholder,
+  placeholder = "",
   readOnly = false,
   value = "",
   translated = "",
@@ -12902,7 +12919,6 @@ function TranslationPanel({
   onChange,
   onClear
 }) {
-  const isEnglishPanel = fromLang.toLowerCase().includes("english");
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__header", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__lang-selector", children: [
@@ -12919,53 +12935,76 @@ function TranslationPanel({
             style: { animation: "spin 1s linear infinite", color: "var(--accent)" }
           }
         ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "panel__action-btn", title: "Limpiar", onClick: onClear, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 }) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__body panel__body--split", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__half panel__half--top", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: fromLang }),
+        readOnly ? (
+          // Panel de solo lectura: muestra burbujas directamente
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            BubbleList,
+            {
+              text: value,
+              interimText,
+              placeholder: placeholder || "Los subtítulos aparecerán aquí...",
+              variant: "source"
+            }
+          )
+        ) : (
+          // Panel editable: si hay texto muestra burbujas, si no muestra textarea
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble-list bubble-list--editable", children: [
+            value.trim() || interimText ? (
+              // Hay contenido → renderizamos burbujas (el usuario puede borrar con el ícono)
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                value.split(/\n\n+/).map((p) => p.trim()).filter(Boolean).map((para, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bubble bubble--source", children: para }, i)),
+                interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble bubble--source bubble--interim", children: [
+                  interimText,
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bubble__cursor" })
+                ] })
+              ] })
+            ) : (
+              // Panel vacío → mostramos el textarea para que el usuario pueda escribir
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  className: "panel__textarea panel__textarea--ghost",
+                  placeholder,
+                  value,
+                  onChange,
+                  spellCheck: false
+                }
+              )
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(AutoScrollAncla, { dep1: value, dep2: interimText })
+          ] })
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-divider" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__half panel__half--bottom", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: toLang }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
+          BubbleList,
           {
-            className: "panel__action-btn",
-            title: "Clear text",
-            onClick: onClear,
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 })
+            text: translated,
+            interimText: "",
+            placeholder: "La traducción aparecerá aquí...",
+            variant: "translated"
           }
         )
       ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__body", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__display panel__dual", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__section panel__section--source", children: readOnly ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        value && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__text--confirmed", children: isEnglishPanel ? value : value }),
-        interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "panel__text--interim", children: [
-          " ",
-          interimText
-        ] }),
-        !value && !interimText && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__placeholder", children: placeholder })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "textarea",
-          {
-            className: "panel__textarea",
-            placeholder,
-            value,
-            onChange,
-            spellCheck: false,
-            style: { overflow: "hidden" },
-            onInput: (e) => {
-              e.target.style.height = "auto";
-              e.target.style.height = e.target.scrollHeight + "px";
-            },
-            ref: (el) => {
-              if (el) {
-                el.style.height = "auto";
-                el.style.height = el.scrollHeight + "px";
-              }
-            }
-          }
-        ),
-        interimText && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__interim-overlay", children: interimText })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__section panel__section--translated", children: translated ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__text--translated", children: translated }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__placeholder", children: "Translation will appear here..." }) })
-    ] }) })
+    ] })
   ] });
 }
+function AutoScrollAncla({ dep1, dep2 }) {
+  const ref = reactExports.useRef(null);
+  reactExports.useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [dep1, dep2]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref, style: { height: 1 } });
+}
+const DEEPGRAM_URL = "wss://api.deepgram.com/v1/listen";
 function useTranscription({
   lang = "en-US",
   onFinal,
@@ -12974,154 +13013,146 @@ function useTranscription({
 } = {}) {
   const socketRef = reactExports.useRef(null);
   const recorderRef = reactExports.useRef(null);
-  const activeRef = reactExports.useRef(false);
+  const activoRef = reactExports.useRef(false);
   const [active, setActive] = reactExports.useState(false);
   const [error, setError] = reactExports.useState(null);
-  const emitError = reactExports.useCallback((msg) => {
+  const emitirError = reactExports.useCallback((msg) => {
     console.error("[Deepgram]", msg);
     setError(msg);
     onError?.(msg);
   }, [onError]);
   const start = reactExports.useCallback(async (stream = null) => {
-    if (activeRef.current) return;
+    if (activoRef.current) return;
     const API_KEY = localStorage.getItem("app_key");
     if (!API_KEY) {
-      emitError("Missing Deepgram API key");
+      emitirError("Falta el API key de Deepgram");
       return;
     }
     if (!stream) {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: true
-        });
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch (e) {
-        emitError("Mic access denied: " + e.message);
+        emitirError("Micrófono denegado: " + e.message);
         return;
       }
     }
     const params = new URLSearchParams({
       model: "nova-2",
       language: lang,
-      // 🔥 Esto tomará el valor 'multi' que le envías desde App.jsx
       smart_format: "true",
       interim_results: "true",
       punctuate: "true"
     });
     const ws = new WebSocket(
-      `wss://api.deepgram.com/v1/listen?${params.toString()}`,
+      `${DEEPGRAM_URL}?${params}`,
       ["token", API_KEY]
     );
     socketRef.current = ws;
     ws.onopen = () => {
-      activeRef.current = true;
+      activoRef.current = true;
       setActive(true);
-      console.log("🎤 WS OPEN - starting recorder");
-      const recorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm"
-      });
+      console.log("✅ Deepgram conectado");
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
+      const recorder = new MediaRecorder(stream, { mimeType });
       recorder.ondataavailable = (e) => {
-        console.log("📦 chunk:", e.data.size);
-        if (e.data.size > 0 && ws.readyState === 1) {
+        if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
           ws.send(e.data);
         }
       };
-      recorder.onerror = (e) => console.log("recorder error", e);
       recorder.start(250);
       recorderRef.current = recorder;
     };
     ws.onmessage = (msg) => {
-      const data = JSON.parse(msg.data);
-      if (!data.channel?.alternatives?.length) return;
-      const alt = data.channel.alternatives[0];
-      const text = alt.transcript?.trim();
-      const langDetected = alt.languages?.[0] || "unknown";
-      if (!text) return;
-      const payload = {
-        text,
-        lang: langDetected,
-        isFinal: data.is_final
-      };
+      let data;
+      try {
+        data = JSON.parse(msg.data);
+      } catch {
+        return;
+      }
+      if (data.type !== "Results") return;
+      const alt = data.channel?.alternatives?.[0];
+      const texto = alt?.transcript?.trim();
+      const idiomaDetectado = alt?.languages?.[0] || "en";
+      if (!texto) return;
+      const payload = { text: texto, lang: idiomaDetectado };
       if (data.is_final) {
         onFinal?.(payload);
       } else {
         onInterim?.(payload);
       }
     };
-    ws.onerror = (e) => {
-      emitError("WebSocket error");
-    };
+    ws.onerror = () => emitirError("Error en el WebSocket de Deepgram");
     ws.onclose = (e) => {
-      console.log("CLOSE CODE:", e.code);
-      console.log("REASON:", e.reason);
+      console.log(`🔌 Deepgram cerrado — código: ${e.code}`, e.reason || "");
+      if (e.code === 1008) emitirError("API key de Deepgram rechazado (código 1008)");
+      activoRef.current = false;
+      setActive(false);
     };
-  }, [lang, onFinal, onInterim, emitError]);
+  }, [lang, onFinal, onInterim, emitirError]);
   const stop = reactExports.useCallback(() => {
-    activeRef.current = false;
+    activoRef.current = false;
     recorderRef.current?.stop();
     recorderRef.current = null;
-    socketRef.current?.close(1e3, "stop");
+    socketRef.current?.close(1e3, "Usuario detuvo la grabación");
     socketRef.current = null;
     setActive(false);
+    setError(null);
   }, []);
   return { start, stop, active, error };
 }
 const IS_ELECTRON = !!window.electronAPI?.isElectron;
-async function callTranslate({ text, from, to }) {
+const BACKEND_URL = "https://interpreterbk.onrender.com/api/translate";
+(function mantenerDespierto() {
+  const pingUrl = BACKEND_URL.replace("/api/translate", "");
+  fetch(pingUrl, { method: "GET" }).catch(() => {
+  });
+  setInterval(() => {
+    fetch(pingUrl, { method: "GET" }).catch(() => {
+    });
+  }, 5 * 60 * 1e3);
+})();
+const globalCache = /* @__PURE__ */ new Map();
+async function callTranslate({ text, from, to, signal }) {
   const clean = text?.trim();
   if (!clean) return "";
-  const url = `https://interpreterbk.onrender.com/api/translate`;
   if (IS_ELECTRON && window.electronAPI?.translate) {
     try {
       const result = await window.electronAPI.translate({ text: clean, from, to });
       if (result) return result;
     } catch (e) {
-      console.error("[Translation] IPC Error, falling back to Web:", e);
+      console.warn("[Traducción] IPC falló, usando web:", e.message);
     }
   }
   try {
-    const res = await fetch(url, {
+    const res = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal,
+      // Permite cancelar la petición si queda obsoleta
       body: JSON.stringify({
         text: clean,
         source_lang: from,
-        target_lang: to === "en" ? "EN-US" : to
+        target_lang: to === "en" ? "EN-US" : to.toUpperCase()
       })
     });
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.detail || "Server Error");
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `HTTP ${res.status}`);
     }
     const data = await res.json();
     return data.translated_text || clean;
   } catch (e) {
-    console.error("[Translation] Backend Error:", e);
+    if (e.name === "AbortError") return null;
+    console.error("[Traducción] Error:", e.message);
     return clean;
   }
-}
-function useTranslation({ from = "en", to = "es" } = {}) {
-  const cacheRef = reactExports.useRef(/* @__PURE__ */ new Map());
-  const translate = reactExports.useCallback(async (text) => {
-    const clean = text?.trim();
-    if (!clean) return "";
-    const cacheKey = `${from}|${to}:${clean}`;
-    if (cacheRef.current.has(cacheKey)) {
-      return cacheRef.current.get(cacheKey);
-    }
-    const result = await callTranslate({ text: clean, from, to });
-    if (result && result !== clean) {
-      cacheRef.current.set(cacheKey, result);
-    }
-    return result;
-  }, [from, to]);
-  return { translate };
 }
 function useAutoTranslation(sourceText, {
   from = "en",
   to = "es",
-  debounceMs = 600
+  debounceMs = 300
+  // Debounce rápido para que se sienta fluido
 } = {}) {
-  const { translate } = useTranslation({ from, to });
   const [result, setResult] = reactExports.useState("");
   const [translating, setTranslating] = reactExports.useState(false);
   const timerRef = reactExports.useRef(null);
@@ -13130,31 +13161,56 @@ function useAutoTranslation(sourceText, {
       setResult("");
       return;
     }
+    const controller = new AbortController();
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
       setTranslating(true);
-      const translated = await translate(sourceText);
-      setResult(translated);
+      const paragraphs = sourceText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+      const translationPromises = paragraphs.map(async (p) => {
+        const cacheKey = `${from}|${to}:${p}`;
+        if (globalCache.has(cacheKey)) {
+          return globalCache.get(cacheKey);
+        }
+        const translatedResult = await callTranslate({
+          text: p,
+          from,
+          to,
+          signal: controller.signal
+        });
+        if (translatedResult) {
+          globalCache.set(cacheKey, translatedResult);
+          return translatedResult;
+        }
+        return "";
+      });
+      const results = await Promise.all(translationPromises);
+      const finalTranslatedText = results.filter(Boolean).join("\n\n");
+      if (finalTranslatedText) {
+        setResult(finalTranslatedText);
+      }
       setTranslating(false);
     }, debounceMs);
-    return () => clearTimeout(timerRef.current);
-  }, [sourceText, translate, debounceMs]);
+    return () => {
+      clearTimeout(timerRef.current);
+      controller.abort();
+    };
+  }, [sourceText, from, to, debounceMs]);
   return { translatedText: result, translating };
 }
 const startElectronCapture = async () => {
   if (!window.electronAPI?.getAudioSource) {
-    console.error("[ElectronCapture] electronAPI.getAudioSource not found. Is preload.js loaded?");
+    console.error("[Electron] electronAPI no encontrado. ¿Está cargado el preload.js?");
     return null;
   }
-  let source;
+  let fuente;
   try {
-    source = await window.electronAPI.getAudioSource();
+    fuente = await window.electronAPI.getAudioSource();
   } catch (e) {
-    console.error("[ElectronCapture] IPC error:", e);
+    console.error("[Electron] Error IPC:", e);
     return null;
   }
-  if (!source) {
-    console.error("[ElectronCapture] No desktop audio source returned from main process.");
+  if (!fuente) {
+    console.error("[Electron] El proceso principal no devolvió ninguna fuente de audio");
     return null;
   }
   try {
@@ -13162,57 +13218,70 @@ const startElectronCapture = async () => {
       audio: {
         mandatory: {
           chromeMediaSource: "desktop",
-          chromeMediaSourceId: source.id,
-          // Disable audio processing — we want raw system audio
+          chromeMediaSourceId: fuente.id,
+          // Desactivamos el procesamiento de audio — queremos el sonido crudo del sistema
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false
         }
       },
-      // We must request video alongside audio for desktop capture,
-      // then immediately discard the video tracks.
+      // Requerimos video aunque no lo usemos — es necesario para desktop capture
       video: {
         mandatory: {
           chromeMediaSource: "desktop",
-          chromeMediaSourceId: source.id
+          chromeMediaSourceId: fuente.id
         }
       }
     });
-    stream.getVideoTracks().forEach((track) => track.stop());
-    console.log("[ElectronCapture] System audio stream ready.");
+    stream.getVideoTracks().forEach((t) => t.stop());
+    console.log("[Electron] Stream de audio del sistema listo");
     return stream;
   } catch (e) {
-    console.error("[ElectronCapture] getUserMedia failed:", e);
+    console.error("[Electron] getUserMedia falló:", e);
     return null;
   }
 };
+const ES_MAC = navigator.platform?.toUpperCase().includes("MAC") || navigator.userAgent?.includes("Mac");
 const startBrowserCapture = async () => {
+  if (ES_MAC) {
+    console.info(
+      '[Captura] Estás en macOS.\nPara audio de pestaña: en el diálogo, elige una pestaña de Chrome específica\n(no "Pantalla" ni "Ventana"), y marca la casilla "Compartir audio de la pestaña".\nPara audio del sistema, usa la fuente "System Audio" en el encabezado.'
+    );
+  }
+  let stream;
   try {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
+    stream = await navigator.mediaDevices.getDisplayMedia({
       audio: {
         echoCancellation: false,
         noiseSuppression: false,
-        sampleRate: 44100
+        autoGainControl: false,
+        // En Windows/Linux pedimos calidad más alta; en Mac se ignora
+        ...ES_MAC ? {} : { channelCount: 2, sampleRate: 44100 }
       },
-      // We request video so the dialog appears, but discard it.
-      // Some browsers require video: true for getDisplayMedia.
-      video: true
+      video: {
+        // Pedimos la resolución mínima — descartamos el video de todas formas
+        width: { ideal: 1 },
+        height: { ideal: 1 },
+        frameRate: { ideal: 1 }
+      }
     });
-    stream.getVideoTracks().forEach((track) => track.stop());
-    if (stream.getAudioTracks().length === 0) {
-      console.warn('[BrowserCapture] No audio track — user may not have checked "Share tab audio".');
-      return null;
-    }
-    console.log("[BrowserCapture] Tab audio stream ready.");
-    return stream;
   } catch (e) {
     if (e.name === "NotAllowedError") {
-      console.warn("[BrowserCapture] User cancelled the screen share dialog.");
-    } else {
-      console.error("[BrowserCapture] getDisplayMedia failed:", e);
+      return { stream: null, reason: "cancelled" };
     }
-    return null;
+    console.error("[Captura] getDisplayMedia falló:", e);
+    return { stream: null, reason: e.message };
   }
+  stream.getVideoTracks().forEach((t) => t.stop());
+  if (stream.getAudioTracks().length === 0) {
+    return {
+      stream: null,
+      reason: ES_MAC ? "mac-no-audio" : "no-audio-track",
+      userMessage: ES_MAC ? 'Sin audio. En Mac, elige una pestaña de Chrome y marca "Compartir audio de la pestaña".' : 'Sin audio. Asegúrate de marcar "Compartir audio de la pestaña" en el diálogo.'
+    };
+  }
+  console.log("[Captura] Stream de audio listo:", stream.getAudioTracks()[0].label);
+  return { stream, reason: null };
 };
 function App() {
   const [isLoggedIn, setIsLoggedIn] = reactExports.useState(
@@ -13238,44 +13307,35 @@ function App() {
   const { translatedText: enToEs } = useAutoTranslation(englishText, {
     from: "en",
     to: "es",
-    debounceMs: 500
+    debounceMs: 300
   });
   const { translatedText: esToEn } = useAutoTranslation(spanishText, {
     from: "es",
     to: "en",
-    debounceMs: 500
+    debounceMs: 300
   });
-  const {
-    start: startTranscription,
-    stop: stopTranscription,
-    error: transcriptionError
-  } = useTranscription({
+  const { start: startTranscription, stop: stopTranscription, error: transcriptionError } = useTranscription({
     lang: "multi",
+    // Deepgram detecta EN y ES simultáneamente
+    // onFinal: oración completa confirmada → se agrega al buffer
     onFinal: reactExports.useCallback(({ text, lang }) => {
-      const appendWithSpacing = (prevText, newText) => {
-        if (!prevText) return newText;
-        const prevTrimmed = prevText.trim();
-        const newTrimmed = newText.trim();
-        const hasPunctuation = /[.!?]$/.test(prevTrimmed);
-        const separator = hasPunctuation ? "\n\n" : " ";
-        return prevTrimmed + separator + newTrimmed;
+      const agregar = (previo, nuevo) => {
+        if (!previo) return nuevo;
+        const tienePuntuacion = /[.!?]$/.test(previo.trim());
+        return previo.trim() + (tienePuntuacion ? "\n\n" : " ") + nuevo.trim();
       };
       if (lang.startsWith("en")) {
         setInterimEnglish("");
-        setEnglishText((prev) => appendWithSpacing(prev, text));
-      }
-      if (lang.startsWith("es")) {
+        setEnglishText((prev) => agregar(prev, text));
+      } else if (lang.startsWith("es")) {
         setInterimSpanish("");
-        setSpanishText((prev) => appendWithSpacing(prev, text));
+        setSpanishText((prev) => agregar(prev, text));
       }
     }, []),
+    // onInterim: texto en progreso → se muestra en la burbuja parpadeante
     onInterim: reactExports.useCallback(({ text, lang }) => {
-      if (lang.startsWith("en")) {
-        setInterimEnglish(text);
-      }
-      if (lang.startsWith("es")) {
-        setInterimSpanish(text);
-      }
+      if (lang.startsWith("en")) setInterimEnglish(text);
+      else if (lang.startsWith("es")) setInterimSpanish(text);
     }, []),
     onError: reactExports.useCallback((err) => {
       setFooterError(err);
@@ -13284,33 +13344,27 @@ function App() {
     }, [])
   });
   const handleTogglePlay = reactExports.useCallback(async () => {
-    console.log("1️⃣ CLICK");
     if (!playing) {
       setFooterError(null);
       let stream = null;
       if (source === "electron") {
-        console.log("🖥 SYSTEM AUDIO MODE");
         stream = await startElectronCapture();
         if (!stream) {
-          setFooterError("Could not capture system audio.");
+          setFooterError("No se pudo capturar el audio del sistema.");
           return;
         }
-        setFooterStatus("System Audio — Listening...");
+        setFooterStatus("Audio del sistema — Escuchando...");
       } else if (source === "tab") {
-        console.log("🌐 TAB AUDIO MODE");
-        stream = await startBrowserCapture();
-        if (!stream) {
-          setFooterError("Tab capture cancelled.");
+        const resultado = await startBrowserCapture();
+        if (!resultado.stream) {
+          setFooterError(resultado.userMessage || "Captura de pestaña cancelada.");
           return;
         }
-        setFooterStatus("Tab Audio — Listening...");
+        stream = resultado.stream;
+        setFooterStatus("Audio de pestaña — Escuchando...");
       } else {
-        console.log("🎤 MIC MODE");
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: false
-        });
-        setFooterStatus("Microphone — Listening...");
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        setFooterStatus("Micrófono — Escuchando...");
       }
       streamRef.current = stream;
       await startTranscription(stream);
@@ -13347,7 +13401,7 @@ function App() {
         {
           fromLang: "EN",
           toLang: "ES",
-          placeholder: playing ? "Listening..." : "Press ▶ to start",
+          placeholder: playing ? "Escuchando..." : "Presiona ▶ para comenzar",
           value: englishText,
           translated: enToEs,
           interimText: interimEnglish,
