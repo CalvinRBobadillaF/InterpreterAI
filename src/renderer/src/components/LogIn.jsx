@@ -1,10 +1,10 @@
 /**
  * components/LogIn.jsx
  * ─────────────────────────────────────────────────────────────────
- * Saves two keys to localStorage:
- *   app_key   → Deepgram API key  (speech-to-text)
- *   deepl_key → DeepL API key     (translation)
- *   app_name  → user display name
+ * Saves keys and info to localStorage:
+ * app_key   → Deepgram API key (speech-to-text)
+ * app_name  → user display name
+ * * NOTE: DeepL key is now managed securely via Backend (FastAPI).
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -15,10 +15,8 @@ import '../assets/login.css'
 export function LogIn({ onLogin }) {
   const [name, setName] = useState('')
   const [deepgramKey, setDeepgramKey] = useState(localStorage.getItem('app_key') || '')
-  const [deeplKey, setDeeplKey] = useState(localStorage.getItem('deepl_key') || '')
   const [error, setError] = useState('')
   
-  // Estado para el toggle de instrucciones del componente original
   const [showInstructions, setShowInstructions] = useState(false)
 
   const handleSubmit = (e) => {
@@ -33,14 +31,10 @@ export function LogIn({ onLogin }) {
       setError('Deepgram API key is required for transcription.')
       return
     }
-    if (!deeplKey.trim()) {
-      setError('DeepL API key is required for translation.')
-      return
-    }
 
+    // Guardamos solo lo necesario localmente
     localStorage.setItem('app_name', name.trim())
     localStorage.setItem('app_key', deepgramKey.trim())
-    localStorage.setItem('deepl_key', deeplKey.trim())
 
     onLogin()
   }
@@ -56,7 +50,9 @@ export function LogIn({ onLogin }) {
         </div>
 
         <p className="login-subtitle">
-          Enter your API keys to get started. Keys are stored locally and never sent to our servers.
+          Welcome! Enter your name and Deepgram key to start transcribing. 
+          <br />
+          <span style={{ fontSize: '0.85em', opacity: 0.8 }}>Professional translation is now automatically enabled.</span>
         </p>
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -97,30 +93,7 @@ export function LogIn({ onLogin }) {
             <span className="login-hint">Used for real-time speech-to-text (12,000 min/year free)</span>
           </div>
 
-          {/* DeepL */}
-          <div className="login-field">
-            <label className="login-label">
-              DeepL API Key
-              <a
-                className="login-label__link"
-                href="https://www.deepl.com/pro-api"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Get free key →
-              </a>
-            </label>
-            <input
-              className="login-input login-input--mono"
-              type="password"
-              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx"
-              value={deeplKey}
-              onChange={e => setDeeplKey(e.target.value)}
-            />
-            <span className="login-hint">Used for translation (500,000 chars/month free)</span>
-          </div>
-
-          {/* Instructions Toggle (Mantenido de la versión 1) */}
+          {/* Instructions Toggle */}
           <div className="login-instructions">
             <button 
               type="button" 
@@ -133,13 +106,11 @@ export function LogIn({ onLogin }) {
             
             <div className={`instructions-content ${showInstructions ? 'is-open' : ''}`}>
               <p>
-                Enter your name and both API keys.
+                1. <strong>Deepgram:</strong> For high-speed transcription. Get your own key at their console.
                 <br /><br />
-                1. <strong>Deepgram:</strong> For high-speed transcription.
-                <br />
-                2. <strong>DeepL:</strong> For professional translation accuracy.
+                2. <strong>DeepL:</strong> Integrated via secure backend. No key required from the user.
                 <br /><br />
-                Ask Calvin Bobadilla for credentials if needed.
+                Ask Calvin Bobadilla if you need help with credentials.
               </p>
             </div>
           </div>
@@ -154,7 +125,6 @@ export function LogIn({ onLogin }) {
 
         </form>
 
-        {/* Credits (Mantenido de la versión 1) */}
         <div className="login-credits">
           Developed by{' '}
           <a href="https://github.com/CalvinRBobadillaF" target="_blank" rel="noreferrer">

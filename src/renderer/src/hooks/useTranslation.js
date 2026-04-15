@@ -1,15 +1,12 @@
 /**
  * hooks/useTranslation.js
  * ─────────────────────────────────────────────────────────────────
- * WHY IPC:
- *   DeepL rejects fetch() calls from Electron's renderer process due to
- *   CORS restrictions. The solution is to route the HTTP request through
- *   the main process via IPC — main process uses Electron's `net` module
- *   which has no CORS restrictions.
- *
- * KEY STORAGE:
- *   The DeepL key is stored as 'deepl_key' in localStorage (set in LogIn).
- *   The Deepgram key is stored separately as 'app_key'.
+ * ARCHITECTURE:
+ * Now uses a secure FastAPI backend on Render to handle DeepL 
+ * translations. This protects the API Key and bypasses CORS.
+ * * NOTE: 
+ * The Deepgram key (app_key) is still kept in localStorage as 
+ * requested for the STT service.
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -18,45 +15,49 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 const IS_ELECTRON = !!window.electronAPI?.isElectron
 
 // ── Core translate function ────────────────────────────────────────
-async function callTranslate({ text, from, to, apiKey }) {
+async function callTranslate({ text, from, to }) {
   const clean = text?.trim();
-  if (!clean || !apiKey) return clean || '';
+  if (!clean) return '';
 
-  if (IS_ELECTRON) {
-    try {
-      // ⚠️ ASEGÚRATE de que en tu preload.js el nombre sea 'translate'
-      // o cámbialo aquí al nombre que tengas en el preload.
-      const result = await window.electronAPI.translate({ text: clean, from, to, apiKey });
-      return result || clean;
-    } catch (e) {
-      console.error('[Translation] IPC error:', e);
-      return clean;
-    }
-  } else {
-    // 🌐 WEB FALLBACK (Aquí es donde el CSP suele molestar)
-    const url = `https://api-free.deepl.com/v2/translate`;
-    const body = new URLSearchParams({
-      auth_key: apiKey,
-      text: clean,
-      source_lang: from.toUpperCase(),
-      target_lang: to.toUpperCase() === 'EN' ? 'EN-US' : to.toUpperCase(),
-    });
+  // 🚀 Tu endpoint oficial en Render
+  const url = `https://interpreterbk.onrender.com/api/translate`; 
 
+  if (IS_ELECTRON && window.electronAPI?.translate) {
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
-      });
-      const data = await res.json();
-      return data?.translations?.[0]?.text || clean;
+      // Si estás en Electron, intenta usar el IPC (si está configurado)
+      // De lo contrario, caerá al bloque fetch de abajo.
+      const result = await window.electronAPI.translate({ text: clean, from, to });
+      if (result) return result;
     } catch (e) {
-      // Si ves este error en la web, es el CSP bloqueando el fetch
-      console.error('[Translation] Web Fetch blocked by CSP or CORS', e);
-      return clean;
+      console.error('[Translation] IPC Error, falling back to Web:', e);
     }
   }
+
+  // 🌐 WEB FETCH (Para GitHub Pages y Navegadores)
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: clean,
+        source_lang: from,
+        target_lang: to === 'en' ? 'EN-US' : to,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.detail || 'Server Error');
+    }
+    
+    const data = await res.json();
+    return data.translated_text || clean;
+  } catch (e) {
+    console.error('[Translation] Backend Error:', e);
+    return clean; // Retorna el texto original si falla
+  }
 }
+
 // ── useTranslation ────────────────────────────────────────────────
 export function useTranslation({ from = 'en', to = 'es' } = {}) {
   const cacheRef = useRef(new Map())
@@ -65,18 +66,18 @@ export function useTranslation({ from = 'en', to = 'es' } = {}) {
     const clean = text?.trim()
     if (!clean) return ''
 
-    // Read key fresh each call (user may have just logged in)
-    const apiKey = localStorage.getItem('deepl_key') || ''
-    if (!apiKey) {
-      console.warn('[Translation] deepl_key not found in localStorage')
-      return clean
+    // Generamos una llave de caché para no traducir lo mismo dos veces
+    const cacheKey = `${from}|${to}:${clean}`
+    if (cacheRef.current.has(cacheKey)) {
+      return cacheRef.current.get(cacheKey)
     }
 
-    const cacheKey = `${from}|${to}:${clean}`
-    if (cacheRef.current.has(cacheKey)) return cacheRef.current.get(cacheKey)
-
-    const result = await callTranslate({ text: clean, from, to, apiKey })
-    if (result && result !== clean) cacheRef.current.set(cacheKey, result)
+    // Llamamos al backend sin pasar ninguna API Key (ya la tiene el server)
+    const result = await callTranslate({ text: clean, from, to })
+    
+    if (result && result !== clean) {
+      cacheRef.current.set(cacheKey, result)
+    }
     return result
   }, [from, to])
 
@@ -84,14 +85,13 @@ export function useTranslation({ from = 'en', to = 'es' } = {}) {
 }
 
 // ── useAutoTranslation ─────────────────────────────────────────────
-// Watches sourceText and auto-translates with debounce.
 export function useAutoTranslation(sourceText, {
   from       = 'en',
   to         = 'es',
   debounceMs = 600,
 } = {}) {
-  const { translate }             = useTranslation({ from, to })
-  const [result, setResult]       = useState('')
+  const { translate } = useTranslation({ from, to })
+  const [result, setResult] = useState('')
   const [translating, setTranslating] = useState(false)
   const timerRef = useRef(null)
 
