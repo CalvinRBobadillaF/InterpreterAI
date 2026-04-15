@@ -12528,48 +12528,24 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$b = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$b);
-const __iconNode$a = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$a);
-const __iconNode$9 = [
+const __iconNode$9 = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$9);
+const __iconNode$8 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$8);
+const __iconNode$7 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const Globe = createLucideIcon("globe", __iconNode$9);
-const __iconNode$8 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-const LoaderCircle = createLucideIcon("loader-circle", __iconNode$8);
-const __iconNode$7 = [
-  [
-    "path",
-    {
-      d: "m11 7.601-5.994 8.19a1 1 0 0 0 .1 1.298l.817.818a1 1 0 0 0 1.314.087L15.09 12",
-      key: "80a601"
-    }
-  ],
-  [
-    "path",
-    {
-      d: "M16.5 21.174C15.5 20.5 14.372 20 13 20c-2.058 0-3.928 2.356-6 2-2.072-.356-2.775-3.369-1.5-4.5",
-      key: "j0ngtp"
-    }
-  ],
-  ["circle", { cx: "16", cy: "7", r: "5", key: "d08jfb" }]
-];
-const MicVocal = createLucideIcon("mic-vocal", __iconNode$7);
-const __iconNode$6 = [
+const Globe = createLucideIcon("globe", __iconNode$7);
+const __iconNode$6 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+const LoaderCircle = createLucideIcon("loader-circle", __iconNode$6);
+const __iconNode$5 = [
   ["path", { d: "M12 19v3", key: "npa21l" }],
   ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
   ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
 ];
-const Mic = createLucideIcon("mic", __iconNode$6);
-const __iconNode$5 = [
-  ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2", key: "48i651" }],
-  ["line", { x1: "8", x2: "16", y1: "21", y2: "21", key: "1svkeh" }],
-  ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
-];
-const Monitor = createLucideIcon("monitor", __iconNode$5);
+const Mic = createLucideIcon("mic", __iconNode$5);
 const __iconNode$4 = [
   [
     "path",
@@ -12616,65 +12592,108 @@ const __iconNode = [
 const Trash2 = createLucideIcon("trash-2", __iconNode);
 function LogIn({ onLogin }) {
   const [name, setName] = reactExports.useState("");
-  const [apiKey, setApiKey] = reactExports.useState("");
+  const [deepgramKey, setDeepgramKey] = reactExports.useState(localStorage.getItem("app_key") || "");
+  const [error, setError] = reactExports.useState("");
   const [showInstructions, setShowInstructions] = reactExports.useState(false);
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name.trim() || !apiKey.trim()) return;
+    setError("");
+    if (!name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
+    if (!deepgramKey.trim()) {
+      setError("Deepgram API key is required for transcription.");
+      return;
+    }
     localStorage.setItem("app_name", name.trim());
-    localStorage.setItem("app_key", apiKey.trim());
-    window.location.reload();
+    localStorage.setItem("app_key", deepgramKey.trim());
     onLogin();
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "login-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, className: "login-card", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-header", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "login-icon-container", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MicVocal, { size: 24, strokeWidth: 1.5 }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { children: "Interpreter AI beta v1.0" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Sign in " })
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "login-shell", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-card", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-brand", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "login-brand__dot" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-brand__title", children: "Interpreter AI" })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-form-body", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "login-subtitle", children: [
+      "Welcome! Enter your name and Deepgram key to start transcribing.",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "0.85em", opacity: 0.8 }, children: "Professional translation is now automatically enabled." })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { className: "login-form", onSubmit: handleSubmit, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-field", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Display Name" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "login-label", children: "Your Name" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "input",
           {
+            className: "login-input",
             type: "text",
+            placeholder: "e.g. Maria López",
             value: name,
             onChange: (e) => setName(e.target.value),
-            placeholder: "Your name (optional)",
-            required: true
+            autoFocus: true
           }
         )
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-field", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Deepgram API Key" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "login-label", children: [
+          "Deepgram API Key",
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              className: "login-label__link",
+              href: "https://console.deepgram.com",
+              target: "_blank",
+              rel: "noreferrer",
+              children: "Get free key →"
+            }
+          )
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "input",
           {
+            className: "login-input login-input--mono",
             type: "password",
-            value: apiKey,
-            onChange: (e) => setApiKey(e.target.value),
-            placeholder: ""
+            placeholder: "deepgram_xxxxxxxxxxxxxxxxxxxxxxxx",
+            value: deepgramKey,
+            onChange: (e) => setDeepgramKey(e.target.value)
           }
-        )
-      ] })
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Used for real-time speech-to-text (12,000 min/year free)" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-instructions", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: () => setShowInstructions(!showInstructions),
+            className: "instructions-toggle",
+            children: [
+              showInstructions ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { size: 12 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 12 }),
+              "How to get access?"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `instructions-content ${showInstructions ? "is-open" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+          "1. ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Deepgram:" }),
+          " For high-speed transcription. Get your own key at their console.",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          "2. ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DeepL:" }),
+          " Integrated via secure backend. No key required from the user.",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          "Ask Calvin Bobadilla if you need help with credentials."
+        ] }) })
+      ] }),
+      error && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-error", children: [
+        "⚠ ",
+        error
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "login-btn", type: "submit", children: "Start Interpreting" })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-instructions", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          type: "button",
-          onClick: () => setShowInstructions(!showInstructions),
-          className: "instructions-toggle",
-          children: [
-            showInstructions ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { size: 12 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 12 }),
-            "How i get access?"
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `instructions-content ${showInstructions ? "is-open" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "In the first input, enter your name, and in the deepgram api key input, the key that you will use to transcribe and translate. If you dont have one, ask Calvin Bobadilla for access or create one." }) })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { type: "submit", className: "login-submit-btn", children: "Continue" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-credits", children: [
       "Developed by",
       " ",
@@ -12742,13 +12761,6 @@ const SOURCES = [
     sub: "Default input",
     Icon: Mic,
     note: "Works immediately with Web Speech API"
-  },
-  {
-    id: "electron",
-    label: "System Audio",
-    sub: "Desktop capture",
-    Icon: Monitor,
-    note: "Electron only — captures computer audio"
   },
   {
     id: "tab",
@@ -12856,6 +12868,7 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
           onClick: () => {
             localStorage.removeItem("app_name");
             localStorage.removeItem("app_key");
+            localStorage.removeItem("deepl_key");
             window.location.reload();
           },
           title: "Log out and clear data",
@@ -12888,7 +12901,6 @@ function TranslationPanel({
   loading = false,
   onChange,
   onClear
-  // 🔥 nuevo
 }) {
   const isEnglishPanel = fromLang.toLowerCase().includes("english");
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel", children: [
@@ -12934,7 +12946,18 @@ function TranslationPanel({
             placeholder,
             value,
             onChange,
-            spellCheck: false
+            spellCheck: false,
+            style: { overflow: "hidden" },
+            onInput: (e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            },
+            ref: (el) => {
+              if (el) {
+                el.style.height = "auto";
+                el.style.height = el.scrollHeight + "px";
+              }
+            }
           }
         ),
         interimText && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__interim-overlay", children: interimText })
@@ -12943,7 +12966,6 @@ function TranslationPanel({
     ] }) })
   ] });
 }
-const API_KEY = localStorage.getItem("app_key");
 function useTranscription({
   lang = "en-US",
   onFinal,
@@ -12962,6 +12984,7 @@ function useTranscription({
   }, [onError]);
   const start = reactExports.useCallback(async (stream = null) => {
     if (activeRef.current) return;
+    const API_KEY = localStorage.getItem("app_key");
     if (!API_KEY) {
       emitError("Missing Deepgram API key");
       return;
@@ -13042,33 +13065,54 @@ function useTranscription({
   }, []);
   return { start, stop, active, error };
 }
-const MYMEMORY = "https://api.mymemory.translated.net/get";
+const IS_ELECTRON = !!window.electronAPI?.isElectron;
+async function callTranslate({ text, from, to }) {
+  const clean = text?.trim();
+  if (!clean) return "";
+  const url = `https://interpreterbk.onrender.com/api/translate`;
+  if (IS_ELECTRON && window.electronAPI?.translate) {
+    try {
+      const result = await window.electronAPI.translate({ text: clean, from, to });
+      if (result) return result;
+    } catch (e) {
+      console.error("[Translation] IPC Error, falling back to Web:", e);
+    }
+  }
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: clean,
+        source_lang: from,
+        target_lang: to === "en" ? "EN-US" : to
+      })
+    });
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.detail || "Server Error");
+    }
+    const data = await res.json();
+    return data.translated_text || clean;
+  } catch (e) {
+    console.error("[Translation] Backend Error:", e);
+    return clean;
+  }
+}
 function useTranslation({ from = "en", to = "es" } = {}) {
   const cacheRef = reactExports.useRef(/* @__PURE__ */ new Map());
-  const controllerRef = reactExports.useRef(null);
   const translate = reactExports.useCallback(async (text) => {
     const clean = text?.trim();
     if (!clean) return "";
-    const key = `${from}|${to}:${clean}`;
-    if (cacheRef.current.has(key)) return cacheRef.current.get(key);
-    controllerRef.current?.abort();
-    controllerRef.current = new AbortController();
-    try {
-      const url = `${MYMEMORY}?q=${encodeURIComponent(clean)}&langpair=${from}|${to}`;
-      const res = await fetch(url, { signal: controllerRef.current.signal });
-      const data = await res.json();
-      if (data.responseStatus === 200) {
-        const result = data.responseData.translatedText;
-        cacheRef.current.set(key, result);
-        return result;
-      }
-      console.warn("[Translation] API error:", data.responseStatus, data.responseDetails);
-      return clean;
-    } catch (e) {
-      if (e.name === "AbortError") return "";
-      console.warn("[Translation] fetch error:", e);
-      return clean;
+    const cacheKey = `${from}|${to}:${clean}`;
+    if (cacheRef.current.has(cacheKey)) {
+      return cacheRef.current.get(cacheKey);
     }
+    const result = await callTranslate({ text: clean, from, to });
+    if (result && result !== clean) {
+      cacheRef.current.set(cacheKey, result);
+    }
+    return result;
   }, [from, to]);
   return { translate };
 }
@@ -13208,13 +13252,21 @@ function App() {
   } = useTranscription({
     lang: "multi",
     onFinal: reactExports.useCallback(({ text, lang }) => {
+      const appendWithSpacing = (prevText, newText) => {
+        if (!prevText) return newText;
+        const prevTrimmed = prevText.trim();
+        const newTrimmed = newText.trim();
+        const hasPunctuation = /[.!?]$/.test(prevTrimmed);
+        const separator = hasPunctuation ? "\n\n" : " ";
+        return prevTrimmed + separator + newTrimmed;
+      };
       if (lang.startsWith("en")) {
         setInterimEnglish("");
-        setEnglishText((prev) => (prev ? prev + " " : "") + text);
+        setEnglishText((prev) => appendWithSpacing(prev, text));
       }
       if (lang.startsWith("es")) {
         setInterimSpanish("");
-        setSpanishText((prev) => (prev ? prev + " " : "") + text);
+        setSpanishText((prev) => appendWithSpacing(prev, text));
       }
     }, []),
     onInterim: reactExports.useCallback(({ text, lang }) => {
