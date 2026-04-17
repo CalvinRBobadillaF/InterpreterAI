@@ -1,43 +1,26 @@
 /**
  * components/TranslationPanel.jsx
  *
- * ESTRUCTURA VISUAL:
- *   ┌──────────────────────────────────┐
- *   │ Header: EN → ES   [spinner][🗑] │
- *   ├──────────────────────────────────┤
- *   │ Etiqueta "EN"                    │
- *   │ [burbuja] Hola, ¿cómo estás?     │  ← texto original / subtítulos
- *   │ [burbuja parpadeante] interim... │
- *   ├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─  ┤  ← divisor
- *   │ Etiqueta "ES"                    │
- *   │ [burbuja] Hola, how are you?     │  ← traducción
- *   └──────────────────────────────────┘
- *
- * AUTO-SCROLL: useEffect observa cambios en text/interimText y
- * hace scroll al div invisible al final de la lista.
- *
- * BURBUJAS: cada \n\n en el texto crea una burbuja nueva.
+ * NUEVO: prop subtitleOnly
+ *   Cuando es true, oculta la mitad inferior (traducción) y expande
+ *   la mitad superior (subtítulos) al 100% del panel.
+ *   No requiere cambios en el CSS — solo flexbox.
  */
 
 import { useEffect, useRef } from 'react'
 import { Loader2, Trash2 } from 'lucide-react'
 
 
-// ── Componente: lista de burbujas ─────────────────────────────────
-// Usado tanto para texto original como para traducción.
+// ── Lista de burbujas (subtítulos o traducción) ───────────────────
 function BubbleList({ text, interimText, placeholder, variant }) {
   const anclaRef = useRef(null)
 
-  // Auto-scroll al fondo cada vez que cambia el contenido
+  // Auto-scroll al fondo cada vez que llega contenido nuevo
   useEffect(() => {
     anclaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [text, interimText])
 
-  // Dividimos el texto en párrafos — cada doble salto = burbuja nueva
-  const parrafos = text
-    ? text.split(/\n\n+/).map(p => p.trim()).filter(Boolean)
-    : []
-
+  const parrafos    = text ? text.split(/\n\n+/).map(p => p.trim()).filter(Boolean) : []
   const hayContenido = parrafos.length > 0 || !!interimText
 
   return (
@@ -46,14 +29,10 @@ function BubbleList({ text, interimText, placeholder, variant }) {
         <span className="panel__placeholder">{placeholder}</span>
       )}
 
-      {/* Burbujas de texto confirmado */}
       {parrafos.map((para, i) => (
-        <div key={i} className={`bubble bubble--${variant}`}>
-          {para}
-        </div>
+        <div key={i} className={`bubble bubble--${variant}`}>{para}</div>
       ))}
 
-      {/* Burbuja provisional con cursor parpadeante */}
       {interimText && (
         <div className={`bubble bubble--${variant} bubble--interim`}>
           {interimText}
@@ -61,14 +40,22 @@ function BubbleList({ text, interimText, placeholder, variant }) {
         </div>
       )}
 
-      {/* Ancla invisible — scrollIntoView apunta aquí */}
       <div ref={anclaRef} style={{ height: 1 }} />
     </div>
   )
 }
 
+// ── Ancla de auto-scroll para el panel editable ───────────────────
+function AutoScrollAncla({ dep1, dep2 }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [dep1, dep2])
+  return <div ref={ref} style={{ height: 1 }} />
+}
 
-// ── Componente principal: TranslationPanel ────────────────────────
+
+// ── Componente principal ──────────────────────────────────────────
 export function TranslationPanel({
   fromLang,
   toLang,
@@ -80,11 +67,12 @@ export function TranslationPanel({
   loading      = false,
   onChange,
   onClear,
+  subtitleOnly = false,   // oculta la sección de traducción
 }) {
   return (
     <div className="panel">
 
-      {/* ── Encabezado ──────────────────────────────────── */}
+      {/* Encabezado */}
       <div className="panel__header">
         <div className="panel__lang-selector">
           <span className="panel__lang-text">{fromLang}</span>
@@ -93,8 +81,8 @@ export function TranslationPanel({
         </div>
 
         <div className="panel__actions">
-          {/* Spinner de traducción en progreso */}
-          {loading && (
+          {/* Spinner mientras se traduce */}
+          {loading && !subtitleOnly && (
             <Loader2
               size={14}
               className="panel__action-btn"
@@ -107,15 +95,18 @@ export function TranslationPanel({
         </div>
       </div>
 
-      {/* ── Cuerpo dividido en dos mitades ──────────────── */}
+      {/* Cuerpo */}
       <div className="panel__body panel__body--split">
 
-        {/* MITAD SUPERIOR: subtítulos originales */}
-        <div className="panel__half panel__half--top">
+        {/* ── MITAD SUPERIOR: subtítulos originales ──────────── */}
+        {/* flex: 1 siempre; si subtitleOnly, ocupa todo el espacio */}
+        <div
+          className="panel__half panel__half--top"
+          style={{ flex: subtitleOnly ? 1 : undefined }}
+        >
           <div className="panel__half-label">{fromLang}</div>
 
           {readOnly ? (
-            // Panel de solo lectura: muestra burbujas directamente
             <BubbleList
               text={value}
               interimText={interimText}
@@ -123,10 +114,8 @@ export function TranslationPanel({
               variant="source"
             />
           ) : (
-            // Panel editable: si hay texto muestra burbujas, si no muestra textarea
             <div className="bubble-list bubble-list--editable">
               {value.trim() || interimText ? (
-                // Hay contenido → renderizamos burbujas (el usuario puede borrar con el ícono)
                 <>
                   {value.split(/\n\n+/).map(p => p.trim()).filter(Boolean).map((para, i) => (
                     <div key={i} className="bubble bubble--source">{para}</div>
@@ -138,7 +127,6 @@ export function TranslationPanel({
                   )}
                 </>
               ) : (
-                // Panel vacío → mostramos el textarea para que el usuario pueda escribir
                 <textarea
                   className="panel__textarea panel__textarea--ghost"
                   placeholder={placeholder}
@@ -147,38 +135,29 @@ export function TranslationPanel({
                   spellCheck={false}
                 />
               )}
-              {/* Ancla de auto-scroll */}
               <AutoScrollAncla dep1={value} dep2={interimText} />
             </div>
           )}
         </div>
 
-        {/* Línea divisora */}
-        <div className="panel__half-divider" />
+        {/* ── Divisor y MITAD INFERIOR: solo si hay traducción ─ */}
+        {!subtitleOnly && (
+          <>
+            <div className="panel__half-divider" />
 
-        {/* MITAD INFERIOR: traducción */}
-        <div className="panel__half panel__half--bottom">
-          <div className="panel__half-label">{toLang}</div>
-          <BubbleList
-            text={translated}
-            interimText=""
-            placeholder="La traducción aparecerá aquí..."
-            variant="translated"
-          />
-        </div>
+            <div className="panel__half panel__half--bottom">
+              <div className="panel__half-label">{toLang}</div>
+              <BubbleList
+                text={translated}
+                interimText=""
+                placeholder="La traducción aparecerá aquí..."
+                variant="translated"
+              />
+            </div>
+          </>
+        )}
 
       </div>
     </div>
   )
-}
-
-
-// ── Helper: ancla de auto-scroll ──────────────────────────────────
-// Componente mínimo que hace scroll a sí mismo cuando cambian sus dependencias.
-function AutoScrollAncla({ dep1, dep2 }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [dep1, dep2])
-  return <div ref={ref} style={{ height: 1 }} />
 }
