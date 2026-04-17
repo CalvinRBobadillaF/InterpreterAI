@@ -642,7 +642,37 @@ html.light .source-dropdown {
   .waveform {
     display: none; /* Ocultar animación de audio si no cabe */
   }
-}/* ════════════════════════════════════════════════════
+}
+/* ════════════════════════════════════════════════════
+   BOTÓN SOLO SUBTÍTULOS  —  agregar al final de App.css
+════════════════════════════════════════════════════ */
+/* Botón compuesto: ícono + label corto */
+.header-subtitle-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;             /* override del padding del header-icon-btn */
+  width: auto;                 /* override del width fijo */
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+/* Activo: modo solo subtítulos encendido */
+.header-subtitle-toggle.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.header-subtitle-toggle__label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+/* ════════════════════════════════════════════════════
    LOGIN  —  add these rules to the bottom of App.css
 ════════════════════════════════════════════════════ */
 

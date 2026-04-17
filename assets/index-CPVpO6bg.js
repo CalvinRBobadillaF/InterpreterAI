@@ -12528,16 +12528,30 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$9 = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$9);
-const __iconNode$8 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$8);
-const __iconNode$7 = [
+const __iconNode$b = [
+  ["rect", { width: "18", height: "14", x: "3", y: "5", rx: "2", ry: "2", key: "12ruh7" }],
+  ["path", { d: "M7 15h4M15 15h2M7 11h2M13 11h4", key: "1ueiar" }]
+];
+const Captions = createLucideIcon("captions", __iconNode$b);
+const __iconNode$a = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$a);
+const __iconNode$9 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$9);
+const __iconNode$8 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const Globe = createLucideIcon("globe", __iconNode$7);
+const Globe = createLucideIcon("globe", __iconNode$8);
+const __iconNode$7 = [
+  ["path", { d: "m5 8 6 6", key: "1wu5hv" }],
+  ["path", { d: "m4 14 6-6 2-3", key: "1k1g8d" }],
+  ["path", { d: "M2 5h12", key: "or177f" }],
+  ["path", { d: "M7 2h1", key: "1t2jsx" }],
+  ["path", { d: "m22 22-5-10-5 10", key: "don7ne" }],
+  ["path", { d: "M14 18h6", key: "1m8k6r" }]
+];
+const Languages = createLucideIcon("languages", __iconNode$7);
 const __iconNode$6 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
 const LoaderCircle = createLucideIcon("loader-circle", __iconNode$6);
 const __iconNode$5 = [
@@ -12706,31 +12720,6 @@ const BAR_HEIGHTS = Array.from({ length: BAR_COUNT }, (_, i) => {
   const v = Math.abs(Math.sin(i * 0.47) * 0.5 + Math.sin(i * 0.11) * 0.5);
   return Math.round(3 + v * 14);
 });
-const handleElectronAudio = async () => {
-  try {
-    if (!window.electronAPI) {
-      console.error("❌ Not running inside Electron");
-      return;
-    }
-    const source = await window.electronAPI.getAudioSource();
-    if (!source) {
-      console.error("❌ No source received");
-      return;
-    }
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: "desktop",
-          chromeMediaSourceId: source.id
-        }
-      },
-      video: false
-    });
-    console.log("✅ System audio stream:", stream);
-  } catch (err) {
-    console.error("❌ Could not capture system audio:", err);
-  }
-};
 function Waveform({ active }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `waveform ${active ? "waveform--active" : ""}`, children: [
     BAR_HEIGHTS.map((h, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "waveform__bar", style: { height: h } }, i)),
@@ -12754,23 +12743,32 @@ function useTimer(running) {
   const ss = String(secs % 60).padStart(2, "0");
   return `${hh}:${mm}:${ss}`;
 }
-const SOURCES = [
+const FUENTES = [
   {
     id: "mic",
     label: "Microphone",
     sub: "Default input",
     Icon: Mic,
-    note: "Works immediately with Web Speech API"
+    note: "Captura el micrófono del dispositivo"
   },
   {
     id: "tab",
     label: "Browser Tab",
     sub: "Tab / screen",
     Icon: Globe,
-    note: "Pick a tab in the share dialog"
+    note: "Elige una pestaña en el diálogo de compartir"
   }
 ];
-function Header({ playing, onTogglePlay, source, onSourceChange }) {
+function Header({
+  playing,
+  onTogglePlay,
+  source,
+  onSourceChange,
+  subtitleOnly,
+  // boolean — modo solo subtítulos activo
+  onToggleSubtitleOnly
+  // callback para alternarlo
+}) {
   const timer = useTimer(playing);
   const [lightTheme, setLightTheme] = reactExports.useState(
     () => localStorage.getItem("theme") === "light"
@@ -12781,7 +12779,7 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
   }, [lightTheme]);
   const [dropdownOpen, setDropdownOpen] = reactExports.useState(false);
   const dropdownRef = reactExports.useRef(null);
-  const activeSource = SOURCES.find((s) => s.id === source) || SOURCES[0];
+  const fuenteActiva = FUENTES.find((f) => f.id === source) || FUENTES[0];
   reactExports.useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -12791,9 +12789,15 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-  const selectSource = (id) => {
+  const seleccionarFuente = (id) => {
     onSourceChange?.(id);
     setDropdownOpen(false);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("app_name");
+    localStorage.removeItem("app_key");
+    localStorage.removeItem("deepl_key");
+    window.location.reload();
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "app-header drag", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-brand__title no-drag", children: "Interpreter AI" }),
@@ -12803,23 +12807,23 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
         {
           className: "header-source",
           onClick: () => !playing && setDropdownOpen((o) => !o),
-          title: playing ? "Stop playback to change source" : "Select audio source",
           disabled: playing,
+          title: playing ? "Detén la grabación para cambiar la fuente" : "Seleccionar fuente",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(activeSource.Icon, { size: 13, style: { color: "var(--text-muted)", flexShrink: 0 } }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(fuenteActiva.Icon, { size: 13, style: { color: "var(--text-muted)", flexShrink: 0 } }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-source__lines", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__label", children: activeSource.label }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__sub", children: activeSource.sub })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__label", children: fuenteActiva.label }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__sub", children: fuenteActiva.sub })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 11, style: { color: "var(--text-faint)" } })
           ]
         }
       ),
-      dropdownOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown", children: SOURCES.map(({ id, label, sub, Icon: Icon2, note }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      dropdownOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown", children: FUENTES.map(({ id, label, sub, Icon: Icon2, note }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
           className: `source-dropdown__item ${id === source ? "is-active" : ""}`,
-          onClick: () => selectSource(id),
+          onClick: () => seleccionarFuente(id),
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown__icon", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 14 }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "source-dropdown__text", children: [
@@ -12836,13 +12840,8 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
       "button",
       {
         className: `header-play no-drag ${playing ? "is-playing" : ""}`,
-        onClick: async () => {
-          if (source === "electron") {
-            await handleElectronAudio();
-          }
-          onTogglePlay();
-        },
-        title: playing ? "Stop" : "Start",
+        onClick: onTogglePlay,
+        title: playing ? "Detener" : "Iniciar",
         children: playing ? /* @__PURE__ */ jsxRuntimeExports.jsx(Square, { size: 14, fill: "white", strokeWidth: 0 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 14, fill: "white", strokeWidth: 0, style: { marginLeft: 1 } })
       }
     ),
@@ -12851,36 +12850,35 @@ function Header({ playing, onTogglePlay, source, onSourceChange }) {
       /* @__PURE__ */ jsxRuntimeExports.jsx(Waveform, { active: playing })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-right no-drag", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "button",
+        {
+          className: `header-icon-btn header-subtitle-toggle ${subtitleOnly ? "is-active" : ""}`,
+          onClick: onToggleSubtitleOnly,
+          title: subtitleOnly ? "Activar traducción" : "Solo subtítulos (sin traducción)",
+          children: [
+            subtitleOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(Captions, { size: 15 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Languages, { size: 15 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-subtitle-toggle__label", children: subtitleOnly ? "Subtítulos" : "Traducción" })
+          ]
+        }
+      ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           className: "header-icon-btn",
           onClick: () => setLightTheme((t) => !t),
-          title: "Toggle theme",
+          title: "Cambiar tema",
           children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 15 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 15 })
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "userName", children: localStorage.getItem("app_name") || "Guest" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          className: "log-out-button",
-          onClick: () => {
-            localStorage.removeItem("app_name");
-            localStorage.removeItem("app_key");
-            localStorage.removeItem("deepl_key");
-            window.location.reload();
-          },
-          title: "Log out and clear data",
-          children: "Log out"
-        }
-      )
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "log-out-button", onClick: handleLogout, title: "Cerrar sesión", children: "Log out" })
     ] })
   ] });
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.1" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.2" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12907,6 +12905,13 @@ function BubbleList({ text, interimText, placeholder, variant }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: anclaRef, style: { height: 1 } })
   ] });
 }
+function AutoScrollAncla({ dep1, dep2 }) {
+  const ref = reactExports.useRef(null);
+  reactExports.useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [dep1, dep2]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref, style: { height: 1 } });
+}
 function TranslationPanel({
   fromLang,
   toLang,
@@ -12917,7 +12922,9 @@ function TranslationPanel({
   interimText = "",
   loading = false,
   onChange,
-  onClear
+  onClear,
+  subtitleOnly = false
+  // oculta la sección de traducción
 }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__header", children: [
@@ -12927,7 +12934,7 @@ function TranslationPanel({
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__lang-text", children: toLang })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__actions", children: [
-        loading && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        loading && !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx(
           LoaderCircle,
           {
             size: 14,
@@ -12939,34 +12946,29 @@ function TranslationPanel({
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__body panel__body--split", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__half panel__half--top", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: fromLang }),
-        readOnly ? (
-          // Panel de solo lectura: muestra burbujas directamente
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            BubbleList,
-            {
-              text: value,
-              interimText,
-              placeholder: placeholder || "Los subtítulos aparecerán aquí...",
-              variant: "source"
-            }
-          )
-        ) : (
-          // Panel editable: si hay texto muestra burbujas, si no muestra textarea
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble-list bubble-list--editable", children: [
-            value.trim() || interimText ? (
-              // Hay contenido → renderizamos burbujas (el usuario puede borrar con el ícono)
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: "panel__half panel__half--top",
+          style: { flex: subtitleOnly ? 1 : void 0 },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: fromLang }),
+            readOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+              BubbleList,
+              {
+                text: value,
+                interimText,
+                placeholder: placeholder || "Los subtítulos aparecerán aquí...",
+                variant: "source"
+              }
+            ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble-list bubble-list--editable", children: [
+              value.trim() || interimText ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 value.split(/\n\n+/).map((p) => p.trim()).filter(Boolean).map((para, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bubble bubble--source", children: para }, i)),
                 interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble bubble--source bubble--interim", children: [
                   interimText,
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bubble__cursor" })
                 ] })
-              ] })
-            ) : (
-              // Panel vacío → mostramos el textarea para que el usuario pueda escribir
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "textarea",
                 {
                   className: "panel__textarea panel__textarea--ghost",
@@ -12975,38 +12977,85 @@ function TranslationPanel({
                   onChange,
                   spellCheck: false
                 }
-              )
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(AutoScrollAncla, { dep1: value, dep2: interimText })
-          ] })
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-divider" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__half panel__half--bottom", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: toLang }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          BubbleList,
-          {
-            text: translated,
-            interimText: "",
-            placeholder: "La traducción aparecerá aquí...",
-            variant: "translated"
-          }
-        )
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(AutoScrollAncla, { dep1: value, dep2: interimText })
+            ] })
+          ]
+        }
+      ),
+      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-divider" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__half panel__half--bottom", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: toLang }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            BubbleList,
+            {
+              text: translated,
+              interimText: "",
+              placeholder: "La traducción aparecerá aquí...",
+              variant: "translated"
+            }
+          )
+        ] })
       ] })
     ] })
   ] });
 }
-function AutoScrollAncla({ dep1, dep2 }) {
-  const ref = reactExports.useRef(null);
-  reactExports.useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [dep1, dep2]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref, style: { height: 1 } });
-}
 const DEEPGRAM_URL = "wss://api.deepgram.com/v1/listen";
+const KEYWORDS = [
+  // Emergencias / 911
+  "CPR:3",
+  "RCP:3",
+  "dispatcher:2",
+  "paramedics:2",
+  "paramédicos:2",
+  "unconscious:2",
+  "inconsciente:2",
+  "overdose:2",
+  "sobredosis:2",
+  "intersection:2",
+  "intersección:2",
+  "felony:2",
+  "misdemeanor:2",
+  // Médico
+  "HIPAA:3",
+  "MRI:2",
+  "resonancia:2",
+  "referral:2",
+  "referimiento:2",
+  "pediatrician:2",
+  "pediatra:2",
+  "prescription:2",
+  "receta:2",
+  "blood pressure:2",
+  "presión arterial:2",
+  // Seguros
+  "out-of-pocket:3",
+  "deductible:2",
+  "deducible:2",
+  "copay:2",
+  "copago:2",
+  "premium:2",
+  "prima:2",
+  "claim:2",
+  "reclamo:2",
+  "adjuster:2",
+  "underwriting:2",
+  // Finanzas / Bank of America
+  "Bank of America:3",
+  "routing number:3",
+  "número de ruta:3",
+  "account number:3",
+  "número de cuenta:3",
+  "wire transfer:2",
+  "overdraft:2",
+  "sobregiro:2",
+  "Zelle:3",
+  "statement:2",
+  "estado de cuenta:2"
+];
 function useTranscription({
-  lang = "en-US",
+  lang = "multi",
   onFinal,
   onInterim,
   onError
@@ -13030,7 +13079,16 @@ function useTranscription({
     }
     if (!stream) {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            autoGainControl: true,
+            // amplifica voces bajas automáticamente
+            noiseSuppression: false,
+            // no mutilar palabras por "ruido"
+            echoCancellation: true
+            // evitar retroalimentación
+          }
+        });
       } catch (e) {
         emitirError("Micrófono denegado: " + e.message);
         return;
@@ -13039,19 +13097,29 @@ function useTranscription({
     const params = new URLSearchParams({
       model: "nova-2",
       language: lang,
+      // 'multi' detecta EN + ES simultáneo
       smart_format: "true",
+      // capitalización, números, puntuación
       interim_results: "true",
-      punctuate: "true"
+      // resultados en tiempo real mientras habla
+      punctuate: "true",
+      // agrega puntuación automática
+      endpointing: "400",
+      // ms de silencio para cortar una oración
+      utterance_end_ms: "1200",
+      // ms de silencio para cerrar utterance completa
+      filler_words: "false",
+      // elimina "eh", "um", "este" del texto
+      no_delay: "true"
+      // envía resultados inmediatamente (menos latencia)
     });
-    const ws = new WebSocket(
-      `${DEEPGRAM_URL}?${params}`,
-      ["token", API_KEY]
-    );
+    KEYWORDS.forEach((kw) => params.append("keywords", kw));
+    const ws = new WebSocket(`${DEEPGRAM_URL}?${params}`, ["token", API_KEY]);
     socketRef.current = ws;
     ws.onopen = () => {
       activoRef.current = true;
       setActive(true);
-      console.log("✅ Deepgram conectado");
+      console.log("✅ Deepgram conectado — idioma:", lang);
       const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
       const recorder = new MediaRecorder(stream, { mimeType });
       recorder.ondataavailable = (e) => {
@@ -13059,7 +13127,7 @@ function useTranscription({
           ws.send(e.data);
         }
       };
-      recorder.start(250);
+      recorder.start(200);
       recorderRef.current = recorder;
     };
     ws.onmessage = (msg) => {
@@ -13081,10 +13149,14 @@ function useTranscription({
         onInterim?.(payload);
       }
     };
-    ws.onerror = () => emitirError("Error en el WebSocket de Deepgram");
+    ws.onerror = () => emitirError("Error de conexión con Deepgram");
     ws.onclose = (e) => {
-      console.log(`🔌 Deepgram cerrado — código: ${e.code}`, e.reason || "");
-      if (e.code === 1008) emitirError("API key de Deepgram rechazado (código 1008)");
+      const razones = {
+        1008: "API key de Deepgram rechazado — verifica tu clave",
+        1011: "Error interno de Deepgram — intenta de nuevo"
+      };
+      if (razones[e.code]) emitirError(razones[e.code]);
+      console.log(`🔌 Deepgram cerrado — código: ${e.code}`);
       activoRef.current = false;
       setActive(false);
     };
@@ -13289,6 +13361,7 @@ function App() {
   );
   const [playing, setPlaying] = reactExports.useState(false);
   const [source, setSource] = reactExports.useState("mic");
+  const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
   const [englishText, setEnglishText] = reactExports.useState("");
   const [spanishText, setSpanishText] = reactExports.useState("");
   const [interimEnglish, setInterimEnglish] = reactExports.useState("");
@@ -13304,20 +13377,13 @@ function App() {
     setSpanishText("");
     setInterimSpanish("");
   };
-  const { translatedText: enToEs } = useAutoTranslation(englishText, {
-    from: "en",
-    to: "es",
-    debounceMs: 300
-  });
-  const { translatedText: esToEn } = useAutoTranslation(spanishText, {
-    from: "es",
-    to: "en",
-    debounceMs: 300
-  });
+  const textoParaTraducirEN = subtitleOnly ? "" : englishText;
+  const textoParaTraducirES = subtitleOnly ? "" : spanishText;
+  const { translatedText: enToEs, translating: traduciendoEN } = useAutoTranslation(textoParaTraducirEN, { from: "en", to: "es", debounceMs: 300 });
+  const { translatedText: esToEn, translating: traduciendoES } = useAutoTranslation(textoParaTraducirES, { from: "es", to: "en", debounceMs: 300 });
   const { start: startTranscription, stop: stopTranscription, error: transcriptionError } = useTranscription({
     lang: "multi",
-    // Deepgram detecta EN y ES simultáneamente
-    // onFinal: oración completa confirmada → se agrega al buffer
+    // Deepgram detecta EN + ES al mismo tiempo
     onFinal: reactExports.useCallback(({ text, lang }) => {
       const agregar = (previo, nuevo) => {
         if (!previo) return nuevo;
@@ -13332,7 +13398,6 @@ function App() {
         setSpanishText((prev) => agregar(prev, text));
       }
     }, []),
-    // onInterim: texto en progreso → se muestra en la burbuja parpadeante
     onInterim: reactExports.useCallback(({ text, lang }) => {
       if (lang.startsWith("en")) setInterimEnglish(text);
       else if (lang.startsWith("es")) setInterimSpanish(text);
@@ -13392,7 +13457,9 @@ function App() {
         playing,
         onTogglePlay: handleTogglePlay,
         source,
-        onSourceChange: handleSourceChange
+        onSourceChange: handleSourceChange,
+        subtitleOnly,
+        onToggleSubtitleOnly: () => setSubtitleOnly((v) => !v)
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("main", { className: "app-main", children: [
@@ -13405,8 +13472,10 @@ function App() {
           value: englishText,
           translated: enToEs,
           interimText: interimEnglish,
+          loading: traduciendoEN,
           onChange: (e) => setEnglishText(e.target.value),
-          onClear: handleClearLeft
+          onClear: handleClearLeft,
+          subtitleOnly
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -13418,14 +13487,16 @@ function App() {
           value: spanishText,
           translated: esToEn,
           interimText: interimSpanish,
-          onClear: handleClearRight
+          loading: traduciendoES,
+          onClear: handleClearRight,
+          subtitleOnly
         }
       )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Footer,
       {
-        status: footerStatus,
+        status: subtitleOnly ? `${footerStatus} · Solo subtítulos` : footerStatus,
         error: footerError || (transcriptionError ? `STT: ${transcriptionError}` : null)
       }
     )
