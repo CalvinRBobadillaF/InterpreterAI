@@ -12765,9 +12765,7 @@ function Header({
   source,
   onSourceChange,
   subtitleOnly,
-  // boolean — modo solo subtítulos activo
   onToggleSubtitleOnly
-  // callback para alternarlo
 }) {
   const timer = useTimer(playing);
   const [lightTheme, setLightTheme] = reactExports.useState(
@@ -12855,7 +12853,7 @@ function Header({
         {
           className: `header-icon-btn header-subtitle-toggle ${subtitleOnly ? "is-active" : ""}`,
           onClick: onToggleSubtitleOnly,
-          title: subtitleOnly ? "Activar traducción" : "Solo subtítulos (sin traducción)",
+          title: subtitleOnly ? "Modo subtítulos activo — clic para activar traducción" : "Modo traducción activo — clic para solo subtítulos",
           children: [
             subtitleOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(Captions, { size: 15 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Languages, { size: 15 }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-subtitle-toggle__label", children: subtitleOnly ? "Subtítulos" : "Traducción" })
@@ -13002,60 +13000,7 @@ function TranslationPanel({
   ] });
 }
 const DEEPGRAM_URL = "wss://api.deepgram.com/v1/listen";
-const KEYWORDS = [
-  // Emergencias / 911
-  "CPR:3",
-  "RCP:3",
-  "dispatcher:2",
-  "paramedics:2",
-  "paramédicos:2",
-  "unconscious:2",
-  "inconsciente:2",
-  "overdose:2",
-  "sobredosis:2",
-  "intersection:2",
-  "intersección:2",
-  "felony:2",
-  "misdemeanor:2",
-  // Médico
-  "HIPAA:3",
-  "MRI:2",
-  "resonancia:2",
-  "referral:2",
-  "referimiento:2",
-  "pediatrician:2",
-  "pediatra:2",
-  "prescription:2",
-  "receta:2",
-  "blood pressure:2",
-  "presión arterial:2",
-  // Seguros
-  "out-of-pocket:3",
-  "deductible:2",
-  "deducible:2",
-  "copay:2",
-  "copago:2",
-  "premium:2",
-  "prima:2",
-  "claim:2",
-  "reclamo:2",
-  "adjuster:2",
-  "underwriting:2",
-  // Finanzas / Bank of America
-  "Bank of America:3",
-  "routing number:3",
-  "número de ruta:3",
-  "account number:3",
-  "número de cuenta:3",
-  "wire transfer:2",
-  "overdraft:2",
-  "sobregiro:2",
-  "Zelle:3",
-  "statement:2",
-  "estado de cuenta:2"
-];
 function useTranscription({
-  lang = "multi",
   onFinal,
   onInterim,
   onError
@@ -13082,11 +13027,11 @@ function useTranscription({
         stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             autoGainControl: true,
-            // amplifica voces bajas automáticamente
-            noiseSuppression: false,
-            // no mutilar palabras por "ruido"
+            // amplifica voces bajas
+            noiseSuppression: true,
+            // reduce ruido de fondo en llamadas
             echoCancellation: true
-            // evitar retroalimentación
+            // evita retroalimentación
           }
         });
       } catch (e) {
@@ -13095,31 +13040,39 @@ function useTranscription({
       }
     }
     const params = new URLSearchParams({
-      model: "nova-2",
-      language: lang,
-      // 'multi' detecta EN + ES simultáneo
+      model: "nova-3",
+      // más preciso que nova-2, mejor con acentos
+      language: "multi",
+      // ✅ CORRECTO para nova-3 multilenguaje
+      // ❌ NO usar detect_language=true con nova-3
       smart_format: "true",
-      // capitalización, números, puntuación
+      // capitalización, puntuación automática
+      punctuate: "true",
+      // agrega puntos, comas, signos de pregunta
+      numerals: "true",
+      // "cuatro veinte" → "420"
       interim_results: "true",
       // resultados en tiempo real mientras habla
-      punctuate: "true",
-      // agrega puntuación automática
-      endpointing: "400",
-      // ms de silencio para cortar una oración
-      utterance_end_ms: "1200",
-      // ms de silencio para cerrar utterance completa
+      no_delay: "true",
+      // envía resultados inmediatamente
       filler_words: "false",
-      // elimina "eh", "um", "este" del texto
-      no_delay: "true"
-      // envía resultados inmediatamente (menos latencia)
+      // omite "eh", "um", "este", "like"
+      endpointing: "300",
+      // ms de silencio para detectar fin de turno
+      utterance_end_ms: "1500",
+      // ms de silencio para cerrar la utterance completa
+      // 1500ms da margen para pausas de llamadas telefónicas
+      diarize: "false"
+      // no separar hablantes — el intérprete habla uno a la vez
     });
-    KEYWORDS.forEach((kw) => params.append("keywords", kw));
-    const ws = new WebSocket(`${DEEPGRAM_URL}?${params}`, ["token", API_KEY]);
+    const wsUrl = `${DEEPGRAM_URL}?${params}`;
+    console.log("🔌 Conectando a Deepgram...");
+    const ws = new WebSocket(wsUrl, ["token", API_KEY]);
     socketRef.current = ws;
     ws.onopen = () => {
+      console.log("✅ Deepgram conectado — modelo: nova-3, idioma: multi");
       activoRef.current = true;
       setActive(true);
-      console.log("✅ Deepgram conectado — idioma:", lang);
       const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
       const recorder = new MediaRecorder(stream, { mimeType });
       recorder.ondataavailable = (e) => {
@@ -13127,7 +13080,7 @@ function useTranscription({
           ws.send(e.data);
         }
       };
-      recorder.start(200);
+      recorder.start(150);
       recorderRef.current = recorder;
     };
     ws.onmessage = (msg) => {
@@ -13140,27 +13093,32 @@ function useTranscription({
       if (data.type !== "Results") return;
       const alt = data.channel?.alternatives?.[0];
       const texto = alt?.transcript?.trim();
-      const idiomaDetectado = alt?.languages?.[0] || "en";
-      if (!texto) return;
-      const payload = { text: texto, lang: idiomaDetectado };
+      const idioma = alt?.languages?.[0] || "en";
+      const confidence = alt?.confidence ?? 0;
+      if (!texto || texto.length < 2) return;
+      if (!data.is_final && confidence < 0.65) return;
+      const payload = { text: texto, lang: idioma, confidence };
       if (data.is_final) {
         onFinal?.(payload);
       } else {
         onInterim?.(payload);
       }
     };
-    ws.onerror = () => emitirError("Error de conexión con Deepgram");
+    ws.onerror = (err) => {
+      console.error("❌ WebSocket error:", err);
+      emitirError("Error de conexión con Deepgram");
+    };
     ws.onclose = (e) => {
+      console.log(`🔌 Deepgram cerrado — código: ${e.code}`, e.reason || "");
       const razones = {
-        1008: "API key de Deepgram rechazado — verifica tu clave",
+        1008: "API key de Deepgram inválido o expirado",
         1011: "Error interno de Deepgram — intenta de nuevo"
       };
       if (razones[e.code]) emitirError(razones[e.code]);
-      console.log(`🔌 Deepgram cerrado — código: ${e.code}`);
       activoRef.current = false;
       setActive(false);
     };
-  }, [lang, onFinal, onInterim, emitirError]);
+  }, [onFinal, onInterim, emitirError]);
   const stop = reactExports.useCallback(() => {
     activoRef.current = false;
     recorderRef.current?.stop();
@@ -13172,58 +13130,54 @@ function useTranscription({
   }, []);
   return { start, stop, active, error };
 }
-const IS_ELECTRON = !!window.electronAPI?.isElectron;
 const BACKEND_URL = "https://interpreterbk.onrender.com/api/translate";
-(function mantenerDespierto() {
-  const pingUrl = BACKEND_URL.replace("/api/translate", "");
-  fetch(pingUrl, { method: "GET" }).catch(() => {
+const PING_URL = "https://interpreterbk.onrender.com";
+(function keepAlive() {
+  fetch(PING_URL).catch(() => {
   });
-  setInterval(() => {
-    fetch(pingUrl, { method: "GET" }).catch(() => {
-    });
-  }, 5 * 60 * 1e3);
+  setInterval(() => fetch(PING_URL).catch(() => {
+  }), 5 * 60 * 1e3);
 })();
 const globalCache = /* @__PURE__ */ new Map();
+const pendingRequests = /* @__PURE__ */ new Map();
 async function callTranslate({ text, from, to, signal }) {
   const clean = text?.trim();
   if (!clean) return "";
-  if (IS_ELECTRON && window.electronAPI?.translate) {
-    try {
-      const result = await window.electronAPI.translate({ text: clean, from, to });
-      if (result) return result;
-    } catch (e) {
-      console.warn("[Traducción] IPC falló, usando web:", e.message);
-    }
+  const cacheKey = `${from}|${to}:${clean}`;
+  if (globalCache.has(cacheKey)) return globalCache.get(cacheKey);
+  if (pendingRequests.has(cacheKey)) {
+    return pendingRequests.get(cacheKey);
   }
-  try {
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal,
-      // Permite cancelar la petición si queda obsoleta
-      body: JSON.stringify({
-        text: clean,
-        source_lang: from,
-        target_lang: to === "en" ? "EN-US" : to.toUpperCase()
-      })
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || `HTTP ${res.status}`);
-    }
+  const promise = fetch(BACKEND_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    signal,
+    body: JSON.stringify({
+      text,
+      source_lang: from,
+      // DeepL necesita EN-US, no EN genérico
+      target_lang: to === "en" ? "EN-US" : to.toUpperCase()
+    })
+  }).then(async (res) => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    return data.translated_text || clean;
-  } catch (e) {
+    const resultado = data.translated_text || clean;
+    globalCache.set(cacheKey, resultado);
+    return resultado;
+  }).catch((e) => {
     if (e.name === "AbortError") return null;
-    console.error("[Traducción] Error:", e.message);
+    console.error("[Traducción]", e.message);
     return clean;
-  }
+  }).finally(() => {
+    pendingRequests.delete(cacheKey);
+  });
+  pendingRequests.set(cacheKey, promise);
+  return promise;
 }
 function useAutoTranslation(sourceText, {
   from = "en",
   to = "es",
   debounceMs = 300
-  // Debounce rápido para que se sienta fluido
 } = {}) {
   const [result, setResult] = reactExports.useState("");
   const [translating, setTranslating] = reactExports.useState(false);
@@ -13237,29 +13191,12 @@ function useAutoTranslation(sourceText, {
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
       setTranslating(true);
-      const paragraphs = sourceText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
-      const translationPromises = paragraphs.map(async (p) => {
-        const cacheKey = `${from}|${to}:${p}`;
-        if (globalCache.has(cacheKey)) {
-          return globalCache.get(cacheKey);
-        }
-        const translatedResult = await callTranslate({
-          text: p,
-          from,
-          to,
-          signal: controller.signal
-        });
-        if (translatedResult) {
-          globalCache.set(cacheKey, translatedResult);
-          return translatedResult;
-        }
-        return "";
-      });
-      const results = await Promise.all(translationPromises);
-      const finalTranslatedText = results.filter(Boolean).join("\n\n");
-      if (finalTranslatedText) {
-        setResult(finalTranslatedText);
-      }
+      const parrafos = sourceText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+      const resultados = await Promise.all(
+        parrafos.map((p) => callTranslate({ text: p, from, to, signal: controller.signal }))
+      );
+      const textoFinal = resultados.filter(Boolean).join("\n\n");
+      if (textoFinal) setResult(textoFinal);
       setTranslating(false);
     }, debounceMs);
     return () => {
@@ -13324,11 +13261,16 @@ const startBrowserCapture = async () => {
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({
       audio: {
+        // ✅ APAGADOS: Evita doble procesamiento (voz robótica) en audio de pestaña
         echoCancellation: false,
         noiseSuppression: false,
         autoGainControl: false,
-        // En Windows/Linux pedimos calidad más alta; en Mac se ignora
-        ...ES_MAC ? {} : { channelCount: 2, sampleRate: 44100 }
+        // ✅ OPTIMIZADO PARA DEEPGRAM: Mono (1 canal), 16kHz (frecuencia nativa de voz)
+        ...ES_MAC ? {} : {
+          channelCount: 1,
+          sampleRate: 16e3,
+          sampleSize: 16
+        }
       },
       video: {
         // Pedimos la resolución mínima — descartamos el video de todas formas
@@ -13382,7 +13324,6 @@ function App() {
   const { translatedText: enToEs, translating: traduciendoEN } = useAutoTranslation(textoParaTraducirEN, { from: "en", to: "es", debounceMs: 300 });
   const { translatedText: esToEn, translating: traduciendoES } = useAutoTranslation(textoParaTraducirES, { from: "es", to: "en", debounceMs: 300 });
   const { start: startTranscription, stop: stopTranscription, error: transcriptionError } = useTranscription({
-    lang: "multi",
     // Deepgram detecta EN + ES al mismo tiempo
     onFinal: reactExports.useCallback(({ text, lang }) => {
       const agregar = (previo, nuevo) => {
