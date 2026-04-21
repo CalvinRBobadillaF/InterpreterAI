@@ -1,16 +1,12 @@
 /**
  * components/Header.jsx
  *
- * BUG ELIMINADO:
- *   handleElectronAudio() creaba un stream de audio independiente que nunca
- *   se cerraba, en paralelo al stream que ya manejaba App.jsx. Doble stream,
- *   doble consumo de memoria, comportamiento impredecible. Eliminado.
- *   App.jsx es el único responsable de crear y cerrar streams.
+ * El botón de subtítulos/traducción alterna `subtitleOnly` en App.jsx.
+ * Cuando subtitleOnly===true, App.jsx pasa sourceText='' a useAutoTranslation
+ * → el hook hace early-return antes de cualquier fetch → 0 tokens de DeepL gastados.
  *
- * NUEVO:
- *   Botón "Solo Subtítulos / + Traducción" que activa/desactiva la traducción.
- *   Al activar modo subtítulos, TranslationPanel recibe translated='' y no
- *   muestra la sección de traducción. No hace llamadas al backend.
+ * Este componente no necesita lógica extra — la garantía de no-gasto
+ * está en useTranslation.js (early return) y en App.jsx (pasar '' como texto).
  */
 
 import { useState, useEffect, useRef } from 'react'
@@ -58,7 +54,7 @@ function useTimer(running) {
   return `${hh}:${mm}:${ss}`
 }
 
-// ── Fuentes de audio disponibles ─────────────────────────────────
+// ── Fuentes de audio ──────────────────────────────────────────────
 const FUENTES = [
   {
     id:    'mic',
@@ -77,14 +73,13 @@ const FUENTES = [
 ]
 
 
-// ── Header ────────────────────────────────────────────────────────
 export function Header({
   playing,
   onTogglePlay,
   source,
   onSourceChange,
-  subtitleOnly,       // boolean — modo solo subtítulos activo
-  onToggleSubtitleOnly, // callback para alternarlo
+  subtitleOnly,
+  onToggleSubtitleOnly,
 }) {
   const timer = useTimer(playing)
 
@@ -97,12 +92,11 @@ export function Header({
     localStorage.setItem('theme', lightTheme ? 'light' : 'dark')
   }, [lightTheme])
 
-  // Dropdown de fuente de audio
+  // Dropdown fuente de audio
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef  = useRef(null)
   const fuenteActiva = FUENTES.find(f => f.id === source) || FUENTES[0]
 
-  // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -118,7 +112,6 @@ export function Header({
     setDropdownOpen(false)
   }
 
-  // Cierra sesión limpiando todas las claves
   const handleLogout = () => {
     localStorage.removeItem('app_name')
     localStorage.removeItem('app_key')
@@ -129,10 +122,9 @@ export function Header({
   return (
     <header className="app-header drag">
 
-      {/* Nombre de la app */}
       <span className="header-brand__title no-drag">Interpreter AI</span>
 
-      {/* Selector de fuente de audio */}
+      {/* Selector de fuente */}
       <div className="header-source-wrap no-drag" ref={dropdownRef}>
         <button
           className="header-source"
@@ -168,7 +160,7 @@ export function Header({
         )}
       </div>
 
-      {/* Botón Play / Stop */}
+      {/* Play / Stop */}
       <button
         className={`header-play no-drag ${playing ? 'is-playing' : ''}`}
         onClick={onTogglePlay}
@@ -186,20 +178,31 @@ export function Header({
         <Waveform active={playing} />
       </div>
 
-      {/* Controles del lado derecho */}
+      {/* Controles derecha */}
       <div className="header-right no-drag">
 
-        {/* ── NUEVO: Botón Solo Subtítulos ───────────────────────
-            Alterna entre mostrar solo subtítulos (sin traducción)
-            o subtítulos + traducción.                             */}
+        {/*
+          BOTÓN SOLO SUBTÍTULOS / TRADUCCIÓN
+          ─────────────────────────────────────────────────────────
+          Al activar modo subtítulos:
+            1. Este botón cambia su apariencia a "is-active"
+            2. App.jsx recibe subtitleOnly=true y pasa '' a useAutoTranslation
+            3. useAutoTranslation hace early-return inmediato → 0 tokens gastados
+          Al desactivar:
+            1. App.jsx pasa el texto real → useAutoTranslation traduce normalmente
+          ─────────────────────────────────────────────────────────
+        */}
         <button
           className={`header-icon-btn header-subtitle-toggle ${subtitleOnly ? 'is-active' : ''}`}
           onClick={onToggleSubtitleOnly}
-          title={subtitleOnly ? 'Activar traducción' : 'Solo subtítulos (sin traducción)'}
+          title={subtitleOnly
+            ? 'Modo subtítulos activo — clic para activar traducción'
+            : 'Modo traducción activo — clic para solo subtítulos'
+          }
         >
           {subtitleOnly
-            ? <Captions   size={15} />   // ícono: solo subtítulos activo
-            : <Languages  size={15} />   // ícono: modo traducción activo
+            ? <Captions  size={15} />
+            : <Languages size={15} />
           }
           <span className="header-subtitle-toggle__label">
             {subtitleOnly ? 'Subtítulos' : 'Traducción'}
@@ -220,7 +223,7 @@ export function Header({
           {localStorage.getItem('app_name') || 'Guest'}
         </span>
 
-        {/* Cerrar sesión */}
+        {/* Log out */}
         <button className="log-out-button" onClick={handleLogout} title="Cerrar sesión">
           Log out
         </button>

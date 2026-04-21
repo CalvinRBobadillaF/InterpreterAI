@@ -1,173 +1,153 @@
 /**
  * hooks/useTranslation.js
- * ─────────────────────────────────────────────────────────────────
- * ARQUITECTURA DEFINITIVA:
- * - KEEP-ALIVE: Ping cada 5 min para evitar que Render hiberne.
- * - FIABILIDAD (0 Saltos): Re-evalúa todo el texto en cada cambio.
- * - VELOCIDAD EXTREMA: Usa una memoria caché agresiva. Los párrafos 
- * viejos o ya terminados cargan al instante; solo la oración que 
- * se está hablando en este momento hace peticiones al backend.
- * - ABORT CONTROLLER: Cancela automáticamente las peticiones en red
- * si el usuario sigue hablando, evitando lag y respuestas cruzadas.
- * ─────────────────────────────────────────────────────────────────
+ *
+ * ── CAMBIO PRINCIPAL ───────────────────────────────────────────────
+ * Ahora usa DeepL directamente a través del backend de Render.
+ * El backend ya tiene la API key premium configurada como variable de
+ * entorno — el frontend NO necesita enviar ninguna key.
+ *
+ * Para activar la clave premium en el backend:
+ *   1. Ve a tu dashboard de Render.com → tu servicio → Environment
+ *   2. Cambia la variable:  DEEPL_API_KEY=tu_clave_premium_aqui
+ *   3. Render redespliega automáticamente
+ *   El frontend no cambia nada — sigue llamando al mismo endpoint.
+ *
+ * ── GARANTÍA DE NO-GASTO EN MODO SUBTÍTULOS ────────────────────────
+ * App.jsx pasa sourceText='' cuando subtitleOnly===true.
+ * Este hook hace un early-return inmediato si el texto está vacío,
+ * por lo que nunca llega a hacer fetch() al backend.
+ * Cero tokens gastados en modo solo subtítulos.
+ *
+ * ── ARQUITECTURA ──────────────────────────────────────────────────
+ * - Keep-alive: ping GET a "/" de Render cada 5 min (evita cold start)
+ * - Caché global: misma frase = respuesta instantánea, 0 peticiones
+ * - Promise deduplication: si la misma frase se pide dos veces al mismo
+ *   tiempo (EN panel + ES panel), solo se hace UNA llamada HTTP
+ * - AbortController: cancela peticiones obsoletas al llegar texto nuevo
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-const IS_ELECTRON = !!window.electronAPI?.isElectron
 const BACKEND_URL = 'https://interpreterbk.onrender.com/api/translate'
+const PING_URL    = 'https://interpreterbk.onrender.com'
 
-// ── 1. Precalentamiento y Keep-Alive (Render.com) ──────────────────
-;(function mantenerDespierto() {
-  // Ping inicial a la ruta de salud de FastAPI ("/")
-  const pingUrl = BACKEND_URL.replace('/api/translate', '')
-  
-  fetch(pingUrl, { method: 'GET' }).catch(() => {})
-  
-  // Ping cada 5 minutos
-  setInterval(() => {
-    fetch(pingUrl, { method: 'GET' }).catch(() => {})
-  }, 5 * 60 * 1000)
+// ── Keep-alive: mantiene Render despierto ──────────────────────────
+;(function keepAlive() {
+  // Ping inmediato al cargar la app
+  fetch(PING_URL).catch(() => {})
+  // Ping cada 5 minutos durante la sesión
+  setInterval(() => fetch(PING_URL).catch(() => {}), 5 * 60 * 1000)
 })()
 
-// ── 2. Caché Global ────────────────────────────────────────────────
-// Al sacarlo del hook, la caché sobrevive incluso si el componente se desmonta
+// ── Caché global ───────────────────────────────────────────────────
+// Fuera del hook → sobrevive re-renders y desmontajes de componentes.
 const globalCache = new Map()
 
-// ── 3. Core HTTP ───────────────────────────────────────────────────
+// ── Promise deduplication ──────────────────────────────────────────
+// Si dos componentes piden la misma traducción al mismo tiempo,
+// reutilizamos la misma Promise en vez de hacer dos fetch().
+const pendingRequests = new Map()
+
+// ── Función base de traducción ─────────────────────────────────────
 async function callTranslate({ text, from, to, signal }) {
   const clean = text?.trim()
   if (!clean) return ''
 
-  // A. Intentar por IPC (Electron)
-  if (IS_ELECTRON && window.electronAPI?.translate) {
-    try {
-      const result = await window.electronAPI.translate({ text: clean, from, to })
-      if (result) return result
-    } catch (e) {
-      console.warn('[Traducción] IPC falló, usando web:', e.message)
-    }
+  const cacheKey = `${from}|${to}:${clean}`
+
+  // 1. Caché: respuesta instantánea
+  if (globalCache.has(cacheKey)) return globalCache.get(cacheKey)
+
+  // 2. Deduplicación: reusar petición en vuelo si existe
+  if (pendingRequests.has(cacheKey)) {
+    return pendingRequests.get(cacheKey)
   }
 
-  // B. Backend en Render
-  try {
-    const res = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal, // Permite cancelar la petición si queda obsoleta
-      body: JSON.stringify({
-        text: clean,
-        source_lang: from,
-        target_lang: to === 'en' ? 'EN-US' : to.toUpperCase(),
-      }),
+  // 3. Nueva petición al backend
+  // El backend tiene la API key — el frontend no envía ninguna credencial
+  const promise = fetch(BACKEND_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal,
+    body: JSON.stringify({
+      text,
+      source_lang: from,
+      // DeepL necesita EN-US, no EN genérico
+      target_lang: to === 'en' ? 'EN-US' : to.toUpperCase(),
+    }),
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      const resultado = data.translated_text || clean
+      globalCache.set(cacheKey, resultado)
+      return resultado
+    })
+    .catch((e) => {
+      if (e.name === 'AbortError') return null
+      console.error('[Traducción]', e.message)
+      return clean // fallback al texto original
+    })
+    .finally(() => {
+      pendingRequests.delete(cacheKey)
     })
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error(err.detail || `HTTP ${res.status}`)
-    }
-
-    const data = await res.json()
-    return data.translated_text || clean
-
-  } catch (e) {
-    if (e.name === 'AbortError') return null // Petición cancelada
-    console.error('[Traducción] Error:', e.message)
-    return clean // Fallback al texto original
-  }
+  pendingRequests.set(cacheKey, promise)
+  return promise
 }
 
-// ── 4. Hook Manual (Para traducciones de botones o inputs) ─────────
-export function useTranslation({ from = 'en', to = 'es' } = {}) {
-  const translate = useCallback(async (text) => {
-    const clean = text?.trim()
-    if (!clean) return ''
 
-    const cacheKey = `${from}|${to}:${clean}`
-    if (globalCache.has(cacheKey)) return globalCache.get(cacheKey)
-
-    const result = await callTranslate({ text: clean, from, to })
-    
-    if (result && result !== clean) {
-      globalCache.set(cacheKey, result)
-    }
-    return result || clean
-  }, [from, to])
-
-  return { translate }
-}
-
-// ── 5. Hook Automático (Para la transcripción en vivo) ─────────────
+// ── Hook: useAutoTranslation ───────────────────────────────────────
+// Observa sourceText y traduce automáticamente solo los párrafos NUEVOS.
+//
+// GARANTÍA DE CERO GASTO EN MODO SUBTÍTULOS:
+//   App.jsx pasa '' como sourceText cuando subtitleOnly===true.
+//   El primer if (!sourceText?.trim()) hace return inmediato → nunca fetch().
 export function useAutoTranslation(sourceText, {
-  from = 'en',
-  to = 'es',
-  debounceMs = 300, // Debounce rápido para que se sienta fluido
+  from       = 'en',
+  to         = 'es',
+  debounceMs = 300,
 } = {}) {
-  const [result, setResult] = useState('')
+  const [result,      setResult]      = useState('')
   const [translating, setTranslating] = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => {
+    // ── EARLY RETURN: texto vacío = modo subtítulos activo ─────
+    // Este bloque nunca llega a hacer fetch(), garantizando 0 tokens gastados
     if (!sourceText?.trim()) {
       setResult('')
       return
     }
 
-    // El AbortController se crea aquí para matar peticiones de la red 
-    // si el useEffect vuelve a dispararse (ej. el usuario sigue hablando).
+    // AbortController: cancela peticiones si el texto cambia antes de responder
     const controller = new AbortController()
 
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(async () => {
       setTranslating(true)
 
-      // 1. Dividimos todo el texto en párrafos
-      const paragraphs = sourceText
+      // Dividimos en párrafos (cada \n\n es una burbuja separada)
+      const parrafos = sourceText
         .split(/\n\n+/)
         .map(p => p.trim())
         .filter(Boolean)
 
-      // 2. Procesamos todos los párrafos
-      const translationPromises = paragraphs.map(async (p) => {
-        const cacheKey = `${from}|${to}:${p}`
-        
-        // ¡LA MAGIA! Si el párrafo ya está en caché, se resuelve instantáneamente.
-        // Esto evita saltos de texto sin penalizar el rendimiento.
-        if (globalCache.has(cacheKey)) {
-          return globalCache.get(cacheKey)
-        }
+      // Traducimos todos los párrafos en paralelo
+      // Los que ya están en caché se resuelven instantáneamente
+      const resultados = await Promise.all(
+        parrafos.map(p => callTranslate({ text: p, from, to, signal: controller.signal }))
+      )
 
-        // Solo los párrafos nuevos o modificados hacen petición HTTP
-        const translatedResult = await callTranslate({
-          text: p,
-          from,
-          to,
-          signal: controller.signal
-        })
+      const textoFinal = resultados.filter(Boolean).join('\n\n')
+      if (textoFinal) setResult(textoFinal)
 
-        // Si la petición no fue cancelada, la guardamos
-        if (translatedResult) {
-          globalCache.set(cacheKey, translatedResult)
-          return translatedResult
-        }
-        return ''
-      })
-
-      const results = await Promise.all(translationPromises)
-      
-      // Filtramos valores nulos (cancelaciones) y unimos con doble salto de línea
-      const finalTranslatedText = results.filter(Boolean).join('\n\n')
-      
-      if (finalTranslatedText) {
-        setResult(finalTranslatedText)
-      }
       setTranslating(false)
     }, debounceMs)
 
-    // Cleanup: cancela el timeout y aborta peticiones HTTP en vuelo
     return () => {
       clearTimeout(timerRef.current)
-      controller.abort()
+      controller.abort() // cancela fetch si el componente se desmonta o cambia texto
     }
   }, [sourceText, from, to, debounceMs])
 

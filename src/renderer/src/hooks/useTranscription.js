@@ -1,58 +1,37 @@
 /**
  * hooks/useTranscription.js  —  Transcripción en tiempo real con Deepgram
  *
- * MEJORAS DE PRECISIÓN (especialmente español):
+ * ── BUG CORREGIDO ──────────────────────────────────────────────────
+ * El parámetro `detect_language: 'true'` es exclusivo de los modelos
+ * `base` y `enhanced`. En `nova-2` y `nova-3` ese parámetro es inválido
+ * y hace que Deepgram cierre la conexión WebSocket inmediatamente.
  *
- *  1. utterance_end_ms=1200  
- *     Deepgram espera 1.2s de silencio antes de cerrar una utterance.
- *     Sin esto, el español con pausas naturales se corta en medio de oraciones.
- *     Antes solo existía endpointing=500 que no es lo mismo.
+ * La forma CORRECTA de habilitar multilenguaje en nova-2/nova-3 es:
+ *   language: 'multi'
  *
- *  2. filler_words=false
- *     Evita que Deepgram incluya "eh", "um", "este" como texto confirmado,
- *     lo que contamina los subtítulos y confunde a la traducción.
- *
- *  3. no_delay=true
- *     Deepgram envía los resultados en cuanto están listos en vez de 
- *     agruparlos — reduce la latencia visual de los subtítulos.
- *
- *  4. Keywords bilingüe
- *     Lista con términos en inglés Y español ya que el modelo 'multi' 
- *     transcribe ambos idiomas. Prioridades ajustadas por frecuencia real.
+ * ── OPTIMIZACIONES PARA LLAMADAS DE INTÉRPRETE ────────────────────
+ * - nova-3: modelo más preciso de Deepgram, mejor con acentos hispanos
+ * - language: 'multi': detecta EN y ES automáticamente en el mismo stream
+ * - utterance_end_ms: 1500ms — pausa natural antes de cerrar una oración
+ *   (en llamadas telefónicas hay más latencia de red, necesita más margen)
+ * - endpointing: 300ms — detecta el final de turno del hablante
+ * - filler_words: false — no transcribe "eh", "um", "este"
+ * - no_delay: true — envía resultados en cuanto están listos
+ * - numerals: true — "cuatro veinte" → "420" (útil para números de cuenta)
+ * - diarize: false — no separamos hablantes (el intérprete habla uno a la vez)
  */
 
 import { useCallback, useRef, useState } from 'react'
 
 const DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen'
 
-// Vocabulario especializado para intérpretes.
-// Formato: 'palabra:N' donde N=1-5 es la prioridad (mayor = más forzado).
-// Agrupa por industria para facilitar el mantenimiento.
-const KEYWORDS = [
-  // Emergencias / 911
-  'CPR:3', 'RCP:3', 'dispatcher:2', 'paramedics:2', 'paramédicos:2',
-  'unconscious:2', 'inconsciente:2', 'overdose:2', 'sobredosis:2',
-  'intersection:2', 'intersección:2', 'felony:2', 'misdemeanor:2',
+// Vocabulario especializado para llamadas de intérprete.
+// Formato: 'término:prioridad' (1-5). Mantenlo corto — listas largas
+// pueden aumentar la latencia de conexión inicial.
 
-  // Médico
-  'HIPAA:3', 'MRI:2', 'resonancia:2', 'referral:2', 'referimiento:2',
-  'pediatrician:2', 'pediatra:2', 'prescription:2', 'receta:2',
-  'blood pressure:2', 'presión arterial:2',
-
-  // Seguros
-  'out-of-pocket:3', 'deductible:2', 'deducible:2',
-  'copay:2', 'copago:2', 'premium:2', 'prima:2',
-  'claim:2', 'reclamo:2', 'adjuster:2', 'underwriting:2',
-
-  // Finanzas / Bank of America
-  'Bank of America:3', 'routing number:3', 'número de ruta:3',
-  'account number:3', 'número de cuenta:3', 'wire transfer:2',
-  'overdraft:2', 'sobregiro:2', 'Zelle:3', 'statement:2', 'estado de cuenta:2',
-]
 
 
 export function useTranscription({
-  lang = 'multi',
   onFinal,
   onInterim,
   onError,
@@ -79,14 +58,14 @@ export function useTranscription({
     const API_KEY = localStorage.getItem('app_key')
     if (!API_KEY) { emitirError('Falta el API key de Deepgram'); return }
 
-    // Pedimos el micrófono si no recibimos un stream externo
+    // Pedimos micrófono si no recibimos un stream externo
     if (!stream) {
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           audio: {
-            autoGainControl:  true,   // amplifica voces bajas automáticamente
-            noiseSuppression: false,  // no mutilar palabras por "ruido"
-            echoCancellation: true,   // evitar retroalimentación
+            autoGainControl:  true,   // amplifica voces bajas
+            noiseSuppression: true,   // reduce ruido de fondo en llamadas
+            echoCancellation: true,   // evita retroalimentación
           }
         })
       } catch (e) {
@@ -96,33 +75,43 @@ export function useTranscription({
     }
 
     // ── Parámetros de Deepgram ──────────────────────────────────
+    // IMPORTANTE: NO usar detect_language con nova-2/nova-3.
+    // Para multilenguaje en nova-3 se usa: language=multi
     const params = new URLSearchParams({
-      model:            'nova-2',
-      language:         lang,          // 'multi' detecta EN + ES simultáneo
-      smart_format:     'true',        // capitalización, números, puntuación
-      interim_results:  'true',        // resultados en tiempo real mientras habla
-      punctuate:        'true',        // agrega puntuación automática
-      endpointing:      '400',         // ms de silencio para cortar una oración
-      utterance_end_ms: '1200',        // ms de silencio para cerrar utterance completa
-      filler_words:     'false',       // elimina "eh", "um", "este" del texto
-      no_delay:         'true',        // envía resultados inmediatamente (menos latencia)
+      model:            'nova-3',   // más preciso que nova-2, mejor con acentos
+      language:         'multi',    // ✅ CORRECTO para nova-3 multilenguaje
+                                    // ❌ NO usar detect_language=true con nova-3
+
+      smart_format:     'true',     // capitalización, puntuación automática
+      punctuate:        'true',     // agrega puntos, comas, signos de pregunta
+      numerals:         'true',     // "cuatro veinte" → "420"
+      interim_results:  'true',     // resultados en tiempo real mientras habla
+      no_delay:         'true',     // envía resultados inmediatamente
+      filler_words:     'false',    // omite "eh", "um", "este", "like"
+      endpointing:      '300',      // ms de silencio para detectar fin de turno
+      utterance_end_ms: '1500',     // ms de silencio para cerrar la utterance completa
+                                    // 1500ms da margen para pausas de llamadas telefónicas
+      diarize:          'false',    // no separar hablantes — el intérprete habla uno a la vez
     })
 
-    // Inyectamos el vocabulario especializado
-    KEYWORDS.forEach(kw => params.append('keywords', kw))
+    
+     
 
-    const ws = new WebSocket(`${DEEPGRAM_URL}?${params}`, ['token', API_KEY])
+    const wsUrl = `${DEEPGRAM_URL}?${params}`
+    console.log('🔌 Conectando a Deepgram...')
+
+    // El API key se pasa como subprotocolo WebSocket (no en la URL)
+    const ws = new WebSocket(wsUrl, ['token', API_KEY])
     socketRef.current = ws
 
 
     // ── WebSocket abierto ─────────────────────────────────────
     ws.onopen = () => {
+      console.log('✅ Deepgram conectado — modelo: nova-3, idioma: multi')
       activoRef.current = true
       setActive(true)
-      console.log('✅ Deepgram conectado — idioma:', lang)
 
-      // Elegimos el mejor formato disponible
-      // NO pasar encoding a Deepgram — él auto-detecta webm/opus
+      // audio/webm;codecs=opus: mejor compresión, menos bytes por paquete
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
         ? 'audio/webm;codecs=opus'
         : 'audio/webm'
@@ -135,7 +124,8 @@ export function useTranscription({
         }
       }
 
-      recorder.start(200) // chunks de 200ms para mayor fluidez (antes 250ms)
+      // 150ms de chunk = ~6-7 paquetes/seg → buena fluidez sin saturar la conexión
+      recorder.start(150)
       recorderRef.current = recorder
     }
 
@@ -145,16 +135,22 @@ export function useTranscription({
       let data
       try { data = JSON.parse(msg.data) } catch { return }
 
-      // Solo procesamos transcripciones (ignoramos metadatos, SpeechStarted, etc.)
+      // Solo procesamos transcripciones (ignoramos SpeechStarted, UtteranceEnd, etc.)
       if (data.type !== 'Results') return
 
-      const alt             = data.channel?.alternatives?.[0]
-      const texto           = alt?.transcript?.trim()
-      const idiomaDetectado = alt?.languages?.[0] || 'en'
+      const alt        = data.channel?.alternatives?.[0]
+      const texto      = alt?.transcript?.trim()
+      const idioma     = alt?.languages?.[0] || 'en'
+      const confidence = alt?.confidence ?? 0
 
-      if (!texto) return
+      // Filtramos texto vacío o de muy baja confianza
+      if (!texto || texto.length < 2) return
 
-      const payload = { text: texto, lang: idiomaDetectado }
+      // Para interim: solo mostramos si la confianza es aceptable
+      // Para final: siempre mostramos (Deepgram ya filtró lo irrelevante)
+      if (!data.is_final && confidence < 0.65) return
+
+      const payload = { text: texto, lang: idioma, confidence }
 
       if (data.is_final) {
         onFinal?.(payload)
@@ -164,20 +160,23 @@ export function useTranscription({
     }
 
 
-    ws.onerror = () => emitirError('Error de conexión con Deepgram')
+    ws.onerror = (err) => {
+      console.error('❌ WebSocket error:', err)
+      emitirError('Error de conexión con Deepgram')
+    }
 
     ws.onclose = (e) => {
+      console.log(`🔌 Deepgram cerrado — código: ${e.code}`, e.reason || '')
       const razones = {
-        1008: 'API key de Deepgram rechazado — verifica tu clave',
+        1008: 'API key de Deepgram inválido o expirado',
         1011: 'Error interno de Deepgram — intenta de nuevo',
       }
       if (razones[e.code]) emitirError(razones[e.code])
-      console.log(`🔌 Deepgram cerrado — código: ${e.code}`)
       activoRef.current = false
       setActive(false)
     }
 
-  }, [lang, onFinal, onInterim, emitirError])
+  }, [onFinal, onInterim, emitirError])
 
 
   // ── Detener ───────────────────────────────────────────────────

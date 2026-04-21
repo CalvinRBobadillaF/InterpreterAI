@@ -4,15 +4,15 @@
  * Captura audio de una pestaña del navegador usando getDisplayMedia.
  *
  * LIMITACIÓN EN MAC:
- *   macOS no permite capturar el audio del sistema vía getDisplayMedia.
- *   Solo funciona si el usuario comparte una pestaña específica de Chrome
- *   (no ventana ni pantalla completa) y marca "Compartir audio de la pestaña".
- *   Para audio del sistema en Mac, usar el modo "Electron" (desktopCapturer).
+ * macOS no permite capturar el audio del sistema vía getDisplayMedia.
+ * Solo funciona si el usuario comparte una pestaña específica de Chrome
+ * (no ventana ni pantalla completa) y marca "Compartir audio de la pestaña".
+ * Para audio del sistema en Mac, usar el modo "Electron" (desktopCapturer).
  *
  * RETORNA: { stream, reason, userMessage }
- *   - stream: MediaStream con audio, o null si falló
- *   - reason: código del error ('cancelled', 'no-audio-track', 'mac-no-audio')
- *   - userMessage: mensaje legible para mostrar al usuario
+ * - stream: MediaStream con audio, o null si falló
+ * - reason: código del error ('cancelled', 'no-audio-track', 'mac-no-audio')
+ * - userMessage: mensaje legible para mostrar al usuario
  */
 
 const ES_MAC = navigator.platform?.toUpperCase().includes('MAC') ||
@@ -32,11 +32,17 @@ export const startBrowserCapture = async () => {
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({
       audio: {
+        // ✅ APAGADOS: Evita doble procesamiento (voz robótica) en audio de pestaña
         echoCancellation: false,
         noiseSuppression: false,
         autoGainControl:  false,
-        // En Windows/Linux pedimos calidad más alta; en Mac se ignora
-        ...(ES_MAC ? {} : { channelCount: 2, sampleRate: 44100 }),
+        
+        // ✅ OPTIMIZADO PARA DEEPGRAM: Mono (1 canal), 16kHz (frecuencia nativa de voz)
+        ...(ES_MAC ? {} : { 
+          channelCount: 1, 
+          sampleRate: 16000, 
+          sampleSize: 16 
+        }),
       },
       video: {
         // Pedimos la resolución mínima — descartamos el video de todas formas
