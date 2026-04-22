@@ -12749,16 +12749,95 @@ const FUENTES = [
     label: "Microphone",
     sub: "Default input",
     Icon: Mic,
-    note: "Captura el micrófono del dispositivo"
+    note: "Captura el micrófono del dispositivo",
+    badge: null
   },
   {
     id: "tab",
     label: "Browser Tab",
     sub: "Tab / screen",
     Icon: Globe,
-    note: "Elige una pestaña en el diálogo de compartir"
+    note: "Elige una pestaña en el diálogo de compartir",
+    badge: null
   }
+  /*
+  {
+    id:    'system',
+    label: 'System Audio',
+    sub:   'PC / whole screen',
+    Icon:  Monitor,
+    // Nota visible en el dropdown para que el usuario sepa la limitación
+    note:  'Audio del sistema completo (Windows/Chrome recomendado)',
+    // Badge informativo — no bloquea la selección
+    badge: 'Beta',
+  }, */
 ];
+function Badge({ text }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "span",
+    {
+      style: {
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase",
+        padding: "1px 5px",
+        borderRadius: 4,
+        background: "var(--accent, #6366f1)",
+        color: "#fff",
+        lineHeight: 1.6,
+        flexShrink: 0,
+        alignSelf: "center",
+        marginLeft: 4,
+        userSelect: "none"
+      },
+      children: text
+    }
+  );
+}
+const SYSTEM_SUPPORT_LINES = [
+  "✅ Windows + Chrome/Edge",
+  "⚠️  macOS → necesita BlackHole o Loopback",
+  "❌  Linux → sin soporte nativo"
+];
+function SystemAudioTooltip({ visible }) {
+  if (!visible) return null;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      style: {
+        position: "absolute",
+        // Se posiciona a la derecha del dropdown
+        left: "calc(100% + 8px)",
+        top: 0,
+        width: 210,
+        background: "var(--surface-2, #1e1e2e)",
+        border: "1px solid var(--border, #333)",
+        borderRadius: 8,
+        padding: "8px 10px",
+        zIndex: 9999,
+        pointerEvents: "none",
+        boxShadow: "0 4px 18px rgba(0,0,0,.35)"
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
+          margin: "0 0 5px",
+          fontSize: 10,
+          fontWeight: 700,
+          color: "var(--text-muted)",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em"
+        }, children: "Soporte por sistema" }),
+        SYSTEM_SUPPORT_LINES.map((line) => /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
+          margin: "2px 0",
+          fontSize: 11,
+          color: "var(--text, #e0e0e0)",
+          whiteSpace: "nowrap"
+        }, children: line }, line))
+      ]
+    }
+  );
+}
 function Header({
   playing,
   onTogglePlay,
@@ -12776,20 +12855,32 @@ function Header({
     localStorage.setItem("theme", lightTheme ? "light" : "dark");
   }, [lightTheme]);
   const [dropdownOpen, setDropdownOpen] = reactExports.useState(false);
+  const [hoveredSource, setHoveredSource] = reactExports.useState(null);
   const dropdownRef = reactExports.useRef(null);
   const fuenteActiva = FUENTES.find((f) => f.id === source) || FUENTES[0];
   reactExports.useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+        setHoveredSource(null);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
   const seleccionarFuente = (id) => {
+    if (id === "system") {
+      const supported = typeof navigator.mediaDevices?.getDisplayMedia === "function";
+      if (!supported) {
+        alert(
+          "Tu navegador no soporta getDisplayMedia.\nUsa Chrome o Edge en HTTPS / localhost."
+        );
+        return;
+      }
+    }
     onSourceChange?.(id);
     setDropdownOpen(false);
+    setHoveredSource(null);
   };
   const handleLogout = () => {
     localStorage.removeItem("app_name");
@@ -12806,9 +12897,15 @@ function Header({
           className: "header-source",
           onClick: () => !playing && setDropdownOpen((o) => !o),
           disabled: playing,
-          title: playing ? "Detén la grabación para cambiar la fuente" : "Seleccionar fuente",
+          title: playing ? "Detén la grabación para cambiar la fuente" : "Seleccionar fuente de audio",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(fuenteActiva.Icon, { size: 13, style: { color: "var(--text-muted)", flexShrink: 0 } }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              fuenteActiva.Icon,
+              {
+                size: 13,
+                style: { color: "var(--text-muted)", flexShrink: 0 }
+              }
+            ),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-source__lines", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__label", children: fuenteActiva.label }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__sub", children: fuenteActiva.sub })
@@ -12817,18 +12914,29 @@ function Header({
           ]
         }
       ),
-      dropdownOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown", children: FUENTES.map(({ id, label, sub, Icon: Icon2, note }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      dropdownOpen && /*
+      * `position: relative` en el dropdown para que el tooltip
+      * de SystemAudio pueda posicionarse con left: 100%
+      */
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown", style: { position: "relative" }, children: FUENTES.map(({ id, label, sub, Icon: Icon2, note, badge }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
           className: `source-dropdown__item ${id === source ? "is-active" : ""}`,
           onClick: () => seleccionarFuente(id),
+          onMouseEnter: () => setHoveredSource(id),
+          onMouseLeave: () => setHoveredSource(null),
+          "data-source": id,
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown__icon", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 14 }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "source-dropdown__text", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "source-dropdown__label", children: label }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { display: "flex", alignItems: "center", gap: 0 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "source-dropdown__label", children: label }),
+                badge && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { text: badge })
+              ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "source-dropdown__note", children: note })
             ] }),
-            id === source && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown__check", children: "✓" })
+            id === source && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown__check", children: "✓" }),
+            id === "system" && /* @__PURE__ */ jsxRuntimeExports.jsx(SystemAudioTooltip, { visible: hoveredSource === "system" })
           ]
         },
         id
@@ -12876,7 +12984,7 @@ function Header({
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.2" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.3" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -13208,7 +13316,7 @@ function useAutoTranslation(sourceText, {
 }
 const startElectronCapture = async () => {
   if (!window.electronAPI?.getAudioSource) {
-    console.error("[Electron] electronAPI no encontrado. ¿Está cargado el preload.js?");
+    console.error("[Electron] electronAPI no encontrado");
     return null;
   }
   let fuente;
@@ -13219,34 +13327,41 @@ const startElectronCapture = async () => {
     return null;
   }
   if (!fuente) {
-    console.error("[Electron] El proceso principal no devolvió ninguna fuente de audio");
+    console.error("[Electron] Sin fuente disponible");
     return null;
   }
+  console.log("[Electron] Usando fuente:", fuente.name, fuente.id);
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         mandatory: {
           chromeMediaSource: "desktop",
           chromeMediaSourceId: fuente.id,
-          // Desactivamos el procesamiento de audio — queremos el sonido crudo del sistema
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false
         }
       },
-      // Requerimos video aunque no lo usemos — es necesario para desktop capture
       video: {
         mandatory: {
           chromeMediaSource: "desktop",
-          chromeMediaSourceId: fuente.id
+          chromeMediaSourceId: fuente.id,
+          maxWidth: 1,
+          // mínimo posible — igual se descarta
+          maxHeight: 1
         }
       }
     });
+    const audioTracks = stream.getAudioTracks();
+    if (audioTracks.length === 0) {
+      console.error("[Electron] Stream sin pistas de audio — posiblemente Linux o permisos");
+      return null;
+    }
+    console.log("[Electron] Pistas de audio:", audioTracks.map((t) => t.label));
     stream.getVideoTracks().forEach((t) => t.stop());
-    console.log("[Electron] Stream de audio del sistema listo");
     return stream;
   } catch (e) {
-    console.error("[Electron] getUserMedia falló:", e);
+    console.error("[Electron] getUserMedia falló:", e.name, e.message);
     return null;
   }
 };
