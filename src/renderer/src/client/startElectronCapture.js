@@ -12,14 +12,13 @@
  * REQUISITO: preload.js debe exponer window.electronAPI.getAudioSource()
  */
 
+// startElectronCapture.js — versión mejorada
 export const startElectronCapture = async () => {
-  // Verificamos que estamos en Electron y que el preload está cargado
   if (!window.electronAPI?.getAudioSource) {
-    console.error('[Electron] electronAPI no encontrado. ¿Está cargado el preload.js?')
+    console.error('[Electron] electronAPI no encontrado')
     return null
   }
 
-  // Pedimos al proceso principal el id de la fuente de pantalla
   let fuente
   try {
     fuente = await window.electronAPI.getAudioSource()
@@ -29,40 +28,49 @@ export const startElectronCapture = async () => {
   }
 
   if (!fuente) {
-    console.error('[Electron] El proceso principal no devolvió ninguna fuente de audio')
+    console.error('[Electron] Sin fuente disponible')
     return null
   }
 
+  console.log('[Electron] Usando fuente:', fuente.name, fuente.id)
+
   try {
-    // getUserMedia con chromeMediaSource funciona en el Chromium de Electron
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         mandatory: {
-          chromeMediaSource:   'desktop',
+          chromeMediaSource: 'desktop',
           chromeMediaSourceId: fuente.id,
-          // Desactivamos el procesamiento de audio — queremos el sonido crudo del sistema
-          echoCancellation:  false,
-          noiseSuppression:  false,
-          autoGainControl:   false,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
         },
       },
-      // Requerimos video aunque no lo usemos — es necesario para desktop capture
       video: {
         mandatory: {
-          chromeMediaSource:   'desktop',
+          chromeMediaSource: 'desktop',
           chromeMediaSourceId: fuente.id,
+          maxWidth: 1,   // mínimo posible — igual se descarta
+          maxHeight: 1,
         },
       },
     })
 
-    // Descartamos el video inmediatamente
+    // Verificar que realmente hay audio
+    const audioTracks = stream.getAudioTracks()
+    if (audioTracks.length === 0) {
+      console.error('[Electron] Stream sin pistas de audio — posiblemente Linux o permisos')
+      return null
+    }
+
+    console.log('[Electron] Pistas de audio:', audioTracks.map(t => t.label))
+
+    // Descartar video
     stream.getVideoTracks().forEach(t => t.stop())
 
-    console.log('[Electron] Stream de audio del sistema listo')
     return stream
 
   } catch (e) {
-    console.error('[Electron] getUserMedia falló:', e)
+    console.error('[Electron] getUserMedia falló:', e.name, e.message)
     return null
   }
 }
