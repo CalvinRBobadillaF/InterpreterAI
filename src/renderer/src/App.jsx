@@ -1,13 +1,14 @@
 /**
  * App.jsx  —  Interpreter AI
  *
- * NUEVO:
- *   subtitleOnly — cuando está activo, useAutoTranslation no se ejecuta
- *   y TranslationPanel recibe translated='' (no muestra sección de traducción).
- *   Esto evita todas las llamadas al backend cuando el usuario solo quiere subtítulos.
+ * ACTUALIZADO:
+ * - Integración de isAutoMode para permitir que la IA detecte el idioma si es necesario.
+ * - Los controles de idioma ahora viven en el Header.
+ * - Atajo global (Ctrl + Space) bloqueado si está en modo Automático.
+ * - Footer dinámico según el modo activo.
  */
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import './App.css'
 
 import { LogIn }              from './components/LogIn'
@@ -31,8 +32,35 @@ function App() {
   const [playing, setPlaying] = useState(false)
   const [source,  setSource]  = useState('mic')
 
+  // ── ESTADO DE MODOS Y RUTEO (Auto vs Manual) ──────────────────
+  const [isAutoMode, setIsAutoMode] = useState(false) // 👈 NUEVO: Controla si usamos 1 o 2 WebSockets
+  const activeLangRef = useRef('en-US')
+  const [activeLangUI, setActiveLangUI] = useState('en-US')
+
+  // Función para alternar el idioma (Solo en modo manual)
+  const toggleLanguage = useCallback(() => {
+    const newLang = activeLangRef.current === 'en-US' ? 'es-419' : 'en-US'
+    activeLangRef.current = newLang
+    setActiveLangUI(newLang)
+  }, [])
+
+  // Atajo de teclado: Ctrl + Espacio para cambiar el idioma
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignorar si el usuario está escribiendo o si está en Modo Automático
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || isAutoMode) return;
+
+      if (e.ctrlKey && e.code === 'Space') {
+        e.preventDefault() // Evita el scroll accidental
+        toggleLanguage()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [toggleLanguage, isAutoMode]) // 👈 Agregamos isAutoMode a las dependencias
+
+
   // ── Modo: solo subtítulos (sin traducción) ────────────────────
-  // Cuando está activo, no se hacen llamadas al backend de traducción
   const [subtitleOnly, setSubtitleOnly] = useState(false)
 
   // ── Texto transcrito (confirmado e interim) ───────────────────
@@ -42,8 +70,16 @@ function App() {
   const [interimSpanish, setInterimSpanish] = useState('')
 
   // ── Footer ────────────────────────────────────────────────────
-  const [footerStatus, setFooterStatus] = useState('Idle')
   const [footerError,  setFooterError]  = useState(null)
+
+  // Footer dinámico basado en si estamos grabando y qué canal está activo
+  const getFooterStatus = () => {
+    if (!playing) return 'Idle'
+    if (isAutoMode) return '🎙️ Escuchando: MODO AUTOMÁTICO (Inglés y Español)'
+    
+    const langLabel = activeLangUI === 'en-US' ? 'INGLÉS (Agente)' : 'ESPAÑOL (Cliente)'
+    return `🎙️ Escuchando: ${langLabel} — Presiona Ctrl+Espacio para cambiar`
+  }
 
   const streamRef = useRef(null)
 
@@ -52,8 +88,6 @@ function App() {
   const handleClearRight = () => { setSpanishText('');  setInterimSpanish('') }
 
   // ── Traducción automática ─────────────────────────────────────
-  // Solo se activa si subtitleOnly === false.
-  // Pasamos '' si está en modo subtítulos → no se dispara ningún fetch.
   const textoParaTraducirEN = subtitleOnly ? '' : englishText
   const textoParaTraducirES = subtitleOnly ? '' : spanishText
 
@@ -66,11 +100,10 @@ function App() {
   // ── Transcripción en tiempo real ──────────────────────────────
   const { start: startTranscription, stop: stopTranscription, error: transcriptionError } =
     useTranscription({
-      lang: 'multi', // Deepgram detecta EN + ES al mismo tiempo
+      activeLangRef,
+      isAutoMode, // 👈 Pasamos el estado de modo automático al hook
 
       onFinal: useCallback(({ text, lang }) => {
-        // Separador: doble salto (nueva burbuja) si termina con puntuación,
-        // espacio simple si la oración continúa sin pausa
         const agregar = (previo, nuevo) => {
           if (!previo) return nuevo
           const tienePuntuacion = /[.!?]$/.test(previo.trim())
@@ -94,7 +127,6 @@ function App() {
       onError: useCallback((err) => {
         setFooterError(err)
         setPlaying(false)
-        setFooterStatus('Idle')
       }, []),
     })
 
@@ -108,8 +140,6 @@ function App() {
       if (source === 'electron') {
         stream = await startElectronCapture()
         if (!stream) { setFooterError('No se pudo capturar el audio del sistema.'); return }
-        setFooterStatus('Audio del sistema — Escuchando...')
-
       } else if (source === 'tab') {
         const resultado = await startBrowserCapture()
         if (!resultado.stream) {
@@ -117,14 +147,16 @@ function App() {
           return
         }
         stream = resultado.stream
-        setFooterStatus('Audio de pestaña — Escuchando...')
-
       } else {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        setFooterStatus('Micrófono — Escuchando...')
       }
 
       streamRef.current = stream
+      
+      // Reiniciamos al inglés por defecto cada vez que inicia una llamada nueva en modo manual
+      activeLangRef.current = 'en-US'
+      setActiveLangUI('en-US')
+      
       await startTranscription(stream)
       setPlaying(true)
 
@@ -135,7 +167,6 @@ function App() {
       setInterimEnglish('')
       setInterimSpanish('')
       setPlaying(false)
-      setFooterStatus('Idle')
     }
   }, [playing, source, startTranscription, stopTranscription])
 
@@ -158,6 +189,11 @@ function App() {
         onSourceChange={handleSourceChange}
         subtitleOnly={subtitleOnly}
         onToggleSubtitleOnly={() => setSubtitleOnly(v => !v)}
+        // 👇 Nuevos props del Header para controlar los idiomas
+        isAutoMode={isAutoMode}
+        onToggleAutoMode={() => setIsAutoMode(prev => !prev)}
+        activeLangUI={activeLangUI}
+        onToggleLanguage={toggleLanguage}
       />
 
       <main className="app-main">
@@ -165,14 +201,14 @@ function App() {
         <TranslationPanel
           fromLang="EN"
           toLang="ES"
-          placeholder={playing ? 'Escuchando...' : 'Presiona ▶ para comenzar'}
+          placeholder={playing ? (isAutoMode ? 'Escuchando (Modo Auto)...' : 'Escuchando Inglés...') : 'Presiona ▶ para comenzar'}
           value={englishText}
-          translated={enToEs}           // vacío en modo solo subtítulos
+          translated={enToEs}
           interimText={interimEnglish}
           loading={traduciendoEN}
           onChange={(e) => setEnglishText(e.target.value)}
           onClear={handleClearLeft}
-          subtitleOnly={subtitleOnly}   // oculta la sección de traducción
+          subtitleOnly={subtitleOnly}
         />
 
         {/* Panel derecho: ES original → traducción EN */}
@@ -181,7 +217,7 @@ function App() {
           toLang="EN"
           readOnly
           value={spanishText}
-          translated={esToEn}           // vacío en modo solo subtítulos
+          translated={esToEn}
           interimText={interimSpanish}
           loading={traduciendoES}
           onClear={handleClearRight}
@@ -190,7 +226,7 @@ function App() {
       </main>
 
       <Footer
-        status={subtitleOnly ? `${footerStatus} · Solo subtítulos` : footerStatus}
+        status={subtitleOnly ? `${getFooterStatus()} · Solo subtítulos` : getFooterStatus()}
         error={footerError || (transcriptionError ? `STT: ${transcriptionError}` : null)}
       />
     </div>

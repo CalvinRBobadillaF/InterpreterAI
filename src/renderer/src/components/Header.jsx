@@ -2,18 +2,16 @@
  * components/Header.jsx
  *
  * Fuentes de audio disponibles:
- *  - mic  → Micrófono del dispositivo
- *  - tab  → Pestaña del navegador (getDisplayMedia)
- *  - system → Audio del sistema/PC completo (getDisplayMedia con preferencia de pantalla)
+ * - mic    → Micrófono del dispositivo
+ * - tab    → Pestaña del navegador (getDisplayMedia)
+ * - system → Audio del sistema/PC completo (getDisplayMedia con preferencia de pantalla)
  *
  * El botón de subtítulos/traducción alterna `subtitleOnly` en App.jsx.
- * Cuando subtitleOnly===true, App.jsx pasa sourceText='' a useAutoTranslation
- * → el hook hace early-return antes de cualquier fetch → 0 tokens de DeepL gastados.
  */
 import { useState, useEffect, useRef } from 'react'
 import {
   Play, Square, ChevronDown,
-  Mic, Globe, Sun, Moon, Captions, Languages, Monitor,
+  Mic, Globe, Sun, Moon, Captions, Languages, Monitor, Bot, Zap
 } from 'lucide-react'
 
 // ── Waveform ──────────────────────────────────────────────────────
@@ -56,12 +54,6 @@ function useTimer(running) {
 }
 
 // ── Fuentes de audio ───────────────────────────────────────────────
-// 'system' usa getDisplayMedia igual que 'tab' pero con preferenceDisplaySurface:'monitor'
-// para que el diálogo del SO abra directamente en "Toda la pantalla" y capture
-// el audio del sistema (loopback). El soporte real depende del SO y el navegador:
-//   ✅ Windows + Chrome/Edge  → audio del sistema disponible
-//   ⚠️ macOS                 → requiere extensión/driver virtual (BlackHole, Loopback…)
-//   ❌ Linux                  → generalmente no soportado sin PulseAudio loopback
 const FUENTES = [
   {
     id:    'mic',
@@ -79,22 +71,8 @@ const FUENTES = [
     note:  'Elige una pestaña en el diálogo de compartir',
     badge: null,
   },
-  /*
-  {
-    id:    'system',
-    label: 'System Audio',
-    sub:   'PC / whole screen',
-    Icon:  Monitor,
-    // Nota visible en el dropdown para que el usuario sepa la limitación
-    note:  'Audio del sistema completo (Windows/Chrome recomendado)',
-    // Badge informativo — no bloquea la selección
-    badge: 'Beta',
-  }, */
 ]
 
-// ─────────────────────────────────────────────────────────────────
-// Badge pequeño que se muestra junto al label en el dropdown
-// ─────────────────────────────────────────────────────────────────
 function Badge({ text }) {
   return (
     <span
@@ -119,10 +97,6 @@ function Badge({ text }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Tooltip de soporte por SO — aparece al hacer hover sobre el ítem
-// de System Audio para orientar al usuario sin bloquear la acción
-// ─────────────────────────────────────────────────────────────────
 const SYSTEM_SUPPORT_LINES = [
   '✅ Windows + Chrome/Edge',
   '⚠️  macOS → necesita BlackHole o Loopback',
@@ -135,7 +109,6 @@ function SystemAudioTooltip({ visible }) {
     <div
       style={{
         position:     'absolute',
-        // Se posiciona a la derecha del dropdown
         left:         'calc(100% + 8px)',
         top:          0,
         width:        210,
@@ -173,6 +146,11 @@ export function Header({
   onSourceChange,
   subtitleOnly,
   onToggleSubtitleOnly,
+  // Props de Idioma
+  isAutoMode,
+  onToggleAutoMode,
+  activeLangUI,
+  onToggleLanguage
 }) {
   const timer = useTimer(playing)
 
@@ -187,13 +165,11 @@ export function Header({
 
   // Dropdown fuente de audio
   const [dropdownOpen,  setDropdownOpen]  = useState(false)
-  // Cuál ítem tiene el hover (para el tooltip de soporte)
   const [hoveredSource, setHoveredSource] = useState(null)
 
   const dropdownRef  = useRef(null)
   const fuenteActiva = FUENTES.find(f => f.id === source) || FUENTES[0]
 
-  // Cierra el dropdown al hacer clic fuera
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -205,13 +181,8 @@ export function Header({
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  // ── Selección de fuente ──────────────────────────────────────
-  // Para 'system' intentamos verificar si el navegador soporta
-  // getDisplayMedia antes de confirmar la selección. Si no, avisamos
-  // pero igual permitimos seleccionarlo (el hook de captura decide).
   const seleccionarFuente = (id) => {
     if (id === 'system') {
-      // getDisplayMedia no está disponible en HTTP sin localhost
       const supported = typeof navigator.mediaDevices?.getDisplayMedia === 'function'
       if (!supported) {
         alert(
@@ -260,10 +231,6 @@ export function Header({
         </button>
 
         {dropdownOpen && (
-          /*
-           * `position: relative` en el dropdown para que el tooltip
-           * de SystemAudio pueda posicionarse con left: 100%
-           */
           <div className="source-dropdown" style={{ position: 'relative' }}>
             {FUENTES.map(({ id, label, sub, Icon, note, badge }) => (
               <button
@@ -272,16 +239,11 @@ export function Header({
                 onClick={() => seleccionarFuente(id)}
                 onMouseEnter={() => setHoveredSource(id)}
                 onMouseLeave={() => setHoveredSource(null)}
-                /*
-                 * Atributo data para CSS opcional:
-                 *   [data-source="system"] { border-top: 1px solid var(--border) }
-                 */
                 data-source={id}
               >
                 <div className="source-dropdown__icon"><Icon size={14} /></div>
 
                 <div className="source-dropdown__text">
-                  {/* Label + badge en la misma fila */}
                   <span style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
                     <span className="source-dropdown__label">{label}</span>
                     {badge && <Badge text={badge} />}
@@ -291,7 +253,6 @@ export function Header({
 
                 {id === source && <div className="source-dropdown__check">✓</div>}
 
-                {/* Tooltip de soporte solo para System Audio */}
                 {id === 'system' && (
                   <SystemAudioTooltip visible={hoveredSource === 'system'} />
                 )}
@@ -319,20 +280,46 @@ export function Header({
         <Waveform active={playing} />
       </div>
 
+      {/* ── CENTRAL: Controles de Idioma (NUEVO) ───────────────── */}
+      <div className="header-lang-controls no-drag" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: 'auto', marginRight: '16px' }}>
+        
+        {/* Toggle Auto/Manual */}
+        <button
+          className={`header-icon-btn ${isAutoMode ? 'is-active' : ''}`}
+          onClick={onToggleAutoMode}
+          title={isAutoMode ? 'Modo Automático activo. Clic para Manual.' : 'Modo Manual activo. Clic para Auto.'}
+          style={{ padding: '4px 10px', borderRadius: '6px', display: 'flex', gap: '6px' }}
+        >
+          {isAutoMode ? <Bot size={14} /> : <Zap size={14} />}
+          <span style={{ fontSize: '11px', fontWeight: 600 }}>{isAutoMode ? 'Auto' : 'Manual'}</span>
+        </button>
+
+        {/* Switch Manual (Solo visible si NO es auto) */}
+        {!isAutoMode && (
+          <button
+            onClick={onToggleLanguage}
+            title="Atajo: Ctrl + Espacio"
+            style={{
+              padding: '4px 12px',
+              borderRadius: '6px',
+              fontSize: '11px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: '1px solid var(--border)',
+              background: activeLangUI === 'en-US' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+              color: activeLangUI === 'en-US' ? '#3b82f6' : '#ef4444',
+              transition: 'all 0.2s',
+              minWidth: '90px'
+            }}
+          >
+            {activeLangUI === 'en-US' ? '🇺🇸 INGLÉS' : '🇪🇸 ESPAÑOL'}
+          </button>
+        )}
+      </div>
+
       {/* ── Controles derecha ──────────────────────────────────── */}
       <div className="header-right no-drag">
 
-        {/*
-          BOTÓN SOLO SUBTÍTULOS / TRADUCCIÓN
-          ─────────────────────────────────────────────────────────
-          Al activar modo subtítulos:
-            1. Este botón cambia su apariencia a "is-active"
-            2. App.jsx recibe subtitleOnly=true y pasa '' a useAutoTranslation
-            3. useAutoTranslation hace early-return inmediato → 0 tokens gastados
-          Al desactivar:
-            1. App.jsx pasa el texto real → useAutoTranslation traduce normalmente
-          ─────────────────────────────────────────────────────────
-        */}
         <button
           className={`header-icon-btn header-subtitle-toggle ${subtitleOnly ? 'is-active' : ''}`}
           onClick={onToggleSubtitleOnly}
