@@ -12552,8 +12552,12 @@ const __iconNode$7 = [
   ["path", { d: "M14 18h6", key: "1m8k6r" }]
 ];
 const Languages = createLucideIcon("languages", __iconNode$7);
-const __iconNode$6 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-const LoaderCircle = createLucideIcon("loader-circle", __iconNode$6);
+const __iconNode$6 = [
+  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
+  ["path", { d: "M21 12H9", key: "dn1m92" }],
+  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
+];
+const LogOut = createLucideIcon("log-out", __iconNode$6);
 const __iconNode$5 = [
   ["path", { d: "M12 19v3", key: "npa21l" }],
   ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
@@ -12715,128 +12719,37 @@ function LogIn({ onLogin }) {
     ] })
   ] }) });
 }
-const BAR_COUNT = 72;
+const BAR_COUNT = 28;
 const BAR_HEIGHTS = Array.from({ length: BAR_COUNT }, (_, i) => {
-  const v = Math.abs(Math.sin(i * 0.47) * 0.5 + Math.sin(i * 0.11) * 0.5);
-  return Math.round(3 + v * 14);
+  const v = Math.abs(Math.sin(i * 0.52) * 0.6 + Math.sin(i * 0.13) * 0.4);
+  return Math.round(3 + v * 10);
 });
 function Waveform({ active }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `waveform ${active ? "waveform--active" : ""}`, children: [
-    BAR_HEIGHTS.map((h, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "waveform__bar", style: { height: h } }, i)),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "waveform__cursor" })
-  ] });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `hdr-wave ${active ? "hdr-wave--on" : ""}`, "aria-hidden": true, children: BAR_HEIGHTS.map((h, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-wave__bar", style: { "--h": `${h}px` } }, i)) });
 }
 function useTimer(running) {
   const [secs, setSecs] = reactExports.useState(0);
   const ref = reactExports.useRef(null);
   reactExports.useEffect(() => {
     if (running) {
-      ref.current = setInterval(() => setSecs((s) => s + 1), 1e3);
+      ref.current = setInterval(() => setSecs((s2) => s2 + 1), 1e3);
     } else {
       clearInterval(ref.current);
       setSecs(0);
     }
     return () => clearInterval(ref.current);
   }, [running]);
-  const hh = String(Math.floor(secs / 3600)).padStart(2, "0");
-  const mm = String(Math.floor(secs % 3600 / 60)).padStart(2, "0");
-  const ss = String(secs % 60).padStart(2, "0");
-  return `${hh}:${mm}:${ss}`;
+  const h = String(Math.floor(secs / 3600)).padStart(2, "0");
+  const m = String(Math.floor(secs % 3600 / 60)).padStart(2, "0");
+  const s = String(secs % 60).padStart(2, "0");
+  return `${h}:${m}:${s}`;
 }
 const FUENTES = [
-  {
-    id: "mic",
-    label: "Microphone",
-    sub: "Default input",
-    Icon: Mic,
-    note: "Captura el micrófono del dispositivo",
-    badge: null
-  },
-  {
-    id: "tab",
-    label: "Browser Tab",
-    sub: "Tab / screen",
-    Icon: Globe,
-    note: "Elige una pestaña en el diálogo de compartir",
-    badge: null
-  }
-  /*
-  {
-    id:    'system',
-    label: 'System Audio',
-    sub:   'PC / whole screen',
-    Icon:  Monitor,
-    // Nota visible en el dropdown para que el usuario sepa la limitación
-    note:  'Audio del sistema completo (Windows/Chrome recomendado)',
-    // Badge informativo — no bloquea la selección
-    badge: 'Beta',
-  }, */
+  { id: "mic", label: "Microphone", sub: "Device input", Icon: Mic },
+  { id: "tab", label: "Browser Tab", sub: "Tab audio", Icon: Globe }
 ];
-function Badge({ text }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "span",
-    {
-      style: {
-        fontSize: 9,
-        fontWeight: 700,
-        letterSpacing: "0.04em",
-        textTransform: "uppercase",
-        padding: "1px 5px",
-        borderRadius: 4,
-        background: "var(--accent, #6366f1)",
-        color: "#fff",
-        lineHeight: 1.6,
-        flexShrink: 0,
-        alignSelf: "center",
-        marginLeft: 4,
-        userSelect: "none"
-      },
-      children: text
-    }
-  );
-}
-const SYSTEM_SUPPORT_LINES = [
-  "✅ Windows + Chrome/Edge",
-  "⚠️  macOS → necesita BlackHole o Loopback",
-  "❌  Linux → sin soporte nativo"
-];
-function SystemAudioTooltip({ visible }) {
-  if (!visible) return null;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    "div",
-    {
-      style: {
-        position: "absolute",
-        // Se posiciona a la derecha del dropdown
-        left: "calc(100% + 8px)",
-        top: 0,
-        width: 210,
-        background: "var(--surface-2, #1e1e2e)",
-        border: "1px solid var(--border, #333)",
-        borderRadius: 8,
-        padding: "8px 10px",
-        zIndex: 9999,
-        pointerEvents: "none",
-        boxShadow: "0 4px 18px rgba(0,0,0,.35)"
-      },
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
-          margin: "0 0 5px",
-          fontSize: 10,
-          fontWeight: 700,
-          color: "var(--text-muted)",
-          textTransform: "uppercase",
-          letterSpacing: "0.05em"
-        }, children: "Soporte por sistema" }),
-        SYSTEM_SUPPORT_LINES.map((line) => /* @__PURE__ */ jsxRuntimeExports.jsx("p", { style: {
-          margin: "2px 0",
-          fontSize: 11,
-          color: "var(--text, #e0e0e0)",
-          whiteSpace: "nowrap"
-        }, children: line }, line))
-      ]
-    }
-  );
+function Sep() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-sep", "aria-hidden": true });
 }
 function Header({
   playing,
@@ -12844,9 +12757,12 @@ function Header({
   source,
   onSourceChange,
   subtitleOnly,
-  onToggleSubtitleOnly
+  onToggleSubtitleOnly,
+  onLogout
 }) {
   const timer = useTimer(playing);
+  const dropRef = reactExports.useRef(null);
+  const [dropOpen, setDropOpen] = reactExports.useState(false);
   const [lightTheme, setLightTheme] = reactExports.useState(
     () => localStorage.getItem("theme") === "light"
   );
@@ -12854,137 +12770,102 @@ function Header({
     document.documentElement.classList.toggle("light", lightTheme);
     localStorage.setItem("theme", lightTheme ? "light" : "dark");
   }, [lightTheme]);
-  const [dropdownOpen, setDropdownOpen] = reactExports.useState(false);
-  const [hoveredSource, setHoveredSource] = reactExports.useState(null);
-  const dropdownRef = reactExports.useRef(null);
-  const fuenteActiva = FUENTES.find((f) => f.id === source) || FUENTES[0];
   reactExports.useEffect(() => {
-    const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
-        setHoveredSource(null);
-      }
+    const fn = (e) => {
+      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
   }, []);
-  const seleccionarFuente = (id) => {
-    if (id === "system") {
-      const supported = typeof navigator.mediaDevices?.getDisplayMedia === "function";
-      if (!supported) {
-        alert(
-          "Tu navegador no soporta getDisplayMedia.\nUsa Chrome o Edge en HTTPS / localhost."
-        );
-        return;
-      }
-    }
-    onSourceChange?.(id);
-    setDropdownOpen(false);
-    setHoveredSource(null);
-  };
-  const handleLogout = () => {
-    localStorage.removeItem("app_name");
-    localStorage.removeItem("app_key");
-    localStorage.removeItem("deepl_key");
-    window.location.reload();
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "app-header drag", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-brand__title no-drag", children: "Interpreter AI" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-source-wrap no-drag", ref: dropdownRef, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          className: "header-source",
-          onClick: () => !playing && setDropdownOpen((o) => !o),
-          disabled: playing,
-          title: playing ? "Detén la grabación para cambiar la fuente" : "Seleccionar fuente de audio",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              fuenteActiva.Icon,
-              {
-                size: 13,
-                style: { color: "var(--text-muted)", flexShrink: 0 }
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-source__lines", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__label", children: fuenteActiva.label }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-source__sub", children: fuenteActiva.sub })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 11, style: { color: "var(--text-faint)" } })
-          ]
-        }
-      ),
-      dropdownOpen && /*
-      * `position: relative` en el dropdown para que el tooltip
-      * de SystemAudio pueda posicionarse con left: 100%
-      */
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown", style: { position: "relative" }, children: FUENTES.map(({ id, label, sub, Icon: Icon2, note, badge }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          className: `source-dropdown__item ${id === source ? "is-active" : ""}`,
-          onClick: () => seleccionarFuente(id),
-          onMouseEnter: () => setHoveredSource(id),
-          onMouseLeave: () => setHoveredSource(null),
-          "data-source": id,
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown__icon", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 14 }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "source-dropdown__text", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { style: { display: "flex", alignItems: "center", gap: 0 }, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "source-dropdown__label", children: label }),
-                badge && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { text: badge })
+  const fuenteActiva = FUENTES.find((f) => f.id === source) || FUENTES[0];
+  const username = localStorage.getItem("app_name") || "Guest";
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "hdr no-drag", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-left", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "hdr-brand", children: [
+        "Interpreter ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-brand-ai", children: "AI" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-source-wrap", ref: dropRef, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            className: "hdr-btn hdr-source-btn",
+            onClick: () => !playing && setDropOpen((o) => !o),
+            disabled: playing,
+            title: "Audio source",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(fuenteActiva.Icon, { size: 12, strokeWidth: 2 }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-btn-label", children: fuenteActiva.label }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 10, className: "hdr-chevron" })
+            ]
+          }
+        ),
+        dropOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-dropdown", children: FUENTES.map(({ id, label, sub, Icon: Icon2 }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            className: `hdr-dropdown-item ${id === source ? "is-active" : ""}`,
+            onClick: () => {
+              onSourceChange?.(id);
+              setDropOpen(false);
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-dropdown-icon", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 13 }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-dropdown-text", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-dropdown-label", children: label }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-dropdown-sub", children: sub })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "source-dropdown__note", children: note })
-            ] }),
-            id === source && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "source-dropdown__check", children: "✓" }),
-            id === "system" && /* @__PURE__ */ jsxRuntimeExports.jsx(SystemAudioTooltip, { visible: hoveredSource === "system" })
-          ]
-        },
-        id
-      )) })
+              id === source && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-dropdown-check", children: "✓" })
+            ]
+          },
+          id
+        )) })
+      ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
-      {
-        className: `header-play no-drag ${playing ? "is-playing" : ""}`,
-        onClick: onTogglePlay,
-        title: playing ? "Detener" : "Iniciar",
-        children: playing ? /* @__PURE__ */ jsxRuntimeExports.jsx(Square, { size: 14, fill: "white", strokeWidth: 0 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 14, fill: "white", strokeWidth: 0, style: { marginLeft: 1 } })
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-wave-block no-drag", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-timer", children: timer }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Waveform, { active: playing })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "header-right no-drag", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          className: `header-icon-btn header-subtitle-toggle ${subtitleOnly ? "is-active" : ""}`,
-          onClick: onToggleSubtitleOnly,
-          title: subtitleOnly ? "Modo subtítulos activo — clic para activar traducción" : "Modo traducción activo — clic para solo subtítulos",
-          children: [
-            subtitleOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(Captions, { size: 15 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Languages, { size: 15 }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "header-subtitle-toggle__label", children: subtitleOnly ? "Subtítulos" : "Traducción" })
-          ]
-        }
-      ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
-          className: "header-icon-btn",
-          onClick: () => setLightTheme((t) => !t),
-          title: "Cambiar tema",
-          children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 15 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 15 })
+          className: `hdr-play ${playing ? "hdr-play--stop" : ""}`,
+          onClick: onTogglePlay,
+          title: playing ? "Stop" : "Start",
+          children: playing ? /* @__PURE__ */ jsxRuntimeExports.jsx(Square, { size: 12, fill: "currentColor", strokeWidth: 0 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 12, fill: "currentColor", strokeWidth: 0, style: { marginLeft: 1 } })
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "userName", children: localStorage.getItem("app_name") || "Guest" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "log-out-button", onClick: handleLogout, title: "Cerrar sesión", children: "Log out" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Waveform, { active: playing }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-timer", children: timer })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-right", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "button",
+        {
+          className: `hdr-btn ${subtitleOnly ? "hdr-btn--active" : ""}`,
+          onClick: onToggleSubtitleOnly,
+          title: subtitleOnly ? "Subtitles only" : "With translation",
+          children: [
+            subtitleOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(Captions, { size: 13, strokeWidth: 2 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Languages, { size: 13, strokeWidth: 2 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-btn-label", children: subtitleOnly ? "Subtitles" : "Translate" })
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          className: "hdr-icon",
+          onClick: () => setLightTheme((t) => !t),
+          title: "Toggle theme",
+          children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 13, strokeWidth: 2 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 13, strokeWidth: 2 })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-username", children: username }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: onLogout, title: "Log out", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 13, strokeWidth: 2 }) })
     ] })
   ] });
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.3" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.5" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12994,116 +12875,62 @@ function Footer({ status = "Idle", error = null }) {
     ] }) })
   ] });
 }
-function BubbleList({ text, interimText, placeholder, variant }) {
-  const anclaRef = reactExports.useRef(null);
-  reactExports.useEffect(() => {
-    anclaRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [text, interimText]);
-  const parrafos = text ? text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean) : [];
-  const hayContenido = parrafos.length > 0 || !!interimText;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble-list", children: [
-    !hayContenido && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__placeholder", children: placeholder }),
-    parrafos.map((para, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `bubble bubble--${variant}`, children: para }, i)),
-    interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `bubble bubble--${variant} bubble--interim`, children: [
-      interimText,
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bubble__cursor" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: anclaRef, style: { height: 1 } })
+function TranslatingDots() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-dots", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", {})
   ] });
 }
-function AutoScrollAncla({ dep1, dep2 }) {
-  const ref = reactExports.useRef(null);
-  reactExports.useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [dep1, dep2]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref, style: { height: 1 } });
-}
-function TranslationPanel({
-  fromLang,
-  toLang,
-  placeholder = "",
-  readOnly = false,
-  value = "",
-  translated = "",
+function ConversationView({
+  utterances = [],
   interimText = "",
-  loading = false,
-  onChange,
-  onClear,
-  subtitleOnly = false
-  // oculta la sección de traducción
+  interimLang = "en",
+  interimTranslation = "",
+  subtitleOnly = false,
+  playing = false,
+  onClear
 }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__header", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__lang-selector", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__lang-text", children: fromLang }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__lang-arrow", children: "→" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "panel__lang-text", children: toLang })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__actions", children: [
-        loading && !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx(
-          LoaderCircle,
-          {
-            size: 14,
-            className: "panel__action-btn",
-            style: { animation: "spin 1s linear infinite", color: "var(--accent)" }
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "panel__action-btn", title: "Limpiar", onClick: onClear, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 14 }) })
-      ] })
+  const bottomRef = reactExports.useRef(null);
+  reactExports.useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [utterances.length, interimText, interimTranslation]);
+  const isEmpty = utterances.length === 0 && !interimText;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-root", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-col-header", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-col-title", children: "Original" }),
+      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-col-title", children: "Translation" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "cv-clear-btn", onClick: onClear, title: "Clear all", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 13 }) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__body panel__body--split", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "div",
-        {
-          className: "panel__half panel__half--top",
-          style: { flex: subtitleOnly ? 1 : void 0 },
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: fromLang }),
-            readOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-              BubbleList,
-              {
-                text: value,
-                interimText,
-                placeholder: placeholder || "Los subtítulos aparecerán aquí...",
-                variant: "source"
-              }
-            ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble-list bubble-list--editable", children: [
-              value.trim() || interimText ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                value.split(/\n\n+/).map((p) => p.trim()).filter(Boolean).map((para, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bubble bubble--source", children: para }, i)),
-                interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bubble bubble--source bubble--interim", children: [
-                  interimText,
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bubble__cursor" })
-                ] })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "textarea",
-                {
-                  className: "panel__textarea panel__textarea--ghost",
-                  placeholder,
-                  value,
-                  onChange,
-                  spellCheck: false
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(AutoScrollAncla, { dep1: value, dep2: interimText })
-            ] })
-          ]
-        }
-      ),
-      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-divider" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "panel__half panel__half--bottom", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "panel__half-label", children: toLang }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            BubbleList,
-            {
-              text: translated,
-              interimText: "",
-              placeholder: "La traducción aparecerá aquí...",
-              variant: "translated"
-            }
-          )
-        ] })
-      ] })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-scroll", children: [
+      isEmpty && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-empty", children: playing ? "Listening…" : "Press ▶ to start" }),
+      utterances.map((u) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row ${subtitleOnly ? "cv-row--single" : ""}`, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-card cv-card--${u.lang}`, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag", children: u.lang === "en" ? "EN" : "ES" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-card-text", children: u.text })
+        ] }),
+        !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--translated", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(TranslatingDots, {}) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag cv-lang-tag--alt", children: u.lang === "en" ? "ES" : "EN" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-card-text", children: u.translation })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-card-text cv-card-text--empty", children: "—" }) })
+      ] }, u.id)),
+      interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row ${subtitleOnly ? "cv-row--single" : ""}`, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-card cv-card--${interimLang} cv-card--interim`, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag", children: interimLang === "en" ? "EN" : "ES" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "cv-card-text", children: [
+            interimText,
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-cursor" })
+          ] })
+        ] }),
+        !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--translated cv-card--interim", children: interimTranslation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag cv-lang-tag--alt", children: interimLang === "en" ? "ES" : "EN" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "cv-card-text", children: [
+            interimTranslation,
+            "..."
+          ] })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(TranslatingDots, {}) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: bottomRef })
     ] })
   ] });
 }
@@ -13135,11 +12962,10 @@ function useTranscription({
         stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             autoGainControl: true,
-            // amplifica voces bajas
             noiseSuppression: true,
-            // reduce ruido de fondo en llamadas
-            echoCancellation: true
-            // evita retroalimentación
+            echoCancellation: true,
+            sampleRate: 16e3
+            // ⚡ Optimización: 16kHz es el estándar de Deepgram. Evita conversiones de formato.
           }
         });
       } catch (e) {
@@ -13149,29 +12975,17 @@ function useTranscription({
     }
     const params = new URLSearchParams({
       model: "nova-3",
-      // más preciso que nova-2, mejor con acentos
       language: "multi",
-      // ✅ CORRECTO para nova-3 multilenguaje
-      // ❌ NO usar detect_language=true con nova-3
       smart_format: "true",
-      // capitalización, puntuación automática
       punctuate: "true",
-      // agrega puntos, comas, signos de pregunta
-      numerals: "true",
-      // "cuatro veinte" → "420"
       interim_results: "true",
-      // resultados en tiempo real mientras habla
-      no_delay: "true",
-      // envía resultados inmediatamente
       filler_words: "false",
-      // omite "eh", "um", "este", "like"
-      endpointing: "300",
-      // ms de silencio para detectar fin de turno
-      utterance_end_ms: "1500",
-      // ms de silencio para cerrar la utterance completa
-      // 1500ms da margen para pausas de llamadas telefónicas
-      diarize: "false"
-      // no separar hablantes — el intérprete habla uno a la vez
+      // 👇 AUMENTADOS PARA FORZAR PÁRRAFOS MÁS LARGOS 👇
+      endpointing: "1500",
+      // 1.5 segundos de silencio real para cortar.
+      utterance_end_ms: "3000",
+      // 3 segundos de límite absoluto de silencio.
+      vad_events: "true"
     });
     const wsUrl = `${DEEPGRAM_URL}?${params}`;
     console.log("🔌 Conectando a Deepgram...");
@@ -13188,7 +13002,7 @@ function useTranscription({
           ws.send(e.data);
         }
       };
-      recorder.start(150);
+      recorder.start(100);
       recorderRef.current = recorder;
     };
     ws.onmessage = (msg) => {
@@ -13204,7 +13018,7 @@ function useTranscription({
       const idioma = alt?.languages?.[0] || "en";
       const confidence = alt?.confidence ?? 0;
       if (!texto || texto.length < 2) return;
-      if (!data.is_final && confidence < 0.65) return;
+      if (!data.is_final && confidence < 0.55) return;
       const payload = { text: texto, lang: idioma, confidence };
       if (data.is_final) {
         onFinal?.(payload);
@@ -13248,25 +13062,27 @@ const PING_URL = "https://interpreterbk.onrender.com";
 })();
 const globalCache = /* @__PURE__ */ new Map();
 const pendingRequests = /* @__PURE__ */ new Map();
-async function callTranslate({ text, from, to, signal }) {
+async function translateText({ text, from, to, signal = null }) {
   const clean = text?.trim();
   if (!clean) return "";
-  const cacheKey = `${from}|${to}:${clean}`;
+  const fromNorm = from.startsWith("en") ? "en" : "es";
+  const toNorm = to.startsWith("en") ? "en" : "es";
+  const targetDeepL = toNorm === "en" ? "EN-US" : "ES";
+  const sourceDeepL = fromNorm.toUpperCase();
+  const cacheKey = `${fromNorm}|${toNorm}:${clean}`;
   if (globalCache.has(cacheKey)) return globalCache.get(cacheKey);
-  if (pendingRequests.has(cacheKey)) {
-    return pendingRequests.get(cacheKey);
-  }
-  const promise = fetch(BACKEND_URL, {
+  if (pendingRequests.has(cacheKey)) return pendingRequests.get(cacheKey);
+  const fetchOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    signal,
     body: JSON.stringify({
-      text,
-      source_lang: from,
-      // DeepL necesita EN-US, no EN genérico
-      target_lang: to === "en" ? "EN-US" : to.toUpperCase()
+      text: clean,
+      source_lang: sourceDeepL,
+      target_lang: targetDeepL
     })
-  }).then(async (res) => {
+  };
+  if (signal) fetchOptions.signal = signal;
+  const promise = fetch(BACKEND_URL, fetchOptions).then(async (res) => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const resultado = data.translated_text || clean;
@@ -13282,89 +13098,6 @@ async function callTranslate({ text, from, to, signal }) {
   pendingRequests.set(cacheKey, promise);
   return promise;
 }
-function useAutoTranslation(sourceText, {
-  from = "en",
-  to = "es",
-  debounceMs = 300
-} = {}) {
-  const [result, setResult] = reactExports.useState("");
-  const [translating, setTranslating] = reactExports.useState(false);
-  const timerRef = reactExports.useRef(null);
-  reactExports.useEffect(() => {
-    if (!sourceText?.trim()) {
-      setResult("");
-      return;
-    }
-    const controller = new AbortController();
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(async () => {
-      setTranslating(true);
-      const parrafos = sourceText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
-      const resultados = await Promise.all(
-        parrafos.map((p) => callTranslate({ text: p, from, to, signal: controller.signal }))
-      );
-      const textoFinal = resultados.filter(Boolean).join("\n\n");
-      if (textoFinal) setResult(textoFinal);
-      setTranslating(false);
-    }, debounceMs);
-    return () => {
-      clearTimeout(timerRef.current);
-      controller.abort();
-    };
-  }, [sourceText, from, to, debounceMs]);
-  return { translatedText: result, translating };
-}
-const startElectronCapture = async () => {
-  if (!window.electronAPI?.getAudioSource) {
-    console.error("[Electron] electronAPI no encontrado");
-    return null;
-  }
-  let fuente;
-  try {
-    fuente = await window.electronAPI.getAudioSource();
-  } catch (e) {
-    console.error("[Electron] Error IPC:", e);
-    return null;
-  }
-  if (!fuente) {
-    console.error("[Electron] Sin fuente disponible");
-    return null;
-  }
-  console.log("[Electron] Usando fuente:", fuente.name, fuente.id);
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: "desktop",
-          chromeMediaSourceId: fuente.id,
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false
-        }
-      },
-      video: {
-        mandatory: {
-          chromeMediaSource: "desktop",
-          chromeMediaSourceId: fuente.id,
-          maxWidth: 1,
-          // mínimo posible — igual se descarta
-          maxHeight: 1
-        }
-      }
-    });
-    const audioTracks = stream.getAudioTracks();
-    if (audioTracks.length === 0) {
-      console.error("[Electron] Stream sin pistas de audio — posiblemente Linux o permisos");
-      return null;
-    }
-    console.log("[Electron] Pistas de audio:", audioTracks.map((t) => t.label));
-    stream.getVideoTracks().forEach((t) => t.stop());
-    return stream;
-  } catch (e) {
-    console.error("[Electron] getUserMedia falló:", e.name, e.message);
-    return null;
-  }
-};
 const ES_MAC = navigator.platform?.toUpperCase().includes("MAC") || navigator.userAgent?.includes("Mac");
 const startBrowserCapture = async () => {
   if (ES_MAC) {
@@ -13412,100 +13145,144 @@ const startBrowserCapture = async () => {
   console.log("[Captura] Stream de audio listo:", stream.getAudioTracks()[0].label);
   return { stream, reason: null };
 };
+let _uid = 0;
+const uid = () => `u${++_uid}`;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = reactExports.useState(
     !!localStorage.getItem("app_key") && !!localStorage.getItem("app_name")
   );
+  const handleLogout = reactExports.useCallback(() => {
+    localStorage.removeItem("app_key");
+    localStorage.removeItem("app_name");
+    setIsLoggedIn(false);
+  }, []);
   const [playing, setPlaying] = reactExports.useState(false);
   const [source, setSource] = reactExports.useState("mic");
-  const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
-  const [englishText, setEnglishText] = reactExports.useState("");
-  const [spanishText, setSpanishText] = reactExports.useState("");
-  const [interimEnglish, setInterimEnglish] = reactExports.useState("");
-  const [interimSpanish, setInterimSpanish] = reactExports.useState("");
-  const [footerStatus, setFooterStatus] = reactExports.useState("Idle");
-  const [footerError, setFooterError] = reactExports.useState(null);
   const streamRef = reactExports.useRef(null);
-  const handleClearLeft = () => {
-    setEnglishText("");
-    setInterimEnglish("");
-  };
-  const handleClearRight = () => {
-    setSpanishText("");
-    setInterimSpanish("");
-  };
-  const textoParaTraducirEN = subtitleOnly ? "" : englishText;
-  const textoParaTraducirES = subtitleOnly ? "" : spanishText;
-  const { translatedText: enToEs, translating: traduciendoEN } = useAutoTranslation(textoParaTraducirEN, { from: "en", to: "es", debounceMs: 300 });
-  const { translatedText: esToEn, translating: traduciendoES } = useAutoTranslation(textoParaTraducirES, { from: "es", to: "en", debounceMs: 300 });
-  const { start: startTranscription, stop: stopTranscription, error: transcriptionError } = useTranscription({
-    // Deepgram detecta EN + ES al mismo tiempo
-    onFinal: reactExports.useCallback(({ text, lang }) => {
-      const agregar = (previo, nuevo) => {
-        if (!previo) return nuevo;
-        const tienePuntuacion = /[.!?]$/.test(previo.trim());
-        return previo.trim() + (tienePuntuacion ? "\n\n" : " ") + nuevo.trim();
-      };
-      if (lang.startsWith("en")) {
-        setInterimEnglish("");
-        setEnglishText((prev) => agregar(prev, text));
-      } else if (lang.startsWith("es")) {
-        setInterimSpanish("");
-        setSpanishText((prev) => agregar(prev, text));
+  const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
+  const subtitleOnlyRef = reactExports.useRef(false);
+  subtitleOnlyRef.current = subtitleOnly;
+  const [utterances, setUtterances] = reactExports.useState([]);
+  const [interimText, setInterimText] = reactExports.useState("");
+  const [interimLang, setInterimLang] = reactExports.useState("en");
+  const [interimTranslation, setInterimTranslation] = reactExports.useState("");
+  const [footerError, setFooterError] = reactExports.useState(null);
+  const footerStatus = reactExports.useMemo(() => {
+    if (!playing) return "Idle";
+    return subtitleOnly ? "🎙️ Listening — Subtitles only" : "🎙️ Listening — Auto EN/ES with translation";
+  }, [playing, subtitleOnly]);
+  reactExports.useEffect(() => {
+    if (!interimText || subtitleOnly) {
+      setInterimTranslation("");
+      return;
+    }
+    const targetLang = interimLang === "en" ? "es" : "en";
+    const abortController = new AbortController();
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const translated = await translateText({
+          text: interimText,
+          from: interimLang,
+          to: targetLang,
+          signal: abortController.signal
+          // Pasamos la señal para cancelar si el usuario sigue hablando
+        });
+        if (translated) {
+          setInterimTranslation(translated);
+        }
+      } catch (e) {
+        if (e.name !== "AbortError") {
+          console.error("[Interim Translation Error]", e);
+        }
       }
-    }, []),
-    onInterim: reactExports.useCallback(({ text, lang }) => {
-      if (lang.startsWith("en")) setInterimEnglish(text);
-      else if (lang.startsWith("es")) setInterimSpanish(text);
-    }, []),
-    onError: reactExports.useCallback((err) => {
-      setFooterError(err);
-      setPlaying(false);
-      setFooterStatus("Idle");
-    }, [])
+    }, 600);
+    return () => {
+      clearTimeout(delayDebounceFn);
+      abortController.abort();
+    };
+  }, [interimText, interimLang, subtitleOnly]);
+  const handleClear = reactExports.useCallback(() => {
+    setUtterances([]);
+    setInterimText("");
+    setInterimTranslation("");
+  }, []);
+  const handleFinal = reactExports.useCallback(async ({ text, lang }) => {
+    setInterimText("");
+    setInterimTranslation("");
+    const id = uid();
+    const l = lang.startsWith("en") ? "en" : "es";
+    const targetLang = l === "en" ? "es" : "en";
+    const isSubOnly = subtitleOnlyRef.current;
+    setUtterances((prev) => [
+      ...prev,
+      { id, text, lang: l, translation: null, translating: !isSubOnly }
+    ]);
+    if (isSubOnly) return;
+    const translation = await translateText({ text, from: l, to: targetLang });
+    if (translation) {
+      setUtterances(
+        (prev) => prev.map((u) => u.id === id ? { ...u, translation, translating: false } : u)
+      );
+    }
+  }, []);
+  const handleInterim = reactExports.useCallback(({ text, lang }) => {
+    setInterimText(text);
+    setInterimLang(lang.startsWith("en") ? "en" : "es");
+  }, []);
+  const handleTranscriptionError = reactExports.useCallback((err) => {
+    setFooterError(err);
+    setPlaying(false);
+  }, []);
+  const {
+    start: startTranscription,
+    stop: stopTranscription,
+    error: transcriptionError
+  } = useTranscription({
+    onFinal: handleFinal,
+    onInterim: handleInterim,
+    onError: handleTranscriptionError
   });
+  const getAudioStream = reactExports.useCallback(async () => {
+    if (source === "tab") {
+      const resultado = await startBrowserCapture();
+      if (!resultado.stream) {
+        throw new Error(resultado.userMessage || "Tab capture cancelled.");
+      }
+      return resultado.stream;
+    }
+    return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+  }, [source]);
   const handleTogglePlay = reactExports.useCallback(async () => {
     if (!playing) {
       setFooterError(null);
       let stream = null;
-      if (source === "electron") {
-        stream = await startElectronCapture();
-        if (!stream) {
-          setFooterError("No se pudo capturar el audio del sistema.");
-          return;
-        }
-        setFooterStatus("Audio del sistema — Escuchando...");
-      } else if (source === "tab") {
-        const resultado = await startBrowserCapture();
-        if (!resultado.stream) {
-          setFooterError(resultado.userMessage || "Captura de pestaña cancelada.");
-          return;
-        }
-        stream = resultado.stream;
-        setFooterStatus("Audio de pestaña — Escuchando...");
-      } else {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        setFooterStatus("Micrófono — Escuchando...");
+      try {
+        stream = await getAudioStream();
+      } catch (err) {
+        setFooterError(err.message);
+        return;
       }
-      streamRef.current = stream;
-      await startTranscription(stream);
-      setPlaying(true);
+      try {
+        await startTranscription(stream);
+        streamRef.current = stream;
+        setPlaying(true);
+      } catch (err) {
+        stream.getTracks().forEach((t) => t.stop());
+        setFooterError(err.message || "Error starting transcription");
+      }
     } else {
       stopTranscription();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
-      setInterimEnglish("");
-      setInterimSpanish("");
+      setInterimText("");
+      setInterimTranslation("");
       setPlaying(false);
-      setFooterStatus("Idle");
     }
-  }, [playing, source, startTranscription, stopTranscription]);
-  const handleSourceChange = reactExports.useCallback((s) => {
-    if (!playing) setSource(s);
-  }, [playing]);
+  }, [playing, getAudioStream, startTranscription, stopTranscription]);
   if (!isLoggedIn) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(LogIn, { onLogin: () => setIsLoggedIn(true) });
   }
+  const footerErrorFinal = footerError || (transcriptionError ? `STT: ${transcriptionError}` : null);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "app-shell", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Header,
@@ -13513,47 +13290,31 @@ function App() {
         playing,
         onTogglePlay: handleTogglePlay,
         source,
-        onSourceChange: handleSourceChange,
+        onSourceChange: (s) => {
+          if (!playing) setSource(s);
+        },
         subtitleOnly,
-        onToggleSubtitleOnly: () => setSubtitleOnly((v) => !v)
+        onToggleSubtitleOnly: () => setSubtitleOnly((p) => !p),
+        onLogout: handleLogout
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("main", { className: "app-main", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        TranslationPanel,
-        {
-          fromLang: "EN",
-          toLang: "ES",
-          placeholder: playing ? "Escuchando..." : "Presiona ▶ para comenzar",
-          value: englishText,
-          translated: enToEs,
-          interimText: interimEnglish,
-          loading: traduciendoEN,
-          onChange: (e) => setEnglishText(e.target.value),
-          onClear: handleClearLeft,
-          subtitleOnly
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        TranslationPanel,
-        {
-          fromLang: "ES",
-          toLang: "EN",
-          readOnly: true,
-          value: spanishText,
-          translated: esToEn,
-          interimText: interimSpanish,
-          loading: traduciendoES,
-          onClear: handleClearRight,
-          subtitleOnly
-        }
-      )
-    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "app-main", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConversationView,
+      {
+        utterances,
+        interimText,
+        interimLang,
+        interimTranslation,
+        subtitleOnly,
+        playing,
+        onClear: handleClear
+      }
+    ) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Footer,
       {
-        status: subtitleOnly ? `${footerStatus} · Solo subtítulos` : footerStatus,
-        error: footerError || (transcriptionError ? `STT: ${transcriptionError}` : null)
+        status: footerStatus,
+        error: footerErrorFinal
       }
     )
   ] });
