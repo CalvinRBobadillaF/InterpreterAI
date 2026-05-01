@@ -12865,7 +12865,7 @@ function Header({
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.5" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.6" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12875,8 +12875,9 @@ function Footer({ status = "Idle", error = null }) {
     ] }) })
   ] });
 }
-function TranslatingDots() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-dots", children: [
+const fmtTime = (date) => date instanceof Date ? date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
+function Dots() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-dots", "aria-label": "Translating…", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("span", {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx("span", {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx("span", {})
@@ -12886,7 +12887,6 @@ function ConversationView({
   utterances = [],
   interimText = "",
   interimLang = "en",
-  interimTranslation = "",
   subtitleOnly = false,
   playing = false,
   onClear
@@ -12894,67 +12894,110 @@ function ConversationView({
   const bottomRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [utterances.length, interimText, interimTranslation]);
+  }, [utterances.length, interimText]);
   const isEmpty = utterances.length === 0 && !interimText;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-root", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-col-header", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-col-title", children: "Original" }),
-      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-col-title", children: "Translation" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "cv-clear-btn", onClick: onClear, title: "Clear all", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 13 }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-toolbar", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: "Original" }),
+      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: "Translation" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "cv-clear-btn", onClick: onClear, title: "Clear conversation", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 12 }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-scroll", children: [
-      isEmpty && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-empty", children: playing ? "Listening…" : "Press ▶ to start" }),
-      utterances.map((u) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row ${subtitleOnly ? "cv-row--single" : ""}`, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-card cv-card--${u.lang}`, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag", children: u.lang === "en" ? "EN" : "ES" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-card-text", children: u.text })
-        ] }),
-        !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--translated", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(TranslatingDots, {}) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag cv-lang-tag--alt", children: u.lang === "en" ? "ES" : "EN" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-card-text", children: u.translation })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-card-text cv-card-text--empty", children: "—" }) })
-      ] }, u.id)),
-      interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row ${subtitleOnly ? "cv-row--single" : ""}`, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-card cv-card--${interimLang} cv-card--interim`, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag", children: interimLang === "en" ? "EN" : "ES" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "cv-card-text", children: [
-            interimText,
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-cursor" })
-          ] })
-        ] }),
-        !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--translated cv-card--interim", children: interimTranslation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-lang-tag cv-lang-tag--alt", children: interimLang === "en" ? "ES" : "EN" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "cv-card-text", children: [
-            interimTranslation,
-            "..."
-          ] })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(TranslatingDots, {}) })
+      isEmpty && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-empty", children: playing ? "Listening…" : "Press ▶ to start" }),
+      utterances.map((u) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: `cv-row ${subtitleOnly ? "cv-row--solo" : ""}`,
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-card cv-card--orig", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text", children: u.text }),
+              u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
+            ] }),
+            !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(Dots, {}) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text cv-text--trans", children: u.translation }),
+              u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-dash", children: "—" }) })
+          ]
+        },
+        u.id
+      )),
+      interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row cv-row--live ${subtitleOnly ? "cv-row--solo" : ""}`, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--orig cv-card--live", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "cv-text", children: [
+          interimText,
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-cursor" })
+        ] }) }),
+        !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans cv-card--live" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: bottomRef })
     ] })
   ] });
 }
 const DEEPGRAM_URL = "wss://api.deepgram.com/v1/listen";
-function useTranscription({
-  onFinal,
-  onInterim,
-  onError
-} = {}) {
-  const socketRef = reactExports.useRef(null);
+const buildWsUrl = () => {
+  const params = new URLSearchParams({
+    model: "nova-3",
+    language: "multi",
+    smart_format: "true",
+    punctuate: "true",
+    numerals: "true",
+    interim_results: "true",
+    filler_words: "false",
+    // 800ms: oraciones largas llegan completas sin sacrificar latencia
+    endpointing: "800",
+    // 2500ms: margen absoluto para pausas dentro de una misma idea
+    utterance_end_ms: "2500",
+    vad_events: "true",
+    diarize: "false"
+  });
+  return `${DEEPGRAM_URL}?${params}`;
+};
+function useTranscription({ onFinal, onInterim, onError } = {}) {
+  const wsRef = reactExports.useRef(null);
   const recorderRef = reactExports.useRef(null);
   const activoRef = reactExports.useRef(false);
+  const onFinalRef = reactExports.useRef(onFinal);
+  const onInterimRef = reactExports.useRef(onInterim);
+  const onErrorRef = reactExports.useRef(onError);
+  onFinalRef.current = onFinal;
+  onInterimRef.current = onInterim;
+  onErrorRef.current = onError;
   const [active, setActive] = reactExports.useState(false);
   const [error, setError] = reactExports.useState(null);
   const emitirError = reactExports.useCallback((msg) => {
     console.error("[Deepgram]", msg);
     setError(msg);
-    onError?.(msg);
-  }, [onError]);
+    onErrorRef.current?.(msg);
+  }, []);
+  const handleMessage = reactExports.useCallback((msg) => {
+    let data;
+    try {
+      data = JSON.parse(msg.data);
+    } catch {
+      return;
+    }
+    if (data.type === "SpeechStarted") return;
+    if (data.type === "UtteranceEnd") return;
+    if (data.type !== "Results") return;
+    const alt = data.channel?.alternatives?.[0];
+    const texto = alt?.transcript?.trim();
+    const confidence = alt?.confidence ?? 0;
+    const detectedLang = alt?.languages?.[0] ?? "en";
+    if (!texto || texto.length < 2) return;
+    if (!data.is_final && confidence < 0.5) return;
+    const payload = {
+      text: texto,
+      lang: detectedLang,
+      confidence,
+      speechFinal: data.speech_final ?? data.is_final
+    };
+    if (data.is_final) onFinalRef.current?.(payload);
+    else onInterimRef.current?.(payload);
+  }, []);
   const start = reactExports.useCallback(async (stream = null) => {
     if (activoRef.current) return;
-    const API_KEY = localStorage.getItem("app_key");
+    const API_KEY = localStorage.getItem("app_key")?.trim();
     if (!API_KEY) {
-      emitirError("Falta el API key de Deepgram");
+      emitirError("Missing Deepgram API key");
       return;
     }
     if (!stream) {
@@ -12965,38 +13008,27 @@ function useTranscription({
             noiseSuppression: true,
             echoCancellation: true,
             sampleRate: 16e3
-            // ⚡ Optimización: 16kHz es el estándar de Deepgram. Evita conversiones de formato.
           }
         });
       } catch (e) {
-        emitirError("Micrófono denegado: " + e.message);
+        emitirError("Microphone denied: " + e.message);
         return;
       }
     }
-    const params = new URLSearchParams({
-      model: "nova-3",
-      language: "multi",
-      smart_format: "true",
-      punctuate: "true",
-      interim_results: "true",
-      filler_words: "false",
-      // 👇 AUMENTADOS PARA FORZAR PÁRRAFOS MÁS LARGOS 👇
-      endpointing: "1500",
-      // 1.5 segundos de silencio real para cortar.
-      utterance_end_ms: "3000",
-      // 3 segundos de límite absoluto de silencio.
-      vad_events: "true"
-    });
-    const wsUrl = `${DEEPGRAM_URL}?${params}`;
-    console.log("🔌 Conectando a Deepgram...");
-    const ws = new WebSocket(wsUrl, ["token", API_KEY]);
-    socketRef.current = ws;
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
+    console.log("[Deepgram] Connecting…");
+    const ws = new WebSocket(buildWsUrl(), ["token", API_KEY]);
+    wsRef.current = ws;
+    ws.binaryType = "arraybuffer";
     ws.onopen = () => {
-      console.log("✅ Deepgram conectado — modelo: nova-3, idioma: multi");
+      console.log("[Deepgram] ✅ Connected — nova-3 / multi");
       activoRef.current = true;
       setActive(true);
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
-      const recorder = new MediaRecorder(stream, { mimeType });
+      setError(null);
+      const recorder = new MediaRecorder(stream, {
+        mimeType,
+        audioBitsPerSecond: 32e3
+      });
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
           ws.send(e.data);
@@ -13005,48 +13037,27 @@ function useTranscription({
       recorder.start(100);
       recorderRef.current = recorder;
     };
-    ws.onmessage = (msg) => {
-      let data;
-      try {
-        data = JSON.parse(msg.data);
-      } catch {
-        return;
-      }
-      if (data.type !== "Results") return;
-      const alt = data.channel?.alternatives?.[0];
-      const texto = alt?.transcript?.trim();
-      const idioma = alt?.languages?.[0] || "en";
-      const confidence = alt?.confidence ?? 0;
-      if (!texto || texto.length < 2) return;
-      if (!data.is_final && confidence < 0.55) return;
-      const payload = { text: texto, lang: idioma, confidence };
-      if (data.is_final) {
-        onFinal?.(payload);
-      } else {
-        onInterim?.(payload);
-      }
-    };
-    ws.onerror = (err) => {
-      console.error("❌ WebSocket error:", err);
-      emitirError("Error de conexión con Deepgram");
+    ws.onmessage = handleMessage;
+    ws.onerror = () => {
+      console.warn("[Deepgram] onerror fired — waiting for onclose details");
     };
     ws.onclose = (e) => {
-      console.log(`🔌 Deepgram cerrado — código: ${e.code}`, e.reason || "");
-      const razones = {
-        1008: "API key de Deepgram inválido o expirado",
-        1011: "Error interno de Deepgram — intenta de nuevo"
-      };
-      if (razones[e.code]) emitirError(razones[e.code]);
+      console.log(`[Deepgram] Closed — code:${e.code} reason:"${e.reason}"`);
+      const wasActive = activoRef.current;
       activoRef.current = false;
       setActive(false);
+      if (wasActive && !e.wasClean) {
+        const msg = e.reason ? e.reason : e.code === 1006 ? "Connection lost — check API key or network" : e.code === 1008 ? "Rejected by Deepgram — invalid params or key" : e.code === 1011 ? "Deepgram internal error — try again" : `Closed unexpectedly (code ${e.code})`;
+        emitirError(msg);
+      }
     };
-  }, [onFinal, onInterim, emitirError]);
+  }, [emitirError, handleMessage]);
   const stop = reactExports.useCallback(() => {
     activoRef.current = false;
     recorderRef.current?.stop();
     recorderRef.current = null;
-    socketRef.current?.close(1e3, "Usuario detuvo la grabación");
-    socketRef.current = null;
+    wsRef.current?.close(1e3, "User stopped");
+    wsRef.current = null;
     setActive(false);
     setError(null);
   }, []);
@@ -13054,102 +13065,202 @@ function useTranscription({
 }
 const BACKEND_URL = "https://interpreterbk.onrender.com/api/translate";
 const PING_URL = "https://interpreterbk.onrender.com";
+const MAX_RETRIES = 2;
+const RETRY_DELAY = 350;
+const REQ_TIMEOUT = 8e3;
 (function keepAlive() {
   fetch(PING_URL).catch(() => {
   });
   setInterval(() => fetch(PING_URL).catch(() => {
-  }), 5 * 60 * 1e3);
+  }), 4 * 60 * 1e3);
 })();
 const globalCache = /* @__PURE__ */ new Map();
 const pendingRequests = /* @__PURE__ */ new Map();
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function fetchTranslation({ clean, sourceDeepL, targetDeepL, signal }) {
+  const timeoutCtrl = new AbortController();
+  const timeoutId = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT);
+  let combinedSignal = timeoutCtrl.signal;
+  if (signal && typeof AbortSignal.any === "function") {
+    combinedSignal = AbortSignal.any([signal, timeoutCtrl.signal]);
+  }
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: combinedSignal,
+      body: JSON.stringify({
+        text: clean,
+        source_lang: sourceDeepL,
+        target_lang: targetDeepL
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return data.translated_text || null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 async function translateText({ text, from, to, signal = null }) {
   const clean = text?.trim();
   if (!clean) return "";
   const fromNorm = from.startsWith("en") ? "en" : "es";
   const toNorm = to.startsWith("en") ? "en" : "es";
   const targetDeepL = toNorm === "en" ? "EN-US" : "ES";
-  const sourceDeepL = fromNorm.toUpperCase();
+  const sourceDeepL = fromNorm === "en" ? "EN" : "ES";
   const cacheKey = `${fromNorm}|${toNorm}:${clean}`;
   if (globalCache.has(cacheKey)) return globalCache.get(cacheKey);
   if (pendingRequests.has(cacheKey)) return pendingRequests.get(cacheKey);
-  const fetchOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: clean,
-      source_lang: sourceDeepL,
-      target_lang: targetDeepL
-    })
-  };
-  if (signal) fetchOptions.signal = signal;
-  const promise = fetch(BACKEND_URL, fetchOptions).then(async (res) => {
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const resultado = data.translated_text || clean;
-    globalCache.set(cacheKey, resultado);
-    return resultado;
-  }).catch((e) => {
-    if (e.name === "AbortError") return null;
-    console.error("[Traducción]", e.message);
+  const promise = (async () => {
+    let lastError;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      if (signal?.aborted) return null;
+      try {
+        const resultado = await fetchTranslation({
+          clean,
+          sourceDeepL,
+          targetDeepL,
+          signal
+        });
+        if (resultado) {
+          globalCache.set(cacheKey, resultado);
+          return resultado;
+        }
+        lastError = new Error("Empty translation response");
+      } catch (e) {
+        if (e.name === "AbortError") return null;
+        lastError = e;
+        console.warn(`[Traducción] Attempt ${attempt + 1} failed: ${e.message}`);
+      }
+      if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY * (attempt + 1));
+    }
+    console.error("[Traducción] All retries failed:", lastError?.message);
     return clean;
-  }).finally(() => {
+  })().finally(() => {
     pendingRequests.delete(cacheKey);
   });
   pendingRequests.set(cacheKey, promise);
   return promise;
 }
-const ES_MAC = navigator.platform?.toUpperCase().includes("MAC") || navigator.userAgent?.includes("Mac");
-const startBrowserCapture = async () => {
+const ES_MAC = (() => {
+  if (navigator.userAgentData?.platform) {
+    return navigator.userAgentData.platform.toLowerCase().includes("mac");
+  }
+  return navigator.platform?.toUpperCase().includes("MAC") || /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+})();
+const startBrowserCapture = async ({ onTrackEnded } = {}) => {
   if (ES_MAC) {
     console.info(
-      '[Captura] Estás en macOS.\nPara audio de pestaña: en el diálogo, elige una pestaña de Chrome específica\n(no "Pantalla" ni "Ventana"), y marca la casilla "Compartir audio de la pestaña".\nPara audio del sistema, usa la fuente "System Audio" en el encabezado.'
+      '[Captura] macOS detectado.\n→ Para audio de pestaña: en el diálogo, elige una PESTAÑA de Chrome\n  (no "Pantalla" ni "Ventana") y marca "Compartir audio de la pestaña".\n→ Para audio del sistema: usa BlackHole o Loopback como fuente de audio.'
     );
   }
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(
+      () => reject(new Error("DIALOG_TIMEOUT")),
+      6e4
+    );
+  });
   let stream;
   try {
-    stream = await navigator.mediaDevices.getDisplayMedia({
-      audio: {
-        // ✅ APAGADOS: Evita doble procesamiento (voz robótica) en audio de pestaña
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
-        // ✅ OPTIMIZADO PARA DEEPGRAM: Mono (1 canal), 16kHz (frecuencia nativa de voz)
-        ...ES_MAC ? {} : {
-          channelCount: 1,
-          sampleRate: 16e3,
-          sampleSize: 16
+    stream = await Promise.race([
+      navigator.mediaDevices.getDisplayMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          // En Mac omitimos restricciones de sample rate porque
+          // el sistema las ignora y puede causar errores de constraints
+          ...ES_MAC ? {} : {
+            channelCount: 1,
+            sampleRate: 16e3,
+            sampleSize: 16
+          }
+        },
+        video: {
+          // Mínima resolución posible — lo descartamos inmediatamente
+          width: { ideal: 1 },
+          height: { ideal: 1 },
+          frameRate: { ideal: 1 }
         }
-      },
-      video: {
-        // Pedimos la resolución mínima — descartamos el video de todas formas
-        width: { ideal: 1 },
-        height: { ideal: 1 },
-        frameRate: { ideal: 1 }
-      }
-    });
+      }),
+      timeoutPromise
+    ]);
   } catch (e) {
-    if (e.name === "NotAllowedError") {
-      return { stream: null, reason: "cancelled" };
+    clearTimeout(timeoutId);
+    if (e.message === "DIALOG_TIMEOUT") {
+      return {
+        stream: null,
+        reason: "timeout",
+        userMessage: "El diálogo tardó demasiado. Inténtalo de nuevo."
+      };
     }
-    console.error("[Captura] getDisplayMedia falló:", e);
-    return { stream: null, reason: e.message };
+    if (e.name === "NotAllowedError") {
+      return {
+        stream: null,
+        reason: "cancelled",
+        userMessage: null
+        // Cancelación voluntaria → no mostrar error
+      };
+    }
+    if (e.name === "NotFoundError") {
+      return {
+        stream: null,
+        reason: "not-found",
+        userMessage: "No se encontró ninguna fuente de audio disponible."
+      };
+    }
+    if (e.name === "NotSupportedError") {
+      return {
+        stream: null,
+        reason: "not-supported",
+        userMessage: "Tu navegador no soporta captura de pantalla. Usa Chrome o Edge."
+      };
+    }
+    console.error("[Captura] getDisplayMedia falló:", e.name, e.message);
+    return {
+      stream: null,
+      reason: e.message,
+      userMessage: `Error al iniciar captura: ${e.message}`
+    };
+  } finally {
+    clearTimeout(timeoutId);
   }
-  stream.getVideoTracks().forEach((t) => t.stop());
-  if (stream.getAudioTracks().length === 0) {
+  stream.getVideoTracks().forEach((t) => {
+    t.stop();
+    stream.removeTrack(t);
+  });
+  const audioTracks = stream.getAudioTracks();
+  if (audioTracks.length === 0) {
     return {
       stream: null,
       reason: ES_MAC ? "mac-no-audio" : "no-audio-track",
-      userMessage: ES_MAC ? 'Sin audio. En Mac, elige una pestaña de Chrome y marca "Compartir audio de la pestaña".' : 'Sin audio. Asegúrate de marcar "Compartir audio de la pestaña" en el diálogo.'
+      userMessage: ES_MAC ? 'Sin audio. En Mac:\n1. Elige una pestaña de Chrome (no Pantalla ni Ventana)\n2. Marca la casilla "Compartir audio de la pestaña"' : 'Sin audio. En el diálogo, asegúrate de marcar "Compartir audio del sistema".'
     };
   }
-  console.log("[Captura] Stream de audio listo:", stream.getAudioTracks()[0].label);
-  return { stream, reason: null };
+  if (typeof onTrackEnded === "function") {
+    audioTracks.forEach((track) => {
+      track.addEventListener("ended", onTrackEnded, { once: true });
+    });
+  }
+  console.log(
+    "[Captura] Stream de audio listo:",
+    audioTracks[0].label,
+    "| Canales:",
+    audioTracks[0].getSettings().channelCount ?? "?",
+    "| SampleRate:",
+    audioTracks[0].getSettings().sampleRate ?? "?"
+  );
+  return { stream, reason: null, userMessage: null };
 };
 let _uid = 0;
 const uid = () => `u${++_uid}`;
+const MERGE_WINDOW_MS = 600;
+const TERMINAL_PUNCT = /[.!?…]$/;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = reactExports.useState(
-    !!localStorage.getItem("app_key") && !!localStorage.getItem("app_name")
+    !!localStorage.getItem("app_key")?.trim() && !!localStorage.getItem("app_name")
   );
   const handleLogout = reactExports.useCallback(() => {
     localStorage.removeItem("app_key");
@@ -13165,64 +13276,73 @@ function App() {
   const [utterances, setUtterances] = reactExports.useState([]);
   const [interimText, setInterimText] = reactExports.useState("");
   const [interimLang, setInterimLang] = reactExports.useState("en");
-  const [interimTranslation, setInterimTranslation] = reactExports.useState("");
+  const lastFinalTimeRef = reactExports.useRef(0);
+  const lastUtteranceRef = reactExports.useRef(null);
   const [footerError, setFooterError] = reactExports.useState(null);
   const footerStatus = reactExports.useMemo(() => {
     if (!playing) return "Idle";
-    return subtitleOnly ? "🎙️ Listening — Subtitles only" : "🎙️ Listening — Auto EN/ES with translation";
+    return subtitleOnly ? "🎙️ Listening — Subtitles only" : "🎙️ Listening — Auto EN/ES";
   }, [playing, subtitleOnly]);
-  reactExports.useEffect(() => {
-    if (!interimText || subtitleOnly) {
-      setInterimTranslation("");
-      return;
-    }
-    const targetLang = interimLang === "en" ? "es" : "en";
-    const abortController = new AbortController();
-    const delayDebounceFn = setTimeout(async () => {
-      try {
-        const translated = await translateText({
-          text: interimText,
-          from: interimLang,
-          to: targetLang,
-          signal: abortController.signal
-          // Pasamos la señal para cancelar si el usuario sigue hablando
-        });
-        if (translated) {
-          setInterimTranslation(translated);
-        }
-      } catch (e) {
-        if (e.name !== "AbortError") {
-          console.error("[Interim Translation Error]", e);
-        }
-      }
-    }, 600);
-    return () => {
-      clearTimeout(delayDebounceFn);
-      abortController.abort();
-    };
-  }, [interimText, interimLang, subtitleOnly]);
   const handleClear = reactExports.useCallback(() => {
     setUtterances([]);
     setInterimText("");
-    setInterimTranslation("");
+    lastFinalTimeRef.current = 0;
+    lastUtteranceRef.current = null;
   }, []);
-  const handleFinal = reactExports.useCallback(async ({ text, lang }) => {
+  const handleFinal = reactExports.useCallback(async ({ text, lang, speechFinal }) => {
     setInterimText("");
-    setInterimTranslation("");
-    const id = uid();
+    const now = Date.now();
     const l = lang.startsWith("en") ? "en" : "es";
-    const targetLang = l === "en" ? "es" : "en";
     const isSubOnly = subtitleOnlyRef.current;
-    setUtterances((prev) => [
-      ...prev,
-      { id, text, lang: l, translation: null, translating: !isSubOnly }
+    const endsWithP = TERMINAL_PUNCT.test(text);
+    const prev = lastUtteranceRef.current;
+    const withinWindow = now - lastFinalTimeRef.current < MERGE_WINDOW_MS;
+    const shouldMerge = prev && withinWindow && prev.lang === l && !prev.endsWithPunct && !speechFinal;
+    lastFinalTimeRef.current = now;
+    if (shouldMerge) {
+      const mergedText = prev.text + " " + text;
+      const targetLang2 = l === "en" ? "es" : "en";
+      lastUtteranceRef.current = {
+        id: prev.id,
+        text: mergedText,
+        lang: l,
+        endsWithPunct: TERMINAL_PUNCT.test(mergedText)
+      };
+      setUtterances((utt) => utt.map(
+        (u) => u.id === prev.id ? { ...u, text: mergedText, translation: null, translating: !isSubOnly } : u
+      ));
+      if (!isSubOnly) {
+        let translation2 = null;
+        try {
+          translation2 = await translateText({ text: mergedText, from: l, to: targetLang2 });
+        } catch {
+          translation2 = mergedText;
+        } finally {
+          setUtterances((utt) => utt.map(
+            (u) => u.id === prev.id ? { ...u, translation: translation2 || mergedText, translating: false } : u
+          ));
+        }
+      }
+      return;
+    }
+    const id = uid();
+    const targetLang = l === "en" ? "es" : "en";
+    const timestamp = /* @__PURE__ */ new Date();
+    lastUtteranceRef.current = { id, text, lang: l, endsWithPunct: endsWithP };
+    setUtterances((prev2) => [
+      ...prev2,
+      { id, text, lang: l, translation: null, translating: !isSubOnly, timestamp }
     ]);
     if (isSubOnly) return;
-    const translation = await translateText({ text, from: l, to: targetLang });
-    if (translation) {
-      setUtterances(
-        (prev) => prev.map((u) => u.id === id ? { ...u, translation, translating: false } : u)
-      );
+    let translation = null;
+    try {
+      translation = await translateText({ text, from: l, to: targetLang });
+    } catch {
+      translation = text;
+    } finally {
+      setUtterances((utt) => utt.map(
+        (u) => u.id === id ? { ...u, translation: translation || text, translating: false } : u
+      ));
     }
   }, []);
   const handleInterim = reactExports.useCallback(({ text, lang }) => {
@@ -13244,18 +13364,16 @@ function App() {
   });
   const getAudioStream = reactExports.useCallback(async () => {
     if (source === "tab") {
-      const resultado = await startBrowserCapture();
-      if (!resultado.stream) {
-        throw new Error(resultado.userMessage || "Tab capture cancelled.");
-      }
-      return resultado.stream;
+      const r = await startBrowserCapture();
+      if (!r.stream) throw new Error(r.userMessage || "Tab capture cancelled.");
+      return r.stream;
     }
     return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
   }, [source]);
   const handleTogglePlay = reactExports.useCallback(async () => {
     if (!playing) {
       setFooterError(null);
-      let stream = null;
+      let stream;
       try {
         stream = await getAudioStream();
       } catch (err) {
@@ -13275,14 +13393,10 @@ function App() {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
       setInterimText("");
-      setInterimTranslation("");
       setPlaying(false);
     }
   }, [playing, getAudioStream, startTranscription, stopTranscription]);
-  if (!isLoggedIn) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(LogIn, { onLogin: () => setIsLoggedIn(true) });
-  }
-  const footerErrorFinal = footerError || (transcriptionError ? `STT: ${transcriptionError}` : null);
+  if (!isLoggedIn) return /* @__PURE__ */ jsxRuntimeExports.jsx(LogIn, { onLogin: () => setIsLoggedIn(true) });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "app-shell", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Header,
@@ -13304,7 +13418,6 @@ function App() {
         utterances,
         interimText,
         interimLang,
-        interimTranslation,
         subtitleOnly,
         playing,
         onClear: handleClear
@@ -13314,7 +13427,7 @@ function App() {
       Footer,
       {
         status: footerStatus,
-        error: footerErrorFinal
+        error: footerError || (transcriptionError ? `STT: ${transcriptionError}` : null)
       }
     )
   ] });
