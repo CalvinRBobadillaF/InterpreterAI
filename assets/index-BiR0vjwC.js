@@ -12528,22 +12528,22 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$b = [
+const __iconNode$c = [
   ["rect", { width: "18", height: "14", x: "3", y: "5", rx: "2", ry: "2", key: "12ruh7" }],
   ["path", { d: "M7 15h4M15 15h2M7 11h2M13 11h4", key: "1ueiar" }]
 ];
-const Captions = createLucideIcon("captions", __iconNode$b);
-const __iconNode$a = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$a);
-const __iconNode$9 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$9);
-const __iconNode$8 = [
+const Captions = createLucideIcon("captions", __iconNode$c);
+const __iconNode$b = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$b);
+const __iconNode$a = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$a);
+const __iconNode$9 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const Globe = createLucideIcon("globe", __iconNode$8);
-const __iconNode$7 = [
+const Globe = createLucideIcon("globe", __iconNode$9);
+const __iconNode$8 = [
   ["path", { d: "m5 8 6 6", key: "1wu5hv" }],
   ["path", { d: "m4 14 6-6 2-3", key: "1k1g8d" }],
   ["path", { d: "M2 5h12", key: "or177f" }],
@@ -12551,20 +12551,20 @@ const __iconNode$7 = [
   ["path", { d: "m22 22-5-10-5 10", key: "don7ne" }],
   ["path", { d: "M14 18h6", key: "1m8k6r" }]
 ];
-const Languages = createLucideIcon("languages", __iconNode$7);
-const __iconNode$6 = [
+const Languages = createLucideIcon("languages", __iconNode$8);
+const __iconNode$7 = [
   ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
   ["path", { d: "M21 12H9", key: "dn1m92" }],
   ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
 ];
-const LogOut = createLucideIcon("log-out", __iconNode$6);
-const __iconNode$5 = [
+const LogOut = createLucideIcon("log-out", __iconNode$7);
+const __iconNode$6 = [
   ["path", { d: "M12 19v3", key: "npa21l" }],
   ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
   ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
 ];
-const Mic = createLucideIcon("mic", __iconNode$5);
-const __iconNode$4 = [
+const Mic = createLucideIcon("mic", __iconNode$6);
+const __iconNode$5 = [
   [
     "path",
     {
@@ -12573,8 +12573,8 @@ const __iconNode$4 = [
     }
   ]
 ];
-const Moon = createLucideIcon("moon", __iconNode$4);
-const __iconNode$3 = [
+const Moon = createLucideIcon("moon", __iconNode$5);
+const __iconNode$4 = [
   [
     "path",
     {
@@ -12583,7 +12583,14 @@ const __iconNode$3 = [
     }
   ]
 ];
-const Play = createLucideIcon("play", __iconNode$3);
+const Play = createLucideIcon("play", __iconNode$4);
+const __iconNode$3 = [
+  ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
+  ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
+  ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
+  ["path", { d: "M8 16H3v5", key: "1cv678" }]
+];
+const RefreshCw = createLucideIcon("refresh-cw", __iconNode$3);
 const __iconNode$2 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]
 ];
@@ -12865,7 +12872,7 @@ function Header({
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.6" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.7" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12889,7 +12896,9 @@ function ConversationView({
   interimLang = "en",
   subtitleOnly = false,
   playing = false,
-  onClear
+  onClear,
+  onRetry
+  // NUEVO: (id) => void
 }) {
   const bottomRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
@@ -12913,7 +12922,21 @@ function ConversationView({
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text", children: u.text }),
               u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
             ] }),
-            !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(Dots, {}) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(Dots, {}) : u.failed ? (
+              /* NUEVO: botón de retry en lugar de texto idéntico */
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  className: "cv-retry-btn",
+                  onClick: () => onRetry?.(u.id),
+                  title: "Retry translation",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { size: 12 }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Retry" })
+                  ]
+                }
+              )
+            ) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text cv-text--trans", children: u.translation }),
               u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
             ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-dash", children: "—" }) })
@@ -12942,15 +12965,21 @@ const buildWsUrl = () => {
     numerals: "true",
     interim_results: "true",
     filler_words: "false",
-    // 800ms: oraciones largas llegan completas sin sacrificar latencia
-    endpointing: "800",
-    // 2500ms: margen absoluto para pausas dentro de una misma idea
-    utterance_end_ms: "2500",
+    endpointing: "300",
+    utterance_end_ms: "1200",
+    no_delay: "true",
     vad_events: "true",
     diarize: "false"
   });
   return `${DEEPGRAM_URL}?${params}`;
 };
+const ALLOWED_LANGS = /* @__PURE__ */ new Set(["en", "es", "en-US", "en-GB", "es-419", "es-ES"]);
+function isAllowedLang(lang) {
+  if (!lang) return false;
+  if (ALLOWED_LANGS.has(lang)) return true;
+  const prefix = lang.slice(0, 2).toLowerCase();
+  return prefix === "en" || prefix === "es";
+}
 function useTranscription({ onFinal, onInterim, onError } = {}) {
   const wsRef = reactExports.useRef(null);
   const recorderRef = reactExports.useRef(null);
@@ -12984,6 +13013,10 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
     const detectedLang = alt?.languages?.[0] ?? "en";
     if (!texto || texto.length < 2) return;
     if (!data.is_final && confidence < 0.5) return;
+    if (!isAllowedLang(detectedLang)) {
+      console.debug(`[Deepgram] Idioma descartado: "${detectedLang}" — "${texto.slice(0, 30)}"`);
+      return;
+    }
     const payload = {
       text: texto,
       lang: detectedLang,
@@ -13021,7 +13054,7 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
     wsRef.current = ws;
     ws.binaryType = "arraybuffer";
     ws.onopen = () => {
-      console.log("[Deepgram] ✅ Connected — nova-3 / multi");
+      console.log("[Deepgram] ✅ Connected — nova-3 / multi / EN+ES only / no_delay");
       activoRef.current = true;
       setActive(true);
       setError(null);
@@ -13034,12 +13067,12 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
           ws.send(e.data);
         }
       };
-      recorder.start(100);
+      recorder.start(50);
       recorderRef.current = recorder;
     };
     ws.onmessage = handleMessage;
     ws.onerror = () => {
-      console.warn("[Deepgram] onerror fired — waiting for onclose details");
+      console.warn("[Deepgram] onerror — waiting for onclose details");
     };
     ws.onclose = (e) => {
       console.log(`[Deepgram] Closed — code:${e.code} reason:"${e.reason}"`);
@@ -13066,18 +13099,28 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
 const BACKEND_URL = "https://interpreterbk.onrender.com/api/translate";
 const PING_URL = "https://interpreterbk.onrender.com";
 const MAX_RETRIES = 2;
-const RETRY_DELAY = 350;
-const REQ_TIMEOUT = 8e3;
+const RETRY_DELAY = 300;
+const REQ_TIMEOUT = 6e3;
 (function keepAlive() {
   fetch(PING_URL).catch(() => {
   });
+  setTimeout(() => fetch(PING_URL).catch(() => {
+  }), 5e3);
   setInterval(() => fetch(PING_URL).catch(() => {
-  }), 4 * 60 * 1e3);
+  }), 3 * 60 * 1e3);
 })();
 const globalCache = /* @__PURE__ */ new Map();
 const pendingRequests = /* @__PURE__ */ new Map();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-async function fetchTranslation({ clean, sourceDeepL, targetDeepL, signal }) {
+function isValidTranslation(result, original) {
+  if (!result || result.trim().length === 0) return false;
+  if (result.trim() === original.trim()) return false;
+  return true;
+}
+function normalizeForCache(text) {
+  return text.trim().replace(/\s+/g, " ").replace(/[.,;:!?…]+$/, "").toLowerCase();
+}
+async function fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal }) {
   const timeoutCtrl = new AbortController();
   const timeoutId = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT);
   let combinedSignal = timeoutCtrl.signal;
@@ -13085,15 +13128,13 @@ async function fetchTranslation({ clean, sourceDeepL, targetDeepL, signal }) {
     combinedSignal = AbortSignal.any([signal, timeoutCtrl.signal]);
   }
   try {
+    const body = { text: clean, source_lang: sourceDeepL, target_lang: targetDeepL };
+    if (context) body.context = context;
     const res = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: combinedSignal,
-      body: JSON.stringify({
-        text: clean,
-        source_lang: sourceDeepL,
-        target_lang: targetDeepL
-      })
+      body: JSON.stringify(body)
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -13102,14 +13143,15 @@ async function fetchTranslation({ clean, sourceDeepL, targetDeepL, signal }) {
     clearTimeout(timeoutId);
   }
 }
-async function translateText({ text, from, to, signal = null }) {
+async function translateText({ text, from, to, context = null, signal = null }) {
   const clean = text?.trim();
   if (!clean) return "";
   const fromNorm = from.startsWith("en") ? "en" : "es";
   const toNorm = to.startsWith("en") ? "en" : "es";
+  if (fromNorm === toNorm) return null;
   const targetDeepL = toNorm === "en" ? "EN-US" : "ES";
   const sourceDeepL = fromNorm === "en" ? "EN" : "ES";
-  const cacheKey = `${fromNorm}|${toNorm}:${clean}`;
+  const cacheKey = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`;
   if (globalCache.has(cacheKey)) return globalCache.get(cacheKey);
   if (pendingRequests.has(cacheKey)) return pendingRequests.get(cacheKey);
   const promise = (async () => {
@@ -13117,17 +13159,13 @@ async function translateText({ text, from, to, signal = null }) {
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       if (signal?.aborted) return null;
       try {
-        const resultado = await fetchTranslation({
-          clean,
-          sourceDeepL,
-          targetDeepL,
-          signal
-        });
-        if (resultado) {
+        const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal });
+        if (isValidTranslation(resultado, clean)) {
           globalCache.set(cacheKey, resultado);
           return resultado;
         }
-        lastError = new Error("Empty translation response");
+        lastError = new Error("Same-text or empty translation response");
+        console.warn(`[Traducción] Invalid response on attempt ${attempt + 1}`);
       } catch (e) {
         if (e.name === "AbortError") return null;
         lastError = e;
@@ -13136,12 +13174,36 @@ async function translateText({ text, from, to, signal = null }) {
       if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY * (attempt + 1));
     }
     console.error("[Traducción] All retries failed:", lastError?.message);
-    return clean;
+    return null;
   })().finally(() => {
     pendingRequests.delete(cacheKey);
   });
   pendingRequests.set(cacheKey, promise);
   return promise;
+}
+function prewarmTranslation({ text, from }) {
+  const clean = text?.trim();
+  if (!clean || clean.length < 10) return;
+  const fromNorm = from.startsWith("en") ? "en" : "es";
+  const toNorm = fromNorm === "en" ? "es" : "en";
+  if (fromNorm === toNorm) return;
+  const targetDeepL = toNorm === "en" ? "EN-US" : "ES";
+  const sourceDeepL = fromNorm === "en" ? "EN" : "ES";
+  const cacheKey = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`;
+  if (globalCache.has(cacheKey) || pendingRequests.has(cacheKey)) return;
+  const promise = (async () => {
+    try {
+      const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context: null, signal: null });
+      if (isValidTranslation(resultado, clean)) {
+        globalCache.set(cacheKey, resultado);
+        console.debug("[Prewarm] ✓ cached:", clean.slice(0, 40));
+      }
+    } catch {
+    }
+  })().finally(() => {
+    pendingRequests.delete(cacheKey);
+  });
+  pendingRequests.set(cacheKey, promise);
 }
 const ES_MAC = (() => {
   if (navigator.userAgentData?.platform) {
@@ -13256,8 +13318,14 @@ const startBrowserCapture = async ({ onTrackEnded } = {}) => {
 };
 let _uid = 0;
 const uid = () => `u${++_uid}`;
-const MERGE_WINDOW_MS = 600;
+const MERGE_WINDOW_MS = 250;
 const TERMINAL_PUNCT = /[.!?…]$/;
+const PREWARM_DEBOUNCE_MS = 300;
+function normLang(lang = "") {
+  const p = lang.slice(0, 2).toLowerCase();
+  return p === "es" ? "es" : "en";
+}
+const TRANSLATION_CONTEXT = null;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = reactExports.useState(
     !!localStorage.getItem("app_key")?.trim() && !!localStorage.getItem("app_name")
@@ -13278,6 +13346,7 @@ function App() {
   const [interimLang, setInterimLang] = reactExports.useState("en");
   const lastFinalTimeRef = reactExports.useRef(0);
   const lastUtteranceRef = reactExports.useRef(null);
+  const prewarmTimerRef = reactExports.useRef(null);
   const [footerError, setFooterError] = reactExports.useState(null);
   const footerStatus = reactExports.useMemo(() => {
     if (!playing) return "Idle";
@@ -13289,10 +13358,35 @@ function App() {
     lastFinalTimeRef.current = 0;
     lastUtteranceRef.current = null;
   }, []);
+  const handleRetryTranslation = reactExports.useCallback(async (id) => {
+    const u = utterances.find((u2) => u2.id === id);
+    if (!u || !u.failed) return;
+    const targetLang = u.lang === "en" ? "es" : "en";
+    setUtterances((prev) => prev.map(
+      (x) => x.id === id ? { ...x, translating: true, failed: false } : x
+    ));
+    let translation = null;
+    try {
+      translation = await translateText({
+        text: u.text,
+        from: u.lang,
+        to: targetLang,
+        context: TRANSLATION_CONTEXT
+      });
+    } catch {
+    }
+    setUtterances((prev) => prev.map(
+      (x) => x.id === id ? { ...x, translation, translating: false, failed: !translation } : x
+    ));
+  }, [utterances]);
   const handleFinal = reactExports.useCallback(async ({ text, lang, speechFinal }) => {
     setInterimText("");
+    if (prewarmTimerRef.current) {
+      clearTimeout(prewarmTimerRef.current);
+      prewarmTimerRef.current = null;
+    }
     const now = Date.now();
-    const l = lang.startsWith("en") ? "en" : "es";
+    const l = normLang(lang);
     const isSubOnly = subtitleOnlyRef.current;
     const endsWithP = TERMINAL_PUNCT.test(text);
     const prev = lastUtteranceRef.current;
@@ -13309,19 +13403,22 @@ function App() {
         endsWithPunct: TERMINAL_PUNCT.test(mergedText)
       };
       setUtterances((utt) => utt.map(
-        (u) => u.id === prev.id ? { ...u, text: mergedText, translation: null, translating: !isSubOnly } : u
+        (u) => u.id === prev.id ? { ...u, text: mergedText, translation: null, translating: !isSubOnly, failed: false } : u
       ));
       if (!isSubOnly) {
         let translation2 = null;
         try {
-          translation2 = await translateText({ text: mergedText, from: l, to: targetLang2 });
+          translation2 = await translateText({
+            text: mergedText,
+            from: l,
+            to: targetLang2,
+            context: TRANSLATION_CONTEXT
+          });
         } catch {
-          translation2 = mergedText;
-        } finally {
-          setUtterances((utt) => utt.map(
-            (u) => u.id === prev.id ? { ...u, translation: translation2 || mergedText, translating: false } : u
-          ));
         }
+        setUtterances((utt) => utt.map(
+          (u) => u.id === prev.id ? { ...u, translation: translation2, translating: false, failed: !translation2 } : u
+        ));
       }
       return;
     }
@@ -13331,23 +13428,33 @@ function App() {
     lastUtteranceRef.current = { id, text, lang: l, endsWithPunct: endsWithP };
     setUtterances((prev2) => [
       ...prev2,
-      { id, text, lang: l, translation: null, translating: !isSubOnly, timestamp }
+      { id, text, lang: l, translation: null, translating: !isSubOnly, failed: false, timestamp }
     ]);
     if (isSubOnly) return;
     let translation = null;
     try {
-      translation = await translateText({ text, from: l, to: targetLang });
+      translation = await translateText({
+        text,
+        from: l,
+        to: targetLang,
+        context: TRANSLATION_CONTEXT
+      });
     } catch {
-      translation = text;
-    } finally {
-      setUtterances((utt) => utt.map(
-        (u) => u.id === id ? { ...u, translation: translation || text, translating: false } : u
-      ));
     }
+    setUtterances((utt) => utt.map(
+      (u) => u.id === id ? { ...u, translation, translating: false, failed: !translation } : u
+    ));
   }, []);
   const handleInterim = reactExports.useCallback(({ text, lang }) => {
     setInterimText(text);
-    setInterimLang(lang.startsWith("en") ? "en" : "es");
+    const l = normLang(lang);
+    setInterimLang(l);
+    if (subtitleOnlyRef.current) return;
+    if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current);
+    prewarmTimerRef.current = setTimeout(() => {
+      prewarmTranslation({ text, from: l });
+      prewarmTimerRef.current = null;
+    }, PREWARM_DEBOUNCE_MS);
   }, []);
   const handleTranscriptionError = reactExports.useCallback((err) => {
     setFooterError(err);
@@ -13389,6 +13496,10 @@ function App() {
         setFooterError(err.message || "Error starting transcription");
       }
     } else {
+      if (prewarmTimerRef.current) {
+        clearTimeout(prewarmTimerRef.current);
+        prewarmTimerRef.current = null;
+      }
       stopTranscription();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
@@ -13420,7 +13531,8 @@ function App() {
         interimLang,
         subtitleOnly,
         playing,
-        onClear: handleClear
+        onClear: handleClear,
+        onRetry: handleRetryTranslation
       }
     ) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
