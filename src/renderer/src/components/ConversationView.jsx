@@ -1,16 +1,15 @@
 /**
- * components/ConversationView.jsx
+ * components/ConversationView.jsx  v3
  *
- * Diseño idéntico a la imagen de referencia:
- * - Fondo negro, cards rectangulares con bordes sutiles
- * - Dos columnas: original izquierda, traducción derecha
- * - Texto normal en original, semi-bold en traducción
- * - Timestamp pequeño en la esquina inferior derecha de cada card
- * - Gaps amplios entre utterances (como la imagen)
+ * NUEVO en esta versión:
+ * - Prop `onRetry` para reintentar traducciones fallidas
+ * - Estado `failed` en utterance muestra un ícono de retry en lugar
+ *   de texto idéntico al original (que era el bug visible en la imagen)
+ * - Resto del diseño idéntico a v2
  */
 
 import { useEffect, useRef } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, RefreshCw } from 'lucide-react'
 
 const fmtTime = (date) =>
   date instanceof Date
@@ -32,6 +31,7 @@ export function ConversationView({
   subtitleOnly = false,
   playing      = false,
   onClear,
+  onRetry,       // NUEVO: (id) => void
 }) {
   const bottomRef = useRef(null)
 
@@ -62,7 +62,6 @@ export function ConversationView({
           </p>
         )}
 
-        {/* Utterances finalizados */}
         {utterances.map((u) => (
           <div
             key={u.id}
@@ -81,6 +80,16 @@ export function ConversationView({
               <div className="cv-card cv-card--trans">
                 {u.translating ? (
                   <Dots />
+                ) : u.failed ? (
+                  /* NUEVO: botón de retry en lugar de texto idéntico */
+                  <button
+                    className="cv-retry-btn"
+                    onClick={() => onRetry?.(u.id)}
+                    title="Retry translation"
+                  >
+                    <RefreshCw size={12} />
+                    <span>Retry</span>
+                  </button>
                 ) : u.translation ? (
                   <>
                     <p className="cv-text cv-text--trans">{u.translation}</p>

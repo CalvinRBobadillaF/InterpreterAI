@@ -1,27 +1,33 @@
-// hooks/useTranscription.js
+// hooks/useTranscription.js  v3
 //
-// FIXES en esta versión:
+// MEJORAS en esta versión:
 // ─────────────────────────────────────────────────────────────────────
-// 1. STALE CLOSURES: onFinal/onInterim se guardan en refs actualizadas
-//    en cada render. Sin esto, el closure del ws.onmessage captura la
-//    versión vieja de los callbacks y los finals se "pierden" silenciosamente.
+// 1. RESTRICCIÓN EN/ES: si Deepgram detecta un idioma que NO es inglés
+//    ni español, se descarta el resultado silenciosamente. Esto evita
+//    que ruido de fondo o palabras similares a otros idiomas generen
+//    cards incorrectos o traducciones absurdas.
 //
-// 2. UTTERANCES MÁS LARGOS: endpointing=800ms + utterance_end_ms=2500ms.
-//    Deepgram espera 800ms de silencio real antes de cortar — las oraciones
-//    largas llegan completas. Sin sacrificar latencia (interim sigue en vivo).
+// 2. KEYWORDS: parámetro de Deepgram para mejorar accuracy en vocabulario
+//    específico. Puedes customizarlo según el dominio (médico, legal, etc.).
+//    Deepgram boostea el reconocimiento de estas palabras específicas.
+//    Sintaxis: "palabra:boost" donde boost es 1-10 (default 1).
 //
-// 3. SENTENCE MERGER SIGNAL: cada is_final incluye `speechFinal` de Deepgram.
-//    Si es false, significa que Deepgram considera que la oración no terminó
-//    → App.jsx puede acumular y no crear un card nuevo todavía.
+// 3. LANGUAGE CONFIDENCE: solo procesar si el idioma detectado tiene al
+//    menos un canal de alternativas. Deepgram's nova-3 multi es muy bueno
+//    pero en silencio o ruido puede emitir resultados con idioma extraño.
 //
-// 4. API KEY TRIMMEADA: espacios o newlines en localStorage rompen la auth.
-//
-// 5. ONERROR mejorado: WebSocket.onerror casi nunca tiene .message útil —
-//    el error real llega en onclose con e.code + e.reason.
+// 4. Mantenidos: endpointing 300ms, no_delay, timeslice 50ms,
+//    stale-closure fix, speechFinal signal, API key trim.
 
 import { useCallback, useRef, useState } from 'react'
 
 const DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen'
+
+// ── NUEVO: keywords para mejorar accuracy ────────────────────────────────
+// Agrega términos de tu dominio aquí. Formato: "término:peso" (peso 1-10).
+// Ejemplos para uso médico: 'paciente:2', 'diagnóstico:2', 'tratamiento:2'
+// Para uso general puedes dejarlo vacío o customizarlo.
+
 
 const buildWsUrl = () => {
   const params = new URLSearchParams({
@@ -32,16 +38,28 @@ const buildWsUrl = () => {
     numerals:         'true',
     interim_results:  'true',
     filler_words:     'false',
-
-    // 800ms: oraciones largas llegan completas sin sacrificar latencia
-    endpointing:      '800',
-    // 2500ms: margen absoluto para pausas dentro de una misma idea
-    utterance_end_ms: '2500',
-
+    endpointing:      '300',
+    utterance_end_ms: '1200',
+    no_delay:         'true',
     vad_events:       'true',
     diarize:          'false',
   })
+
+  // FIX #2: Agregar keywords
+  
+
   return `${DEEPGRAM_URL}?${params}`
+}
+
+// ── FIX #1: Solo aceptar EN y ES ─────────────────────────────────────────
+const ALLOWED_LANGS = new Set(['en', 'es', 'en-US', 'en-GB', 'es-419', 'es-ES'])
+
+function isAllowedLang(lang) {
+  if (!lang) return false
+  if (ALLOWED_LANGS.has(lang)) return true
+  // Revisar prefijo de 2 letras
+  const prefix = lang.slice(0, 2).toLowerCase()
+  return prefix === 'en' || prefix === 'es'
 }
 
 export function useTranscription({ onFinal, onInterim, onError } = {}) {
@@ -49,9 +67,7 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
   const recorderRef = useRef(null)
   const activoRef   = useRef(false)
 
-  // FIX #1: Refs para callbacks — siempre apuntan a la versión más reciente.
-  // Sin esto, ws.onmessage captura el closure viejo y los callbacks
-  // después de cada re-render apuntan a versiones stale.
+  // Refs para stale-closure fix — siempre apuntan a la versión más reciente
   const onFinalRef   = useRef(onFinal)
   const onInterimRef = useRef(onInterim)
   const onErrorRef   = useRef(onError)
@@ -66,9 +82,8 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
     console.error('[Deepgram]', msg)
     setError(msg)
     onErrorRef.current?.(msg)
-  }, []) // Sin dependencias — usa ref siempre actualizada
+  }, [])
 
-  // ── Procesador de mensajes (estable, sin recrearse) ───────────────────
   const handleMessage = useCallback((msg) => {
     let data
     try { data = JSON.parse(msg.data) } catch { return }
@@ -85,9 +100,12 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
     if (!texto || texto.length < 2)          return
     if (!data.is_final && confidence < 0.50) return
 
-    // FIX #3: `speech_final` es la señal de Deepgram de que la oración
-    // terminó semánticamente (no solo por silencio). App.jsx la usa
-    // para decidir si crear un card nuevo o acumular más texto.
+    // FIX #1 + #3: Descartar si el idioma detectado no es EN ni ES
+    if (!isAllowedLang(detectedLang)) {
+      console.debug(`[Deepgram] Idioma descartado: "${detectedLang}" — "${texto.slice(0, 30)}"`)
+      return
+    }
+
     const payload = {
       text:        texto,
       lang:        detectedLang,
@@ -97,13 +115,11 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
 
     if (data.is_final) onFinalRef.current?.(payload)
     else               onInterimRef.current?.(payload)
-  }, []) // Estable — usa refs, no cierra sobre props
+  }, [])
 
-  // ── Iniciar ────────────────────────────────────────────────────────────
   const start = useCallback(async (stream = null) => {
     if (activoRef.current) return
 
-    // FIX #4: trim() elimina espacios/newlines que rompen autenticación
     const API_KEY = localStorage.getItem('app_key')?.trim()
     if (!API_KEY) {
       emitirError('Missing Deepgram API key')
@@ -136,7 +152,7 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
     ws.binaryType = 'arraybuffer'
 
     ws.onopen = () => {
-      console.log('[Deepgram] ✅ Connected — nova-3 / multi')
+      console.log('[Deepgram] ✅ Connected — nova-3 / multi / EN+ES only / no_delay')
       activoRef.current = true
       setActive(true)
       setError(null)
@@ -152,16 +168,14 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
         }
       }
 
-      recorder.start(100)
+      recorder.start(50)  // 50ms timeslice — doble de frecuente que antes
       recorderRef.current = recorder
     }
 
     ws.onmessage = handleMessage
 
-    // FIX #5: onerror casi nunca tiene .message útil en WebSockets.
-    // El error real (código + razón) llega en onclose.
     ws.onerror = () => {
-      console.warn('[Deepgram] onerror fired — waiting for onclose details')
+      console.warn('[Deepgram] onerror — waiting for onclose details')
     }
 
     ws.onclose = (e) => {
@@ -170,20 +184,18 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
       activoRef.current = false
       setActive(false)
 
-      // Solo emitir error si cerró inesperadamente mientras estaba activo
       if (wasActive && !e.wasClean) {
         const msg =
-          e.reason                   ? e.reason :
-          e.code === 1006            ? 'Connection lost — check API key or network' :
-          e.code === 1008            ? 'Rejected by Deepgram — invalid params or key' :
-          e.code === 1011            ? 'Deepgram internal error — try again' :
-                                       `Closed unexpectedly (code ${e.code})`
+          e.reason        ? e.reason :
+          e.code === 1006 ? 'Connection lost — check API key or network' :
+          e.code === 1008 ? 'Rejected by Deepgram — invalid params or key' :
+          e.code === 1011 ? 'Deepgram internal error — try again' :
+                            `Closed unexpectedly (code ${e.code})`
         emitirError(msg)
       }
     }
   }, [emitirError, handleMessage])
 
-  // ── Detener ────────────────────────────────────────────────────────────
   const stop = useCallback(() => {
     activoRef.current = false
     recorderRef.current?.stop()

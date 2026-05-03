@@ -1,68 +1,83 @@
 /**
- * hooks/useTranslation.js
+ * hooks/useTranslation.js  v3
  *
  * FIXES en esta versión:
  * ─────────────────────────────────────────────────────────────────────
- * 1. RETRY LOGIC: si la petición falla (red, 5xx), reintenta hasta 2 veces
- *    con backoff de 300ms. Esto arregla el bug de "traducción no carga".
+ * 1. SAME-TEXT DETECTION: si el backend devuelve exactamente el mismo
+ *    texto que se mandó (traducción fallida silenciosa), no se cachea
+ *    y se reintenta. Antes esto se cacheaba como "exitoso" y el card
+ *    mostraba el original como si fuera la traducción.
  *
- * 2. TIMEOUT: cada petición tiene 8s de timeout. Si Render está en cold
- *    start (primer ping del día), no bloquea indefinidamente.
+ * 2. CONTEXT SUPPORT: translateText acepta `context` opcional que se
+ *    manda al backend → DeepL lo usa para mejorar precisión de dominio
+ *    (medicina, legal, etc.). Requiere soporte en tu backend.
  *
- * 3. CACHÉ mejorada: las traducciones fallidas NO se cachean.
- *    Antes, un fallo devolvía el texto original y lo cacheaba → nunca
- *    se reintentaba esa frase.
+ * 3. PREWARM MÁS INTELIGENTE: normaliza el texto antes del cacheKey
+ *    (trim + colapsar espacios + strip de puntuación trailing + lowercase).
+ *    El interim "hola mundo," y el final "Hola mundo." ahora comparten
+ *    el mismo cache key → más hits, menos requests.
  *
- * 4. KEEP-ALIVE: ping a Render cada 4 min (antes 5) para reducir
- *    probabilidad de cold start en sesiones largas.
+ * 4. translateText devuelve null en fallo total en lugar del original.
+ *    App.jsx decide qué mostrar (ícono de retry en lugar de texto idéntico).
+ *
+ * 5. Mantenidos: retry con backoff, caché solo exitosa, dedup, keep-alive.
  */
 
 const BACKEND_URL  = 'https://interpreterbk.onrender.com/api/translate'
 const PING_URL     = 'https://interpreterbk.onrender.com'
 const MAX_RETRIES  = 2
-const RETRY_DELAY  = 350   // ms entre reintentos
-const REQ_TIMEOUT  = 8000  // ms antes de abortar la petición
+const RETRY_DELAY  = 300
+const REQ_TIMEOUT  = 6000
 
 // ── Keep-alive ────────────────────────────────────────────────────────────
 ;(function keepAlive() {
   fetch(PING_URL).catch(() => {})
-  setInterval(() => fetch(PING_URL).catch(() => {}), 4 * 60 * 1000)
+  setTimeout(() => fetch(PING_URL).catch(() => {}), 5_000)
+  setInterval(() => fetch(PING_URL).catch(() => {}), 3 * 60 * 1000)
 })()
 
-// ── Caché: solo guarda traducciones exitosas ───────────────────────────────
 const globalCache     = new Map()
 const pendingRequests = new Map()
-
-// ── Helper: sleep ─────────────────────────────────────────────────────────
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-// ── Una sola petición con timeout ─────────────────────────────────────────
-async function fetchTranslation({ clean, sourceDeepL, targetDeepL, signal }) {
-  // Timeout independiente del signal externo
+// ── Validar que la traducción es genuinamente diferente al original ────────
+function isValidTranslation(result, original) {
+  if (!result || result.trim().length === 0) return false
+  if (result.trim() === original.trim())     return false  // same-text → inválido
+  return true
+}
+
+// ── Normalizar para cache key: más hits entre interim y final ─────────────
+// El texto real enviado al backend NO se modifica.
+function normalizeForCache(text) {
+  return text
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[.,;:!?…]+$/, '')
+    .toLowerCase()
+}
+
+async function fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal }) {
   const timeoutCtrl = new AbortController()
   const timeoutId   = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT)
 
-  // Combinar signal externo + timeout usando AbortSignal.any si disponible,
-  // de lo contrario solo usamos el timeout
   let combinedSignal = timeoutCtrl.signal
   if (signal && typeof AbortSignal.any === 'function') {
     combinedSignal = AbortSignal.any([signal, timeoutCtrl.signal])
   }
 
   try {
+    const body = { text: clean, source_lang: sourceDeepL, target_lang: targetDeepL }
+    if (context) body.context = context   // FIX #2: contexto de dominio
+
     const res = await fetch(BACKEND_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       signal:  combinedSignal,
-      body: JSON.stringify({
-        text:        clean,
-        source_lang: sourceDeepL,
-        target_lang: targetDeepL,
-      }),
+      body:    JSON.stringify(body),
     })
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-
     const data = await res.json()
     return data.translated_text || null
 
@@ -71,58 +86,52 @@ async function fetchTranslation({ clean, sourceDeepL, targetDeepL, signal }) {
   }
 }
 
-// ── translateText — exportada para uso directo ────────────────────────────
-export async function translateText({ text, from, to, signal = null }) {
+// ── translateText ─────────────────────────────────────────────────────────
+export async function translateText({ text, from, to, context = null, signal = null }) {
   const clean = text?.trim()
   if (!clean) return ''
 
-  const fromNorm    = from.startsWith('en') ? 'en' : 'es'
-  const toNorm      = to.startsWith('en')   ? 'en' : 'es'
+  const fromNorm = from.startsWith('en') ? 'en' : 'es'
+  const toNorm   = to.startsWith('en')   ? 'en' : 'es'
+
+  // Si los idiomas son iguales no tiene sentido traducir
+  if (fromNorm === toNorm) return null
+
   const targetDeepL = toNorm   === 'en' ? 'EN-US' : 'ES'
   const sourceDeepL = fromNorm === 'en' ? 'EN'    : 'ES'
+  const cacheKey    = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`
 
-  const cacheKey = `${fromNorm}|${toNorm}:${clean}`
-
-  // 1. Caché instantánea
-  if (globalCache.has(cacheKey)) return globalCache.get(cacheKey)
-
-  // 2. Deduplicación — reusar Promise en vuelo para la misma frase
+  if (globalCache.has(cacheKey))     return globalCache.get(cacheKey)
   if (pendingRequests.has(cacheKey)) return pendingRequests.get(cacheKey)
 
-  // 3. Petición con retry
   const promise = (async () => {
     let lastError
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      // Si el signal externo ya fue abortado, salir inmediatamente
       if (signal?.aborted) return null
 
       try {
-        const resultado = await fetchTranslation({
-          clean, sourceDeepL, targetDeepL, signal,
-        })
+        const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal })
 
-        if (resultado) {
-          // FIX #3: solo cachear si fue exitosa
+        if (isValidTranslation(resultado, clean)) {
           globalCache.set(cacheKey, resultado)
           return resultado
         }
 
-        // Respuesta vacía — reintentar
-        lastError = new Error('Empty translation response')
+        // Respuesta igual al original → reintentar (no cachear)
+        lastError = new Error('Same-text or empty translation response')
+        console.warn(`[Traducción] Invalid response on attempt ${attempt + 1}`)
 
       } catch (e) {
-        if (e.name === 'AbortError') return null  // Signal externo → no reintentar
+        if (e.name === 'AbortError') return null
         lastError = e
         console.warn(`[Traducción] Attempt ${attempt + 1} failed: ${e.message}`)
       }
 
-      // Esperar antes del siguiente intento (excepto en el último)
       if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY * (attempt + 1))
     }
 
-    // Todos los intentos fallaron — devolver texto original como fallback
     console.error('[Traducción] All retries failed:', lastError?.message)
-    return clean
+    return null  // FIX #4: null en vez de original — App.jsx muestra retry UI
 
   })().finally(() => {
     pendingRequests.delete(cacheKey)
@@ -130,4 +139,34 @@ export async function translateText({ text, from, to, signal = null }) {
 
   pendingRequests.set(cacheKey, promise)
   return promise
+}
+
+// ── prewarmTranslation ────────────────────────────────────────────────────
+export function prewarmTranslation({ text, from }) {
+  const clean = text?.trim()
+  if (!clean || clean.length < 10) return
+
+  const fromNorm = from.startsWith('en') ? 'en' : 'es'
+  const toNorm   = fromNorm === 'en' ? 'es' : 'en'
+  if (fromNorm === toNorm) return
+
+  const targetDeepL = toNorm   === 'en' ? 'EN-US' : 'ES'
+  const sourceDeepL = fromNorm === 'en' ? 'EN'    : 'ES'
+  const cacheKey    = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`
+
+  if (globalCache.has(cacheKey) || pendingRequests.has(cacheKey)) return
+
+  const promise = (async () => {
+    try {
+      const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context: null, signal: null })
+      if (isValidTranslation(resultado, clean)) {
+        globalCache.set(cacheKey, resultado)
+        console.debug('[Prewarm] ✓ cached:', clean.slice(0, 40))
+      }
+    } catch { /* silencioso — best-effort */ }
+  })().finally(() => {
+    pendingRequests.delete(cacheKey)
+  })
+
+  pendingRequests.set(cacheKey, promise)
 }
