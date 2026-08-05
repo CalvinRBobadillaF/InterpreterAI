@@ -12528,22 +12528,27 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$c = [
+const __iconNode$f = [
+  ["path", { d: "M12 5v14", key: "s699le" }],
+  ["path", { d: "m19 12-7 7-7-7", key: "1idqje" }]
+];
+const ArrowDown = createLucideIcon("arrow-down", __iconNode$f);
+const __iconNode$e = [
   ["rect", { width: "18", height: "14", x: "3", y: "5", rx: "2", ry: "2", key: "12ruh7" }],
   ["path", { d: "M7 15h4M15 15h2M7 11h2M13 11h4", key: "1ueiar" }]
 ];
-const Captions = createLucideIcon("captions", __iconNode$c);
-const __iconNode$b = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$b);
-const __iconNode$a = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$a);
-const __iconNode$9 = [
+const Captions = createLucideIcon("captions", __iconNode$e);
+const __iconNode$d = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$d);
+const __iconNode$c = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$c);
+const __iconNode$b = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const Globe = createLucideIcon("globe", __iconNode$9);
-const __iconNode$8 = [
+const Globe = createLucideIcon("globe", __iconNode$b);
+const __iconNode$a = [
   ["path", { d: "m5 8 6 6", key: "1wu5hv" }],
   ["path", { d: "m4 14 6-6 2-3", key: "1k1g8d" }],
   ["path", { d: "M2 5h12", key: "or177f" }],
@@ -12551,20 +12556,26 @@ const __iconNode$8 = [
   ["path", { d: "m22 22-5-10-5 10", key: "don7ne" }],
   ["path", { d: "M14 18h6", key: "1m8k6r" }]
 ];
-const Languages = createLucideIcon("languages", __iconNode$8);
-const __iconNode$7 = [
+const Languages = createLucideIcon("languages", __iconNode$a);
+const __iconNode$9 = [
   ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
   ["path", { d: "M21 12H9", key: "dn1m92" }],
   ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
 ];
-const LogOut = createLucideIcon("log-out", __iconNode$7);
-const __iconNode$6 = [
+const LogOut = createLucideIcon("log-out", __iconNode$9);
+const __iconNode$8 = [
   ["path", { d: "M12 19v3", key: "npa21l" }],
   ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
   ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
 ];
-const Mic = createLucideIcon("mic", __iconNode$6);
-const __iconNode$5 = [
+const Mic = createLucideIcon("mic", __iconNode$8);
+const __iconNode$7 = [
+  ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2", key: "48i651" }],
+  ["line", { x1: "8", x2: "16", y1: "21", y2: "21", key: "1svkeh" }],
+  ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
+];
+const Monitor = createLucideIcon("monitor", __iconNode$7);
+const __iconNode$6 = [
   [
     "path",
     {
@@ -12573,8 +12584,8 @@ const __iconNode$5 = [
     }
   ]
 ];
-const Moon = createLucideIcon("moon", __iconNode$5);
-const __iconNode$4 = [
+const Moon = createLucideIcon("moon", __iconNode$6);
+const __iconNode$5 = [
   [
     "path",
     {
@@ -12583,19 +12594,19 @@ const __iconNode$4 = [
     }
   ]
 ];
-const Play = createLucideIcon("play", __iconNode$4);
-const __iconNode$3 = [
+const Play = createLucideIcon("play", __iconNode$5);
+const __iconNode$4 = [
   ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
   ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
   ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
   ["path", { d: "M8 16H3v5", key: "1cv678" }]
 ];
-const RefreshCw = createLucideIcon("refresh-cw", __iconNode$3);
-const __iconNode$2 = [
+const RefreshCw = createLucideIcon("refresh-cw", __iconNode$4);
+const __iconNode$3 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]
 ];
-const Square = createLucideIcon("square", __iconNode$2);
-const __iconNode$1 = [
+const Square = createLucideIcon("square", __iconNode$3);
+const __iconNode$2 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -12606,18 +12617,31 @@ const __iconNode$1 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-const Sun = createLucideIcon("sun", __iconNode$1);
-const __iconNode = [
+const Sun = createLucideIcon("sun", __iconNode$2);
+const __iconNode$1 = [
   ["path", { d: "M10 11v6", key: "nco0om" }],
   ["path", { d: "M14 11v6", key: "outv1u" }],
   ["path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6", key: "miytrc" }],
   ["path", { d: "M3 6h18", key: "d0wm0j" }],
   ["path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", key: "e791ji" }]
 ];
-const Trash2 = createLucideIcon("trash-2", __iconNode);
+const Trash2 = createLucideIcon("trash-2", __iconNode$1);
+const __iconNode = [
+  [
+    "path",
+    {
+      d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3",
+      key: "wmoenq"
+    }
+  ],
+  ["path", { d: "M12 9v4", key: "juzpu7" }],
+  ["path", { d: "M12 17h.01", key: "p32p05" }]
+];
+const TriangleAlert = createLucideIcon("triangle-alert", __iconNode);
 function LogIn({ onLogin }) {
   const [name, setName] = reactExports.useState("");
   const [deepgramKey, setDeepgramKey] = reactExports.useState(localStorage.getItem("app_key") || "");
+  const [googleKey, setGoogleKey] = reactExports.useState(localStorage.getItem("google_key") || "");
   const [error, setError] = reactExports.useState("");
   const [showInstructions, setShowInstructions] = reactExports.useState(false);
   const handleSubmit = (e) => {
@@ -12633,6 +12657,11 @@ function LogIn({ onLogin }) {
     }
     localStorage.setItem("app_name", name.trim());
     localStorage.setItem("app_key", deepgramKey.trim());
+    if (googleKey.trim()) {
+      localStorage.setItem("google_key", googleKey.trim());
+    } else {
+      localStorage.removeItem("google_key");
+    }
     onLogin();
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "login-shell", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-card", children: [
@@ -12686,6 +12715,33 @@ function LogIn({ onLogin }) {
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Used for real-time speech-to-text (12,000 min/year free)" })
       ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-field", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "login-label", children: [
+          "Google Translate API Key ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontWeight: 400, opacity: 0.65 }, children: "(optional)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              className: "login-label__link",
+              href: "https://console.cloud.google.com/apis/library/translate.googleapis.com",
+              target: "_blank",
+              rel: "noreferrer",
+              children: "Get key →"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            className: "login-input login-input--mono",
+            type: "password",
+            placeholder: "AIzaSy...",
+            value: googleKey,
+            onChange: (e) => setGoogleKey(e.target.value)
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Only needed for the 🇭🇹 Kreyòl Ayisyen translation mode — DeepL still handles EN ⇄ ES without it" })
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-instructions", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
@@ -12710,6 +12766,11 @@ function LogIn({ onLogin }) {
           " Integrated via secure backend. No key required from the user.",
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          "3. ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Google Translate:" }),
+          " Optional — only needed if you'll use the Kreyòl Ayisyen mode, since DeepL doesn't support that language. Requires a Google Cloud project with billing enabled (there's a free monthly quota).",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           "Ask Calvin Bobadilla if you need help with credentials."
         ] }) })
       ] }),
@@ -12726,6 +12787,11 @@ function LogIn({ onLogin }) {
     ] })
   ] }) });
 }
+const isElectron = () => {
+  if (typeof window === "undefined") return false;
+  const hasAPI = !!window.electronAPI?.getAudioSource;
+  return hasAPI;
+};
 const BAR_COUNT = 28;
 const BAR_HEIGHTS = Array.from({ length: BAR_COUNT }, (_, i) => {
   const v = Math.abs(Math.sin(i * 0.52) * 0.6 + Math.sin(i * 0.13) * 0.4);
@@ -12751,9 +12817,13 @@ function useTimer(running) {
   const s = String(secs % 60).padStart(2, "0");
   return `${h}:${m}:${s}`;
 }
-const FUENTES = [
+const FUENTES_WEB = [
   { id: "mic", label: "Microphone", sub: "Device input", Icon: Mic },
-  { id: "tab", label: "Browser Tab", sub: "Tab audio", Icon: Globe }
+  { id: "tab", label: "Browser Tab", sub: "Tab audio via getDisplayMedia", Icon: Globe }
+];
+const FUENTES_ELECTRON = [
+  { id: "mic", label: "Microphone", sub: "Device input", Icon: Mic },
+  { id: "system", label: "System Audio", sub: "Computer output", Icon: Monitor }
 ];
 function Sep() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-sep", "aria-hidden": true });
@@ -12765,14 +12835,17 @@ function Header({
   onSourceChange,
   subtitleOnly,
   onToggleSubtitleOnly,
-  onLogout
+  onLogout,
+  htMode,
+  onToggleHtMode
 }) {
   const timer = useTimer(playing);
   const dropRef = reactExports.useRef(null);
   const [dropOpen, setDropOpen] = reactExports.useState(false);
-  const [lightTheme, setLightTheme] = reactExports.useState(
-    () => localStorage.getItem("theme") === "light"
-  );
+  const [lightTheme, setLightTheme] = reactExports.useState(() => localStorage.getItem("theme") === "light");
+  const FUENTES = isElectron() ? FUENTES_ELECTRON : FUENTES_WEB;
+  const hasGoogleKey = !!localStorage.getItem("google_key")?.trim();
+  const missingGoogleKey = htMode && !hasGoogleKey;
   reactExports.useEffect(() => {
     document.documentElement.classList.toggle("light", lightTheme);
     localStorage.setItem("theme", lightTheme ? "light" : "dark");
@@ -12827,7 +12900,21 @@ function Header({
           },
           id
         )) })
-      ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "button",
+        {
+          className: `hdr-btn ${htMode ? "hdr-btn--active" : ""}`,
+          onClick: onToggleHtMode,
+          disabled: playing,
+          title: missingGoogleKey ? "Falta tu Google Translate API key — agrégala en el login para que este modo funcione" : htMode ? "Modo Kreyòl activo — clic para traducir EN ⇄ ES como siempre" : "Modo normal EN ⇄ ES — clic para traducir hacia Kreyòl",
+          children: [
+            missingGoogleKey && /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { size: 11, className: "hdr-warn-icon" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-btn-label", children: htMode ? "🇺🇸🇪🇸→🇭🇹 Kreyòl" : "🇺🇸⇄🇪🇸 EN/ES" })
+          ]
+        }
+      )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -12856,15 +12943,7 @@ function Header({
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          className: "hdr-icon",
-          onClick: () => setLightTheme((t) => !t),
-          title: "Toggle theme",
-          children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 13, strokeWidth: 2 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 13, strokeWidth: 2 })
-        }
-      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: () => setLightTheme((t) => !t), title: "Toggle theme", children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 13, strokeWidth: 2 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 13, strokeWidth: 2 }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-username", children: username }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: onLogout, title: "Log out", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 13, strokeWidth: 2 }) })
     ] })
@@ -12872,7 +12951,7 @@ function Header({
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 1.7" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 2.0" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12890,60 +12969,65 @@ function Dots() {
     /* @__PURE__ */ jsxRuntimeExports.jsx("span", {})
   ] });
 }
+const NEAR_BOTTOM_THRESHOLD = 80;
 function ConversationView({
   utterances = [],
   interimText = "",
   interimLang = "en",
   subtitleOnly = false,
+  htMode = true,
   playing = false,
   onClear,
   onRetry
-  // NUEVO: (id) => void
 }) {
+  const scrollRef = reactExports.useRef(null);
   const bottomRef = reactExports.useRef(null);
+  const isNearBottomRef = reactExports.useRef(true);
+  const [showJumpBtn, setShowJumpBtn] = reactExports.useState(false);
   reactExports.useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const near = el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD;
+      isNearBottomRef.current = near;
+      setShowJumpBtn(!near);
+    };
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
+  reactExports.useEffect(() => {
+    if (isNearBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }, [utterances.length, interimText]);
+  const jumpToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    isNearBottomRef.current = true;
+    setShowJumpBtn(false);
+  };
   const isEmpty = utterances.length === 0 && !interimText;
+  const transColLabel = htMode ? "🇭🇹 Kreyòl" : "EN ⇄ ES";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-root", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-toolbar", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: "Original" }),
-      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: "Translation" }),
+      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: transColLabel }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "cv-clear-btn", onClick: onClear, title: "Clear conversation", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 12 }) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-scroll", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-scroll", ref: scrollRef, children: [
       isEmpty && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-empty", children: playing ? "Listening…" : "Press ▶ to start" }),
-      utterances.map((u) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "div",
-        {
-          className: `cv-row ${subtitleOnly ? "cv-row--solo" : ""}`,
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-card cv-card--orig", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text", children: u.text }),
-              u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
-            ] }),
-            !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(Dots, {}) : u.failed ? (
-              /* NUEVO: botón de retry en lugar de texto idéntico */
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "button",
-                {
-                  className: "cv-retry-btn",
-                  onClick: () => onRetry?.(u.id),
-                  title: "Retry translation",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { size: 12 }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Retry" })
-                  ]
-                }
-              )
-            ) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text cv-text--trans", children: u.translation }),
-              u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-dash", children: "—" }) })
-          ]
-        },
-        u.id
-      )),
+      utterances.map((u) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row ${subtitleOnly ? "cv-row--solo" : ""}`, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-card cv-card--orig", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text", children: u.text }),
+          u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
+        ] }),
+        !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(Dots, {}) : u.failed ? /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "cv-retry-btn", onClick: () => onRetry?.(u.id), title: "Retry translation", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { size: 12 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Retry" })
+        ] }) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text cv-text--trans", children: u.translation }),
+          u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-dash", children: "—" }) })
+      ] }, u.id)),
       interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row cv-row--live ${subtitleOnly ? "cv-row--solo" : ""}`, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--orig cv-card--live", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "cv-text", children: [
           interimText,
@@ -12952,6 +13036,10 @@ function ConversationView({
         !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans cv-card--live" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: bottomRef })
+    ] }),
+    showJumpBtn && /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "cv-jump-btn", onClick: jumpToBottom, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { size: 13 }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Jump to latest" })
     ] })
   ] });
 }
@@ -12973,12 +13061,11 @@ const buildWsUrl = () => {
   });
   return `${DEEPGRAM_URL}?${params}`;
 };
-const ALLOWED_LANGS = /* @__PURE__ */ new Set(["en", "es", "en-US", "en-GB", "es-419", "es-ES"]);
+const ALLOWED_LANGS = /* @__PURE__ */ new Set(["en", "es"]);
 function isAllowedLang(lang) {
   if (!lang) return false;
-  if (ALLOWED_LANGS.has(lang)) return true;
   const prefix = lang.slice(0, 2).toLowerCase();
-  return prefix === "en" || prefix === "es";
+  return ALLOWED_LANGS.has(prefix);
 }
 function useTranscription({ onFinal, onInterim, onError } = {}) {
   const wsRef = reactExports.useRef(null);
@@ -13014,12 +13101,12 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
     if (!texto || texto.length < 2) return;
     if (!data.is_final && confidence < 0.5) return;
     if (!isAllowedLang(detectedLang)) {
-      console.debug(`[Deepgram] Idioma descartado: "${detectedLang}" — "${texto.slice(0, 30)}"`);
+      console.debug(`[Deepgram] Idioma descartado (solo en/es): "${detectedLang}" — "${texto.slice(0, 30)}"`);
       return;
     }
     const payload = {
       text: texto,
-      lang: detectedLang,
+      lang: detectedLang.slice(0, 2).toLowerCase(),
       confidence,
       speechFinal: data.speech_final ?? data.is_final
     };
@@ -13049,12 +13136,11 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
       }
     }
     const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
-    console.log("[Deepgram] Connecting…");
     const ws = new WebSocket(buildWsUrl(), ["token", API_KEY]);
     wsRef.current = ws;
     ws.binaryType = "arraybuffer";
     ws.onopen = () => {
-      console.log("[Deepgram] ✅ Connected — nova-3 / multi / EN+ES only / no_delay");
+      console.log("[Deepgram] ✅ Connected — nova-3 / multi (en+es only)");
       activoRef.current = true;
       setActive(true);
       setError(null);
@@ -13098,37 +13184,118 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
 }
 const BACKEND_URL = "https://interpreterbk.onrender.com/api/translate";
 const PING_URL = "https://interpreterbk.onrender.com";
+const GOOGLE_URL = "https://translation.googleapis.com/language/translate/v2";
 const MAX_RETRIES = 2;
-const RETRY_DELAY = 300;
-const REQ_TIMEOUT = 6e3;
+const RETRY_DELAY = 150;
+const REQ_TIMEOUT = 3500;
+const MAX_CACHE_SIZE = 500;
 (function keepAlive() {
   fetch(PING_URL).catch(() => {
   });
-  setTimeout(() => fetch(PING_URL).catch(() => {
-  }), 5e3);
   setInterval(() => fetch(PING_URL).catch(() => {
   }), 3 * 60 * 1e3);
 })();
-const globalCache = /* @__PURE__ */ new Map();
+const lruCache = {
+  _map: /* @__PURE__ */ new Map(),
+  has(key) {
+    return this._map.has(key);
+  },
+  get(key) {
+    if (!this._map.has(key)) return void 0;
+    const val = this._map.get(key);
+    this._map.delete(key);
+    this._map.set(key, val);
+    return val;
+  },
+  set(key, val) {
+    if (this._map.has(key)) this._map.delete(key);
+    this._map.set(key, val);
+    if (this._map.size > MAX_CACHE_SIZE) {
+      this._map.delete(this._map.keys().next().value);
+    }
+  },
+  get size() {
+    return this._map.size;
+  }
+};
 const pendingRequests = /* @__PURE__ */ new Map();
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+function anySignal(signals) {
+  const ctrl = new AbortController();
+  for (const sig of signals) {
+    if (!sig) continue;
+    if (sig.aborted) {
+      ctrl.abort(sig.reason);
+      break;
+    }
+    sig.addEventListener("abort", () => ctrl.abort(sig.reason), { once: true });
+  }
+  return ctrl.signal;
+}
+const sleep = (ms, signal) => new Promise((resolve, reject) => {
+  const id = setTimeout(resolve, ms);
+  signal?.addEventListener("abort", () => {
+    clearTimeout(id);
+    reject(Object.assign(new Error("AbortError"), { name: "AbortError" }));
+  }, { once: true });
+});
 function isValidTranslation(result, original) {
   if (!result || result.trim().length === 0) return false;
   if (result.trim() === original.trim()) return false;
   return true;
 }
 function normalizeForCache(text) {
-  return text.trim().replace(/\s+/g, " ").replace(/[.,;:!?…]+$/, "").toLowerCase();
+  return text.trim().replace(/\s+/g, " ").replace(/[.,;:!?…\u2026]+$/, "").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u2013\u2014]/g, "-").toLowerCase();
 }
-async function fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal }) {
+function toDeepLSource(code) {
+  return code.toUpperCase();
+}
+function toDeepLTarget(code) {
+  const c = code.toLowerCase();
+  if (c === "en") return "EN-US";
+  if (c === "pt") return "PT-BR";
+  return code.toUpperCase();
+}
+async function translateWithGoogle({ text, from, to, signal }) {
+  const apiKey = localStorage.getItem("google_key")?.trim();
+  if (!apiKey) {
+    throw new Error("Missing Google Translate API key — set localStorage 'google_key'");
+  }
   const timeoutCtrl = new AbortController();
   const timeoutId = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT);
-  let combinedSignal = timeoutCtrl.signal;
-  if (signal && typeof AbortSignal.any === "function") {
-    combinedSignal = AbortSignal.any([signal, timeoutCtrl.signal]);
-  }
+  const combinedSignal = anySignal([signal, timeoutCtrl.signal]);
   try {
-    const body = { text: clean, source_lang: sourceDeepL, target_lang: targetDeepL };
+    const res = await fetch(`${GOOGLE_URL}?key=${encodeURIComponent(apiKey)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: combinedSignal,
+      body: JSON.stringify({
+        q: text,
+        source: from,
+        // Google usa minúsculas de 2 letras: 'en', 'es', 'ht'
+        target: to,
+        format: "text"
+      })
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => null);
+      throw new Error(`Google Translate: ${errBody?.error?.message || `HTTP ${res.status}`}`);
+    }
+    const data = await res.json();
+    return data?.data?.translations?.[0]?.translatedText || null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+async function translateWithDeepL({ text, from, to, context, signal }) {
+  const timeoutCtrl = new AbortController();
+  const timeoutId = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT);
+  const combinedSignal = anySignal([signal, timeoutCtrl.signal]);
+  try {
+    const body = {
+      text,
+      source_lang: toDeepLSource(from),
+      target_lang: toDeepLTarget(to)
+    };
     if (context) body.context = context;
     const res = await fetch(BACKEND_URL, {
       method: "POST",
@@ -13143,37 +13310,47 @@ async function fetchTranslation({ clean, sourceDeepL, targetDeepL, context, sign
     clearTimeout(timeoutId);
   }
 }
+async function dispatchTranslate({ clean, fromNorm, toNorm, context, signal }) {
+  if (fromNorm === "ht" || toNorm === "ht") {
+    return translateWithGoogle({ text: clean, from: fromNorm, to: toNorm, signal });
+  }
+  return translateWithDeepL({ text: clean, from: fromNorm, to: toNorm, context, signal });
+}
 async function translateText({ text, from, to, context = null, signal = null }) {
   const clean = text?.trim();
   if (!clean) return "";
-  const fromNorm = from.startsWith("en") ? "en" : "es";
-  const toNorm = to.startsWith("en") ? "en" : "es";
+  const fromNorm = from.slice(0, 2).toLowerCase();
+  const toNorm = to.slice(0, 2).toLowerCase();
   if (fromNorm === toNorm) return null;
-  const targetDeepL = toNorm === "en" ? "EN-US" : "ES";
-  const sourceDeepL = fromNorm === "en" ? "EN" : "ES";
   const cacheKey = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`;
-  if (globalCache.has(cacheKey)) return globalCache.get(cacheKey);
+  if (lruCache.has(cacheKey)) return lruCache.get(cacheKey);
   if (pendingRequests.has(cacheKey)) return pendingRequests.get(cacheKey);
   const promise = (async () => {
     let lastError;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       if (signal?.aborted) return null;
       try {
-        const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal });
+        const resultado = await dispatchTranslate({ clean, fromNorm, toNorm, context, signal });
         if (isValidTranslation(resultado, clean)) {
-          globalCache.set(cacheKey, resultado);
+          lruCache.set(cacheKey, resultado);
           return resultado;
         }
-        lastError = new Error("Same-text or empty translation response");
-        console.warn(`[Traducción] Invalid response on attempt ${attempt + 1}`);
+        lastError = new Error("Respuesta vacía o igual al original");
       } catch (e) {
         if (e.name === "AbortError") return null;
         lastError = e;
-        console.warn(`[Traducción] Attempt ${attempt + 1} failed: ${e.message}`);
+        console.warn(`[Traducción] Intento ${attempt + 1} fallido: ${e.message}`);
       }
-      if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY * (attempt + 1));
+      if (attempt < MAX_RETRIES) {
+        const delay = RETRY_DELAY * 2 ** attempt;
+        try {
+          await sleep(delay, signal);
+        } catch (e) {
+          if (e.name === "AbortError") return null;
+        }
+      }
     }
-    console.error("[Traducción] All retries failed:", lastError?.message);
+    console.error("[Traducción] Todos los reintentos fallaron:", lastError?.message);
     return null;
   })().finally(() => {
     pendingRequests.delete(cacheKey);
@@ -13181,24 +13358,23 @@ async function translateText({ text, from, to, context = null, signal = null }) 
   pendingRequests.set(cacheKey, promise);
   return promise;
 }
-function prewarmTranslation({ text, from }) {
+function prewarmTranslation({ text, from, to }) {
   const clean = text?.trim();
-  if (!clean || clean.length < 10) return;
-  const fromNorm = from.startsWith("en") ? "en" : "es";
-  const toNorm = fromNorm === "en" ? "es" : "en";
+  if (!clean || clean.length < 10 || !to) return;
+  const fromNorm = from.slice(0, 2).toLowerCase();
+  const toNorm = to.slice(0, 2).toLowerCase();
   if (fromNorm === toNorm) return;
-  const targetDeepL = toNorm === "en" ? "EN-US" : "ES";
-  const sourceDeepL = fromNorm === "en" ? "EN" : "ES";
   const cacheKey = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`;
-  if (globalCache.has(cacheKey) || pendingRequests.has(cacheKey)) return;
+  if (lruCache.has(cacheKey) || pendingRequests.has(cacheKey)) return;
   const promise = (async () => {
     try {
-      const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context: null, signal: null });
+      const resultado = await dispatchTranslate({ clean, fromNorm, toNorm, context: null, signal: null });
       if (isValidTranslation(resultado, clean)) {
-        globalCache.set(cacheKey, resultado);
+        lruCache.set(cacheKey, resultado);
         console.debug("[Prewarm] ✓ cached:", clean.slice(0, 40));
       }
-    } catch {
+    } catch (e) {
+      console.debug("[Prewarm] falló (no es grave, se reintentará al finalizar):", e.message);
     }
   })().finally(() => {
     pendingRequests.delete(cacheKey);
@@ -13316,19 +13492,136 @@ const startBrowserCapture = async ({ onTrackEnded } = {}) => {
   );
   return { stream, reason: null, userMessage: null };
 };
+const IPC_TIMEOUT_MS = 5e3;
+const startElectronCapture = async () => {
+  if (!window.electronAPI?.getAudioSource) {
+    console.error(
+      "[ElectronCapture] window.electronAPI.getAudioSource no encontrado.\n→ Asegúrate de que preload.js expone electronAPI con contextBridge."
+    );
+    return { stream: null, userMessage: "Error interno: API de Electron no disponible." };
+  }
+  let fuente;
+  try {
+    const ipcPromise = window.electronAPI.getAudioSource();
+    const timeout = new Promise(
+      (_, rej) => setTimeout(() => rej(new Error("IPC_TIMEOUT")), IPC_TIMEOUT_MS)
+    );
+    fuente = await Promise.race([ipcPromise, timeout]);
+  } catch (e) {
+    const msg = e.message === "IPC_TIMEOUT" ? "El proceso principal tardó demasiado. Reinicia la app." : `Error IPC: ${e.message}`;
+    console.error("[ElectronCapture]", msg);
+    return { stream: null, userMessage: msg };
+  }
+  if (!fuente?.id) {
+    console.error("[ElectronCapture] No se encontró ninguna fuente de escritorio.");
+    return { stream: null, userMessage: "No se encontró fuente de audio del sistema." };
+  }
+  console.log(`[ElectronCapture] Usando fuente: "${fuente.name}" (${fuente.id})`);
+  let stream = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: fuente.id,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
+        },
+        // FIX #2: hint de sampleRate fuera de mandatory (más compatible)
+        sampleRate: 16e3
+      },
+      video: {
+        // FIX #1: constraints de resolución mínima fuera de mandatory
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: fuente.id
+        },
+        width: { max: 1 },
+        height: { max: 1 },
+        frameRate: { max: 1 }
+      }
+    });
+  } catch (e) {
+    if (e.name === "OverconstrainedError" || e.name === "NotSupportedError") {
+      console.warn(`[ElectronCapture] Fallo con video (${e.name}), reintentando solo audio…`);
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            mandatory: {
+              chromeMediaSource: "desktop",
+              chromeMediaSourceId: fuente.id,
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            }
+          },
+          video: false
+        });
+      } catch (e2) {
+        console.error("[ElectronCapture] Fallback audio-only también falló:", e2.name, e2.message);
+        e = e2;
+      }
+    }
+    if (!stream) {
+      let userMessage;
+      switch (e.name) {
+        case "NotAllowedError":
+          userMessage = 'Permiso denegado. En main.js asegúrate de que setPermissionRequestHandler permite "media" y "display-capture".';
+          break;
+        case "OverconstrainedError":
+          userMessage = `Constraints incompatibles con la fuente (${e.constraint}). Reporta este error.`;
+          break;
+        case "NotFoundError":
+          userMessage = "No se encontró dispositivo de captura de pantalla.";
+          break;
+        default:
+          userMessage = `Error al capturar audio del sistema: ${e.name} — ${e.message}`;
+      }
+      console.error("[ElectronCapture]", e.name, e.message);
+      return { stream: null, userMessage };
+    }
+  }
+  const audioTracks = stream.getAudioTracks();
+  if (audioTracks.length === 0) {
+    stream.getTracks().forEach((t) => t.stop());
+    console.error("[ElectronCapture] Stream sin pistas de audio.");
+    return {
+      stream: null,
+      userMessage: "No se obtuvo audio del sistema. En Linux puede requerir PulseAudio o configuración adicional de loopback."
+    };
+  }
+  stream.getVideoTracks().forEach((t) => {
+    t.stop();
+    stream.removeTrack(t);
+  });
+  const settings = audioTracks[0].getSettings();
+  console.log(
+    `[ElectronCapture] ✅ Audio del sistema listo
+  Label:      ${audioTracks[0].label}
+  SampleRate: ${settings.sampleRate ?? "?"} Hz
+  Channels:   ${settings.channelCount ?? "?"}
+  SampleSize: ${settings.sampleSize ?? "?"} bits`
+  );
+  return { stream, userMessage: null };
+};
 let _uid = 0;
 const uid = () => `u${++_uid}`;
 const MERGE_WINDOW_MS = 250;
 const TERMINAL_PUNCT = /[.!?…]$/;
-const PREWARM_DEBOUNCE_MS = 300;
+const PREWARM_DEBOUNCE_MS = 100;
+const HT_MODE_STORAGE_KEY = "ht_mode";
 function normLang(lang = "") {
-  const p = lang.slice(0, 2).toLowerCase();
-  return p === "es" ? "es" : "en";
+  return lang.slice(0, 2).toLowerCase() || "en";
 }
 const TRANSLATION_CONTEXT = null;
+function getTargetLang(sourceLang, htMode) {
+  if (htMode) return "ht";
+  return sourceLang === "en" ? "es" : "en";
+}
 function App() {
   const [isLoggedIn, setIsLoggedIn] = reactExports.useState(
-    !!localStorage.getItem("app_key")?.trim() && !!localStorage.getItem("app_name")
+    () => !!localStorage.getItem("app_key")?.trim() && !!localStorage.getItem("app_name")
   );
   const handleLogout = reactExports.useCallback(() => {
     localStorage.removeItem("app_key");
@@ -13338,9 +13631,22 @@ function App() {
   const [playing, setPlaying] = reactExports.useState(false);
   const [source, setSource] = reactExports.useState("mic");
   const streamRef = reactExports.useRef(null);
+  const abortCtrlRef = reactExports.useRef(null);
   const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
   const subtitleOnlyRef = reactExports.useRef(false);
   subtitleOnlyRef.current = subtitleOnly;
+  const [htMode, setHtMode] = reactExports.useState(
+    () => localStorage.getItem(HT_MODE_STORAGE_KEY) !== "false"
+  );
+  const htModeRef = reactExports.useRef(htMode);
+  htModeRef.current = htMode;
+  const handleToggleHtMode = reactExports.useCallback(() => {
+    setHtMode((prev) => {
+      const next = !prev;
+      localStorage.setItem(HT_MODE_STORAGE_KEY, String(next));
+      return next;
+    });
+  }, []);
   const [utterances, setUtterances] = reactExports.useState([]);
   const [interimText, setInterimText] = reactExports.useState("");
   const [interimLang, setInterimLang] = reactExports.useState("en");
@@ -13349,9 +13655,11 @@ function App() {
   const prewarmTimerRef = reactExports.useRef(null);
   const [footerError, setFooterError] = reactExports.useState(null);
   const footerStatus = reactExports.useMemo(() => {
-    if (!playing) return "Idle";
-    return subtitleOnly ? "🎙️ Listening — Subtitles only" : "🎙️ Listening — Auto EN/ES";
-  }, [playing, subtitleOnly]);
+    const modeLabel = htMode ? "EN/ES → 🇭🇹 Kreyòl" : "EN ⇄ ES";
+    if (!playing) return `Idle — ${modeLabel}`;
+    const label = source === "system" ? "🖥️ System Audio" : source === "tab" ? "🌐 Browser Tab" : "🎙️ Microphone";
+    return subtitleOnly ? `${label} — Subtitles only` : `${label} — ${modeLabel}`;
+  }, [playing, subtitleOnly, source, htMode]);
   const handleClear = reactExports.useCallback(() => {
     setUtterances([]);
     setInterimText("");
@@ -13359,26 +13667,31 @@ function App() {
     lastUtteranceRef.current = null;
   }, []);
   const handleRetryTranslation = reactExports.useCallback(async (id) => {
-    const u = utterances.find((u2) => u2.id === id);
-    if (!u || !u.failed) return;
-    const targetLang = u.lang === "en" ? "es" : "en";
-    setUtterances((prev) => prev.map(
-      (x) => x.id === id ? { ...x, translating: true, failed: false } : x
-    ));
+    let targetUtterance = null;
+    setUtterances((prev) => {
+      targetUtterance = prev.find((u) => u.id === id) ?? null;
+      return prev.map(
+        (u) => u.id === id && u.failed ? { ...u, translating: true, failed: false } : u
+      );
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    if (!targetUtterance) return;
+    const targetLang = getTargetLang(targetUtterance.lang, htModeRef.current);
     let translation = null;
     try {
       translation = await translateText({
-        text: u.text,
-        from: u.lang,
+        text: targetUtterance.text,
+        from: targetUtterance.lang,
         to: targetLang,
-        context: TRANSLATION_CONTEXT
+        context: TRANSLATION_CONTEXT,
+        signal: abortCtrlRef.current?.signal ?? null
       });
     } catch {
     }
     setUtterances((prev) => prev.map(
-      (x) => x.id === id ? { ...x, translation, translating: false, failed: !translation } : x
+      (u) => u.id === id ? { ...u, translation, translating: false, failed: !translation } : u
     ));
-  }, [utterances]);
+  }, []);
   const handleFinal = reactExports.useCallback(async ({ text, lang, speechFinal }) => {
     setInterimText("");
     if (prewarmTimerRef.current) {
@@ -13387,15 +13700,16 @@ function App() {
     }
     const now = Date.now();
     const l = normLang(lang);
+    const targetLang = getTargetLang(l, htModeRef.current);
     const isSubOnly = subtitleOnlyRef.current;
     const endsWithP = TERMINAL_PUNCT.test(text);
+    const signal = abortCtrlRef.current?.signal ?? null;
     const prev = lastUtteranceRef.current;
     const withinWindow = now - lastFinalTimeRef.current < MERGE_WINDOW_MS;
     const shouldMerge = prev && withinWindow && prev.lang === l && !prev.endsWithPunct && !speechFinal;
     lastFinalTimeRef.current = now;
     if (shouldMerge) {
       const mergedText = prev.text + " " + text;
-      const targetLang2 = l === "en" ? "es" : "en";
       lastUtteranceRef.current = {
         id: prev.id,
         text: mergedText,
@@ -13411,11 +13725,13 @@ function App() {
           translation2 = await translateText({
             text: mergedText,
             from: l,
-            to: targetLang2,
-            context: TRANSLATION_CONTEXT
+            to: targetLang,
+            context: TRANSLATION_CONTEXT,
+            signal
           });
         } catch {
         }
+        if (signal?.aborted) return;
         setUtterances((utt) => utt.map(
           (u) => u.id === prev.id ? { ...u, translation: translation2, translating: false, failed: !translation2 } : u
         ));
@@ -13423,7 +13739,6 @@ function App() {
       return;
     }
     const id = uid();
-    const targetLang = l === "en" ? "es" : "en";
     const timestamp = /* @__PURE__ */ new Date();
     lastUtteranceRef.current = { id, text, lang: l, endsWithPunct: endsWithP };
     setUtterances((prev2) => [
@@ -13437,10 +13752,12 @@ function App() {
         text,
         from: l,
         to: targetLang,
-        context: TRANSLATION_CONTEXT
+        context: TRANSLATION_CONTEXT,
+        signal
       });
     } catch {
     }
+    if (signal?.aborted) return;
     setUtterances((utt) => utt.map(
       (u) => u.id === id ? { ...u, translation, translating: false, failed: !translation } : u
     ));
@@ -13450,9 +13767,10 @@ function App() {
     const l = normLang(lang);
     setInterimLang(l);
     if (subtitleOnlyRef.current) return;
+    const targetLang = getTargetLang(l, htModeRef.current);
     if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current);
     prewarmTimerRef.current = setTimeout(() => {
-      prewarmTranslation({ text, from: l });
+      prewarmTranslation({ text, from: l, to: targetLang });
       prewarmTimerRef.current = null;
     }, PREWARM_DEBOUNCE_MS);
   }, []);
@@ -13469,17 +13787,57 @@ function App() {
     onInterim: handleInterim,
     onError: handleTranscriptionError
   });
+  reactExports.useEffect(() => {
+    return () => {
+      abortCtrlRef.current?.abort();
+      if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current);
+    };
+  }, []);
   const getAudioStream = reactExports.useCallback(async () => {
+    if (source === "mic") {
+      return navigator.mediaDevices.getUserMedia({
+        audio: {
+          autoGainControl: true,
+          noiseSuppression: true,
+          echoCancellation: true,
+          sampleRate: 16e3
+        },
+        video: false
+      });
+    }
+    if (source === "system") {
+      if (!isElectron()) {
+        throw new Error("System audio capture is only available in the desktop app.");
+      }
+      const { stream, userMessage } = await startElectronCapture();
+      if (!stream) throw new Error(userMessage || "Could not capture system audio.");
+      return stream;
+    }
     if (source === "tab") {
       const r = await startBrowserCapture();
       if (!r.stream) throw new Error(r.userMessage || "Tab capture cancelled.");
       return r.stream;
     }
-    return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    throw new Error(`Unknown audio source: "${source}"`);
   }, [source]);
+  reactExports.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code !== "Space") return;
+      const tag = e.target?.tagName;
+      const isEditable = tag === "INPUT" || tag === "TEXTAREA" || e.target?.isContentEditable;
+      if (isEditable) return;
+      e.preventDefault();
+      handleTogglePlayRef.current?.();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+  const handleTogglePlayRef = reactExports.useRef(null);
   const handleTogglePlay = reactExports.useCallback(async () => {
     if (!playing) {
       setFooterError(null);
+      abortCtrlRef.current?.abort();
+      abortCtrlRef.current = new AbortController();
       let stream;
       try {
         stream = await getAudioStream();
@@ -13496,6 +13854,8 @@ function App() {
         setFooterError(err.message || "Error starting transcription");
       }
     } else {
+      abortCtrlRef.current?.abort();
+      abortCtrlRef.current = null;
       if (prewarmTimerRef.current) {
         clearTimeout(prewarmTimerRef.current);
         prewarmTimerRef.current = null;
@@ -13507,6 +13867,7 @@ function App() {
       setPlaying(false);
     }
   }, [playing, getAudioStream, startTranscription, stopTranscription]);
+  handleTogglePlayRef.current = handleTogglePlay;
   if (!isLoggedIn) return /* @__PURE__ */ jsxRuntimeExports.jsx(LogIn, { onLogin: () => setIsLoggedIn(true) });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "app-shell", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -13520,7 +13881,11 @@ function App() {
         },
         subtitleOnly,
         onToggleSubtitleOnly: () => setSubtitleOnly((p) => !p),
-        onLogout: handleLogout
+        onLogout: handleLogout,
+        htMode,
+        onToggleHtMode: () => {
+          if (!playing) handleToggleHtMode();
+        }
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "app-main", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -13530,6 +13895,7 @@ function App() {
         interimText,
         interimLang,
         subtitleOnly,
+        htMode,
         playing,
         onClear: handleClear,
         onRetry: handleRetryTranslation
