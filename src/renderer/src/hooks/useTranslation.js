@@ -1,74 +1,168 @@
 /**
- * hooks/useTranslation.js  v3
+ * hooks/useTranslation.js
  *
- * FIXES en esta versión:
+ * ENRUTADOR HÍBRIDO — completa y corrige tu borrador:
  * ─────────────────────────────────────────────────────────────────────
- * 1. SAME-TEXT DETECTION: si el backend devuelve exactamente el mismo
- *    texto que se mandó (traducción fallida silenciosa), no se cachea
- *    y se reintenta. Antes esto se cacheaba como "exitoso" y el card
- *    mostraba el original como si fuera la traducción.
+ * - Cualquier traducción HACIA o DESDE 'ht' (Criollo Haitiano) → llama
+ *   a Google Cloud Translation DIRECTO desde el navegador (DeepL no
+ *   soporta ht — verificado en su documentación oficial, no está en su
+ *   lista de ~36 idiomas). Necesitas una API key de Google Cloud
+ *   Translation guardada en localStorage bajo la key 'google_key'.
  *
- * 2. CONTEXT SUPPORT: translateText acepta `context` opcional que se
- *    manda al backend → DeepL lo usa para mejorar precisión de dominio
- *    (medicina, legal, etc.). Requiere soporte en tu backend.
+ * - Cualquier otro par (hoy: en↔es) → sigue yendo a tu backend de
+ *   Render sin ningún cambio, exactamente como ya funciona.
  *
- * 3. PREWARM MÁS INTELIGENTE: normaliza el texto antes del cacheKey
- *    (trim + colapsar espacios + strip de puntuación trailing + lowercase).
- *    El interim "hola mundo," y el final "Hola mundo." ahora comparten
- *    el mismo cache key → más hits, menos requests.
- *
- * 4. translateText devuelve null en fallo total en lugar del original.
- *    App.jsx decide qué mostrar (ícono de retry en lugar de texto idéntico).
- *
- * 5. Mantenidos: retry con backoff, caché solo exitosa, dedup, keep-alive.
+ * FIXES respecto a tu versión:
+ * 1. `prewarmTranslation` estaba vacío (no hacía nada) — ahora sí
+ *    dispara la traducción anticipada real, igual que translateText
+ *    pero sin bloquear ni reintentar tan agresivo.
+ * 2. BUG DE DEEPL: mandabas target_lang='EN' o 'PT' directo — DeepL
+ *    RECHAZA esos códigos como destino (exige 'EN-US'/'EN-GB' y
+ *    'PT-BR'/'PT-PT' específicamente). Solo importa si algún día vuelves
+ *    a traducir HACIA inglés o portugués — con el flujo actual (en/es →
+ *    ht) esta rama de DeepL no se usa, pero la dejo corregida por si acaso.
+ * 3. Mismo timeout + reintentos con backoff para AMBOS proveedores
+ *    (antes solo DeepL los tenía).
+ * 4. Si falta la Google API key, falla con un mensaje claro en vez de
+ *    mandarle a Google un placeholder inválido.
  */
 
-const BACKEND_URL  = 'https://interpreterbk.onrender.com/api/translate'
-const PING_URL     = 'https://interpreterbk.onrender.com'
-const MAX_RETRIES  = 2
-const RETRY_DELAY  = 300
-const REQ_TIMEOUT  = 6000
+const BACKEND_URL    = 'https://interpreterbk.onrender.com/api/translate'
+const PING_URL       = 'https://interpreterbk.onrender.com'
+const GOOGLE_URL     = 'https://translation.googleapis.com/language/translate/v2'
+const MAX_RETRIES    = 2
+const RETRY_DELAY    = 150
+const REQ_TIMEOUT    = 3_500
+const MAX_CACHE_SIZE = 500
 
-// ── Keep-alive ────────────────────────────────────────────────────────────
+// ── Keep-alive de tu backend Render ────────────────────────────────────
 ;(function keepAlive() {
   fetch(PING_URL).catch(() => {})
-  setTimeout(() => fetch(PING_URL).catch(() => {}), 5_000)
-  setInterval(() => fetch(PING_URL).catch(() => {}), 3 * 60 * 1000)
+  setInterval(() => fetch(PING_URL).catch(() => {}), 3 * 60 * 1_000)
 })()
 
-const globalCache     = new Map()
-const pendingRequests = new Map()
-const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+// ── LRU Cache (compartida entre ambos proveedores) ─────────────────────
+const lruCache = {
+  _map: new Map(),
+  has(key) { return this._map.has(key) },
+  get(key) {
+    if (!this._map.has(key)) return undefined
+    const val = this._map.get(key)
+    this._map.delete(key)
+    this._map.set(key, val)
+    return val
+  },
+  set(key, val) {
+    if (this._map.has(key)) this._map.delete(key)
+    this._map.set(key, val)
+    if (this._map.size > MAX_CACHE_SIZE) {
+      this._map.delete(this._map.keys().next().value)
+    }
+  },
+  get size() { return this._map.size },
+}
 
-// ── Validar que la traducción es genuinamente diferente al original ────────
+const pendingRequests = new Map()
+
+// ── Utilidades ──────────────────────────────────────────────────────────
+function anySignal(signals) {
+  const ctrl = new AbortController()
+  for (const sig of signals) {
+    if (!sig) continue
+    if (sig.aborted) { ctrl.abort(sig.reason); break }
+    sig.addEventListener('abort', () => ctrl.abort(sig.reason), { once: true })
+  }
+  return ctrl.signal
+}
+
+const sleep = (ms, signal) =>
+  new Promise((resolve, reject) => {
+    const id = setTimeout(resolve, ms)
+    signal?.addEventListener('abort', () => {
+      clearTimeout(id)
+      reject(Object.assign(new Error('AbortError'), { name: 'AbortError' }))
+    }, { once: true })
+  })
+
 function isValidTranslation(result, original) {
   if (!result || result.trim().length === 0) return false
-  if (result.trim() === original.trim())     return false  // same-text → inválido
+  if (result.trim() === original.trim())     return false
   return true
 }
 
-// ── Normalizar para cache key: más hits entre interim y final ─────────────
-// El texto real enviado al backend NO se modifica.
 function normalizeForCache(text) {
   return text
     .trim()
     .replace(/\s+/g, ' ')
-    .replace(/[.,;:!?…]+$/, '')
+    .replace(/[.,;:!?…\u2026]+$/, '')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2013\u2014]/g, '-')
     .toLowerCase()
 }
 
-async function fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal }) {
-  const timeoutCtrl = new AbortController()
-  const timeoutId   = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT)
+// FIX #2: DeepL exige códigos regionales como TARGET para en/pt.
+// Como fuente, el código genérico sí funciona.
+function toDeepLSource(code) {
+  return code.toUpperCase()  // 'EN', 'ES', 'FR', 'PT' — válido como origen
+}
+function toDeepLTarget(code) {
+  const c = code.toLowerCase()
+  if (c === 'en') return 'EN-US'
+  if (c === 'pt') return 'PT-BR'
+  return code.toUpperCase()  // ES, FR no necesitan variante regional
+}
 
-  let combinedSignal = timeoutCtrl.signal
-  if (signal && typeof AbortSignal.any === 'function') {
-    combinedSignal = AbortSignal.any([signal, timeoutCtrl.signal])
+// ── Google Cloud Translation (para cualquier par con 'ht') ─────────────
+async function translateWithGoogle({ text, from, to, signal }) {
+  const apiKey = localStorage.getItem('google_key')?.trim()
+  if (!apiKey) {
+    throw new Error("Missing Google Translate API key — set localStorage 'google_key'")
   }
 
+  const timeoutCtrl = new AbortController()
+  const timeoutId   = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT)
+  const combinedSignal = anySignal([signal, timeoutCtrl.signal])
+
   try {
-    const body = { text: clean, source_lang: sourceDeepL, target_lang: targetDeepL }
-    if (context) body.context = context   // FIX #2: contexto de dominio
+    const res = await fetch(`${GOOGLE_URL}?key=${encodeURIComponent(apiKey)}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal:  combinedSignal,
+      body: JSON.stringify({
+        q:      text,
+        source: from,   // Google usa minúsculas de 2 letras: 'en', 'es', 'ht'
+        target: to,
+        format: 'text',
+      }),
+    })
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => null)
+      throw new Error(`Google Translate: ${errBody?.error?.message || `HTTP ${res.status}`}`)
+    }
+
+    const data = await res.json()
+    return data?.data?.translations?.[0]?.translatedText || null
+
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+// ── DeepL vía tu backend de Render (para pares sin 'ht') ────────────────
+async function translateWithDeepL({ text, from, to, context, signal }) {
+  const timeoutCtrl = new AbortController()
+  const timeoutId   = setTimeout(() => timeoutCtrl.abort(), REQ_TIMEOUT)
+  const combinedSignal = anySignal([signal, timeoutCtrl.signal])
+
+  try {
+    const body = {
+      text,
+      source_lang: toDeepLSource(from),
+      target_lang: toDeepLTarget(to),
+    }
+    if (context) body.context = context
 
     const res = await fetch(BACKEND_URL, {
       method:  'POST',
@@ -86,22 +180,26 @@ async function fetchTranslation({ clean, sourceDeepL, targetDeepL, context, sign
   }
 }
 
-// ── translateText ─────────────────────────────────────────────────────────
+// ── Despachador: decide Google vs DeepL según el par ─────────────────────
+async function dispatchTranslate({ clean, fromNorm, toNorm, context, signal }) {
+  if (fromNorm === 'ht' || toNorm === 'ht') {
+    return translateWithGoogle({ text: clean, from: fromNorm, to: toNorm, signal })
+  }
+  return translateWithDeepL({ text: clean, from: fromNorm, to: toNorm, context, signal })
+}
+
+// ── translateText — misma firma de siempre ───────────────────────────────
 export async function translateText({ text, from, to, context = null, signal = null }) {
   const clean = text?.trim()
   if (!clean) return ''
 
-  const fromNorm = from.startsWith('en') ? 'en' : 'es'
-  const toNorm   = to.startsWith('en')   ? 'en' : 'es'
-
-  // Si los idiomas son iguales no tiene sentido traducir
+  const fromNorm = from.slice(0, 2).toLowerCase()
+  const toNorm   = to.slice(0, 2).toLowerCase()
   if (fromNorm === toNorm) return null
 
-  const targetDeepL = toNorm   === 'en' ? 'EN-US' : 'ES'
-  const sourceDeepL = fromNorm === 'en' ? 'EN'    : 'ES'
-  const cacheKey    = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`
+  const cacheKey = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`
 
-  if (globalCache.has(cacheKey))     return globalCache.get(cacheKey)
+  if (lruCache.has(cacheKey))        return lruCache.get(cacheKey)
   if (pendingRequests.has(cacheKey)) return pendingRequests.get(cacheKey)
 
   const promise = (async () => {
@@ -110,28 +208,28 @@ export async function translateText({ text, from, to, context = null, signal = n
       if (signal?.aborted) return null
 
       try {
-        const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context, signal })
+        const resultado = await dispatchTranslate({ clean, fromNorm, toNorm, context, signal })
 
         if (isValidTranslation(resultado, clean)) {
-          globalCache.set(cacheKey, resultado)
+          lruCache.set(cacheKey, resultado)
           return resultado
         }
-
-        // Respuesta igual al original → reintentar (no cachear)
-        lastError = new Error('Same-text or empty translation response')
-        console.warn(`[Traducción] Invalid response on attempt ${attempt + 1}`)
+        lastError = new Error('Respuesta vacía o igual al original')
 
       } catch (e) {
         if (e.name === 'AbortError') return null
         lastError = e
-        console.warn(`[Traducción] Attempt ${attempt + 1} failed: ${e.message}`)
+        console.warn(`[Traducción] Intento ${attempt + 1} fallido: ${e.message}`)
       }
 
-      if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY * (attempt + 1))
+      if (attempt < MAX_RETRIES) {
+        const delay = RETRY_DELAY * 2 ** attempt
+        try { await sleep(delay, signal) } catch (e) { if (e.name === 'AbortError') return null }
+      }
     }
 
-    console.error('[Traducción] All retries failed:', lastError?.message)
-    return null  // FIX #4: null en vez de original — App.jsx muestra retry UI
+    console.error('[Traducción] Todos los reintentos fallaron:', lastError?.message)
+    return null
 
   })().finally(() => {
     pendingRequests.delete(cacheKey)
@@ -141,32 +239,36 @@ export async function translateText({ text, from, to, context = null, signal = n
   return promise
 }
 
-// ── prewarmTranslation ────────────────────────────────────────────────────
-export function prewarmTranslation({ text, from }) {
+// ── prewarmTranslation — FIX: antes no hacía nada, ahora sí funciona ────
+export function prewarmTranslation({ text, from, to }) {
   const clean = text?.trim()
-  if (!clean || clean.length < 10) return
+  if (!clean || clean.length < 10 || !to) return
 
-  const fromNorm = from.startsWith('en') ? 'en' : 'es'
-  const toNorm   = fromNorm === 'en' ? 'es' : 'en'
+  const fromNorm = from.slice(0, 2).toLowerCase()
+  const toNorm   = to.slice(0, 2).toLowerCase()
   if (fromNorm === toNorm) return
 
-  const targetDeepL = toNorm   === 'en' ? 'EN-US' : 'ES'
-  const sourceDeepL = fromNorm === 'en' ? 'EN'    : 'ES'
-  const cacheKey    = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`
-
-  if (globalCache.has(cacheKey) || pendingRequests.has(cacheKey)) return
+  const cacheKey = `${fromNorm}|${toNorm}:${normalizeForCache(clean)}`
+  if (lruCache.has(cacheKey) || pendingRequests.has(cacheKey)) return
 
   const promise = (async () => {
     try {
-      const resultado = await fetchTranslation({ clean, sourceDeepL, targetDeepL, context: null, signal: null })
+      const resultado = await dispatchTranslate({ clean, fromNorm, toNorm, context: null, signal: null })
       if (isValidTranslation(resultado, clean)) {
-        globalCache.set(cacheKey, resultado)
+        lruCache.set(cacheKey, resultado)
         console.debug('[Prewarm] ✓ cached:', clean.slice(0, 40))
       }
-    } catch { /* silencioso — best-effort */ }
+    } catch (e) {
+      console.debug('[Prewarm] falló (no es grave, se reintentará al finalizar):', e.message)
+    }
   })().finally(() => {
     pendingRequests.delete(cacheKey)
   })
 
   pendingRequests.set(cacheKey, promise)
+}
+
+// ── Debug helper ──────────────────────────────────────────────────────────
+export function getCacheStats() {
+  return { size: lruCache.size, limit: MAX_CACHE_SIZE, pending: pendingRequests.size }
 }

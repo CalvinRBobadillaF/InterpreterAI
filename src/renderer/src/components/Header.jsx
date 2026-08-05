@@ -1,18 +1,22 @@
 /**
  * components/Header.jsx
  *
- * Rediseño: Floating pill en top-right corner.
- * Fondo oscuro profundo, controles compactos.
- * Sin barra horizontal tradicional — los controles flotan sobre el contenido.
+ * NUEVO: si el modo Kreyòl está activo pero no hay una Google API key
+ * guardada, el botón muestra un pequeño ícono de advertencia — así te
+ * enteras ANTES de grabar, en vez de descubrirlo cuando la traducción
+ * falla en silencio.
+ *
+ * (Se mantiene: botón real de modo Kreyòl/EN⇄ES reutilizando .hdr-btn,
+ * layout responsive para móvil vía App.css.)
  */
 
 import { useState, useEffect, useRef } from 'react'
 import {
   Play, Square, ChevronDown,
-  Mic, Globe, Sun, Moon, Captions, Languages, LogOut
+  Mic, Globe, Sun, Moon, Captions, Languages, LogOut, Monitor, AlertTriangle
 } from 'lucide-react'
+import { isElectron } from '../hooks/isElectron'
 
-// ── Waveform ──────────────────────────────────────────────────────────────
 const BAR_COUNT   = 28
 const BAR_HEIGHTS = Array.from({ length: BAR_COUNT }, (_, i) => {
   const v = Math.abs(Math.sin(i * 0.52) * 0.6 + Math.sin(i * 0.13) * 0.4)
@@ -29,7 +33,6 @@ function Waveform({ active }) {
   )
 }
 
-// ── Timer ──────────────────────────────────────────────────────────────────
 function useTimer(running) {
   const [secs, setSecs] = useState(0)
   const ref = useRef(null)
@@ -48,18 +51,19 @@ function useTimer(running) {
   return `${h}:${m}:${s}`
 }
 
-// ── Fuentes de audio ───────────────────────────────────────────────────────
-const FUENTES = [
+const FUENTES_WEB = [
   { id: 'mic', label: 'Microphone', sub: 'Device input', Icon: Mic },
-  { id: 'tab', label: 'Browser Tab', sub: 'Tab audio',   Icon: Globe },
+  { id: 'tab', label: 'Browser Tab', sub: 'Tab audio via getDisplayMedia', Icon: Globe },
+]
+const FUENTES_ELECTRON = [
+  { id: 'mic', label: 'Microphone', sub: 'Device input', Icon: Mic },
+  { id: 'system', label: 'System Audio', sub: 'Computer output', Icon: Monitor },
 ]
 
-// ── Separador vertical ─────────────────────────────────────────────────────
 function Sep() {
   return <div className="hdr-sep" aria-hidden />
 }
 
-// ── Componente principal ───────────────────────────────────────────────────
 export function Header({
   playing,
   onTogglePlay,
@@ -68,13 +72,19 @@ export function Header({
   subtitleOnly,
   onToggleSubtitleOnly,
   onLogout,
+  htMode,
+  onToggleHtMode,
 }) {
-  const timer       = useTimer(playing)
-  const dropRef     = useRef(null)
-  const [dropOpen,  setDropOpen]   = useState(false)
-  const [lightTheme, setLightTheme] = useState(
-    () => localStorage.getItem('theme') === 'light'
-  )
+  const timer   = useTimer(playing)
+  const dropRef = useRef(null)
+  const [dropOpen,   setDropOpen]   = useState(false)
+  const [lightTheme, setLightTheme] = useState(() => localStorage.getItem('theme') === 'light')
+
+  const FUENTES = isElectron() ? FUENTES_ELECTRON : FUENTES_WEB
+
+  // ¿Hay una Google API key guardada? Solo importa si htMode está activo.
+  const hasGoogleKey = !!localStorage.getItem('google_key')?.trim()
+  const missingGoogleKey = htMode && !hasGoogleKey
 
   useEffect(() => {
     document.documentElement.classList.toggle('light', lightTheme)
@@ -94,14 +104,9 @@ export function Header({
 
   return (
     <header className="hdr no-drag">
-
-      {/* ── LEFT: Brand + source selector ─────────────────────── */}
       <div className="hdr-left">
         <span className="hdr-brand">Interpreter <span className="hdr-brand-ai">AI</span></span>
-
         <Sep />
-
-        {/* Source selector */}
         <div className="hdr-source-wrap" ref={dropRef}>
           <button
             className="hdr-btn hdr-source-btn"
@@ -113,7 +118,6 @@ export function Header({
             <span className="hdr-btn-label">{fuenteActiva.label}</span>
             <ChevronDown size={10} className="hdr-chevron" />
           </button>
-
           {dropOpen && (
             <div className="hdr-dropdown">
               {FUENTES.map(({ id, label, sub, Icon }) => (
@@ -133,9 +137,28 @@ export function Header({
             </div>
           )}
         </div>
+
+        <Sep />
+
+        <button
+          className={`hdr-btn ${htMode ? 'hdr-btn--active' : ''}`}
+          onClick={onToggleHtMode}
+          disabled={playing}
+          title={
+            missingGoogleKey
+              ? 'Falta tu Google Translate API key — agrégala en el login para que este modo funcione'
+              : htMode
+                ? 'Modo Kreyòl activo — clic para traducir EN ⇄ ES como siempre'
+                : 'Modo normal EN ⇄ ES — clic para traducir hacia Kreyòl'
+          }
+        >
+          {missingGoogleKey && <AlertTriangle size={11} className="hdr-warn-icon" />}
+          <span className="hdr-btn-label">
+            {htMode ? '🇺🇸🇪🇸→🇭🇹 Kreyòl' : '🇺🇸⇄🇪🇸 EN/ES'}
+          </span>
+        </button>
       </div>
 
-      {/* ── CENTER: Play + Waveform + Timer ──────────────────── */}
       <div className="hdr-center">
         <button
           className={`hdr-play ${playing ? 'hdr-play--stop' : ''}`}
@@ -147,16 +170,11 @@ export function Header({
             : <Play   size={12} fill="currentColor" strokeWidth={0} style={{ marginLeft: 1 }} />
           }
         </button>
-
         <Waveform active={playing} />
-
         <span className="hdr-timer">{timer}</span>
       </div>
 
-      {/* ── RIGHT: Toggles + User ─────────────────────────────── */}
       <div className="hdr-right">
-
-        {/* Subtitles / Translation toggle */}
         <button
           className={`hdr-btn ${subtitleOnly ? 'hdr-btn--active' : ''}`}
           onClick={onToggleSubtitleOnly}
@@ -171,23 +189,15 @@ export function Header({
 
         <Sep />
 
-        {/* Theme */}
-        <button
-          className="hdr-icon"
-          onClick={() => setLightTheme(t => !t)}
-          title="Toggle theme"
-        >
+        <button className="hdr-icon" onClick={() => setLightTheme(t => !t)} title="Toggle theme">
           {lightTheme ? <Moon size={13} strokeWidth={2} /> : <Sun size={13} strokeWidth={2} />}
         </button>
 
-        {/* User */}
         <span className="hdr-username">{username}</span>
 
-        {/* Logout */}
         <button className="hdr-icon" onClick={onLogout} title="Log out">
           <LogOut size={13} strokeWidth={2} />
         </button>
-
       </div>
     </header>
   )

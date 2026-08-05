@@ -1,15 +1,19 @@
 /**
- * components/ConversationView.jsx  v3
+ * components/ConversationView.jsx
  *
  * NUEVO en esta versión:
- * - Prop `onRetry` para reintentar traducciones fallidas
- * - Estado `failed` en utterance muestra un ícono de retry en lugar
- *   de texto idéntico al original (que era el bug visible en la imagen)
- * - Resto del diseño idéntico a v2
+ * - Auto-scroll inteligente: si el usuario se desplaza hacia arriba para
+ *   leer el historial, ya NO lo empuja de vuelta al fondo con cada
+ *   frase nueva. Solo hace auto-scroll si ya estaba cerca del final.
+ * - Botón flotante "↓ Jump to latest" que aparece cuando no estás al
+ *   final, para volver con un toque.
+ *
+ * (Se mantiene de la versión anterior: sin pastilla EN/ES, columna de
+ * traducción con etiqueta según htMode.)
  */
 
-import { useEffect, useRef } from 'react'
-import { Trash2, RefreshCw } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Trash2, RefreshCw, ArrowDown } from 'lucide-react'
 
 const fmtTime = (date) =>
   date instanceof Date
@@ -24,37 +28,66 @@ function Dots() {
   )
 }
 
+const NEAR_BOTTOM_THRESHOLD = 80 // px
+
 export function ConversationView({
   utterances   = [],
   interimText  = '',
   interimLang  = 'en',
   subtitleOnly = false,
+  htMode       = true,
   playing      = false,
   onClear,
-  onRetry,       // NUEVO: (id) => void
+  onRetry,
 }) {
-  const bottomRef = useRef(null)
+  const scrollRef       = useRef(null)
+  const bottomRef       = useRef(null)
+  const isNearBottomRef = useRef(true)
+  const [showJumpBtn, setShowJumpBtn] = useState(false)
 
+  // Detecta si el usuario está cerca del final del scroll
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    const el = scrollRef.current
+    if (!el) return
+
+    const handleScroll = () => {
+      const near = el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD
+      isNearBottomRef.current = near
+      setShowJumpBtn(!near)
+    }
+
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Auto-scroll SOLO si ya estábamos cerca del final
+  useEffect(() => {
+    if (isNearBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
   }, [utterances.length, interimText])
 
+  const jumpToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    isNearBottomRef.current = true
+    setShowJumpBtn(false)
+  }
+
   const isEmpty = utterances.length === 0 && !interimText
+  const transColLabel = htMode ? '🇭🇹 Kreyòl' : 'EN ⇄ ES'
 
   return (
     <div className="cv-root">
 
-      {/* ── Barra de columnas ─────────────────────────────────── */}
       <div className="cv-toolbar">
         <span className="cv-toolbar-col">Original</span>
-        {!subtitleOnly && <span className="cv-toolbar-col">Translation</span>}
+        {!subtitleOnly && <span className="cv-toolbar-col">{transColLabel}</span>}
         <button className="cv-clear-btn" onClick={onClear} title="Clear conversation">
           <Trash2 size={12} />
         </button>
       </div>
 
-      {/* ── Área scrollable ───────────────────────────────────── */}
-      <div className="cv-scroll">
+      <div className="cv-scroll" ref={scrollRef}>
 
         {isEmpty && (
           <p className="cv-empty">
@@ -63,39 +96,26 @@ export function ConversationView({
         )}
 
         {utterances.map((u) => (
-          <div
-            key={u.id}
-            className={`cv-row ${subtitleOnly ? 'cv-row--solo' : ''}`}
-          >
-            {/* Original */}
+          <div key={u.id} className={`cv-row ${subtitleOnly ? 'cv-row--solo' : ''}`}>
+
             <div className="cv-card cv-card--orig">
               <p className="cv-text">{u.text}</p>
-              {u.timestamp && (
-                <time className="cv-timestamp">{fmtTime(u.timestamp)}</time>
-              )}
+              {u.timestamp && <time className="cv-timestamp">{fmtTime(u.timestamp)}</time>}
             </div>
 
-            {/* Traducción */}
             {!subtitleOnly && (
               <div className="cv-card cv-card--trans">
                 {u.translating ? (
                   <Dots />
                 ) : u.failed ? (
-                  /* NUEVO: botón de retry en lugar de texto idéntico */
-                  <button
-                    className="cv-retry-btn"
-                    onClick={() => onRetry?.(u.id)}
-                    title="Retry translation"
-                  >
+                  <button className="cv-retry-btn" onClick={() => onRetry?.(u.id)} title="Retry translation">
                     <RefreshCw size={12} />
                     <span>Retry</span>
                   </button>
                 ) : u.translation ? (
                   <>
                     <p className="cv-text cv-text--trans">{u.translation}</p>
-                    {u.timestamp && (
-                      <time className="cv-timestamp">{fmtTime(u.timestamp)}</time>
-                    )}
+                    {u.timestamp && <time className="cv-timestamp">{fmtTime(u.timestamp)}</time>}
                   </>
                 ) : (
                   <span className="cv-dash">—</span>
@@ -105,7 +125,6 @@ export function ConversationView({
           </div>
         ))}
 
-        {/* Interim (en vivo) */}
         {interimText && (
           <div className={`cv-row cv-row--live ${subtitleOnly ? 'cv-row--solo' : ''}`}>
             <div className="cv-card cv-card--orig cv-card--live">
@@ -113,14 +132,19 @@ export function ConversationView({
                 {interimText}<span className="cv-cursor" />
               </p>
             </div>
-            {!subtitleOnly && (
-              <div className="cv-card cv-card--trans cv-card--live" />
-            )}
+            {!subtitleOnly && <div className="cv-card cv-card--trans cv-card--live" />}
           </div>
         )}
 
         <div ref={bottomRef} />
       </div>
+
+      {showJumpBtn && (
+        <button className="cv-jump-btn" onClick={jumpToBottom}>
+          <ArrowDown size={13} />
+          <span>Jump to latest</span>
+        </button>
+      )}
     </div>
   )
 }

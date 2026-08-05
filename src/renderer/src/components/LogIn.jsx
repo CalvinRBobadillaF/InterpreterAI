@@ -2,9 +2,12 @@
  * components/LogIn.jsx
  * ─────────────────────────────────────────────────────────────────
  * Saves keys and info to localStorage:
- * app_key   → Deepgram API key (speech-to-text)
- * app_name  → user display name
- * * NOTE: DeepL key is now managed securely via Backend (FastAPI).
+ * app_key    → Deepgram API key (speech-to-text)
+ * app_name   → user display name
+ * google_key → Google Cloud Translation API key (OPTIONAL — only
+ *              needed for the EN/ES → Kreyòl Ayisyen mode; DeepL
+ *              via the backend still handles EN ⇄ ES normally without it)
+ * * NOTE: DeepL key is managed securely via Backend (FastAPI).
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -15,8 +18,9 @@ import '../assets/login.css'
 export function LogIn({ onLogin }) {
   const [name, setName] = useState('')
   const [deepgramKey, setDeepgramKey] = useState(localStorage.getItem('app_key') || '')
+  const [googleKey, setGoogleKey] = useState(localStorage.getItem('google_key') || '')
   const [error, setError] = useState('')
-  
+
   const [showInstructions, setShowInstructions] = useState(false)
 
   const handleSubmit = (e) => {
@@ -32,9 +36,17 @@ export function LogIn({ onLogin }) {
       return
     }
 
-    // Guardamos solo lo necesario localmente
     localStorage.setItem('app_name', name.trim())
     localStorage.setItem('app_key', deepgramKey.trim())
+
+    // Google key es opcional — solo hace falta para el modo Kreyòl.
+    // Si lo dejan vacío (o lo borran), limpiamos cualquier valor viejo
+    // en vez de dejar una key obsoleta guardada.
+    if (googleKey.trim()) {
+      localStorage.setItem('google_key', googleKey.trim())
+    } else {
+      localStorage.removeItem('google_key')
+    }
 
     onLogin()
   }
@@ -50,7 +62,7 @@ export function LogIn({ onLogin }) {
         </div>
 
         <p className="login-subtitle">
-          Welcome! Enter your name and Deepgram key to start transcribing. 
+          Welcome! Enter your name and Deepgram key to start transcribing.
           <br />
           <span style={{ fontSize: '0.85em', opacity: 0.8 }}>Professional translation is now automatically enabled.</span>
         </p>
@@ -93,22 +105,51 @@ export function LogIn({ onLogin }) {
             <span className="login-hint">Used for real-time speech-to-text (12,000 min/year free)</span>
           </div>
 
+          {/* NUEVO: Google Translate */}
+          <div className="login-field">
+            <label className="login-label">
+              Google Translate API Key <span style={{ fontWeight: 400, opacity: 0.65 }}>(optional)</span>
+              <a
+                className="login-label__link"
+                href="https://console.cloud.google.com/apis/library/translate.googleapis.com"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Get key →
+              </a>
+            </label>
+            <input
+              className="login-input login-input--mono"
+              type="password"
+              placeholder="AIzaSy..."
+              value={googleKey}
+              onChange={e => setGoogleKey(e.target.value)}
+            />
+            <span className="login-hint">
+              Only needed for the 🇭🇹 Kreyòl Ayisyen translation mode — DeepL still handles EN ⇄ ES without it
+            </span>
+          </div>
+
           {/* Instructions Toggle */}
           <div className="login-instructions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setShowInstructions(!showInstructions)}
               className="instructions-toggle"
             >
               {showInstructions ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               How to get access?
             </button>
-            
+
             <div className={`instructions-content ${showInstructions ? 'is-open' : ''}`}>
               <p>
                 1. <strong>Deepgram:</strong> For high-speed transcription. Get your own key at their console.
                 <br /><br />
                 2. <strong>DeepL:</strong> Integrated via secure backend. No key required from the user.
+                <br /><br />
+                3. <strong>Google Translate:</strong> Optional — only needed if you'll use the Kreyòl Ayisyen
+                mode, since DeepL doesn't support that language. Requires a Google Cloud project with
+                billing enabled (there's a free monthly quota).
                 <br /><br />
                 Ask Calvin Bobadilla if you need help with credentials.
               </p>

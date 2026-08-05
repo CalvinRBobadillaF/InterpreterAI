@@ -1,33 +1,16 @@
-// hooks/useTranscription.js  v3
+// hooks/useTranscription.js
 //
-// MEJORAS en esta versión:
-// ─────────────────────────────────────────────────────────────────────
-// 1. RESTRICCIÓN EN/ES: si Deepgram detecta un idioma que NO es inglés
-//    ni español, se descarta el resultado silenciosamente. Esto evita
-//    que ruido de fondo o palabras similares a otros idiomas generen
-//    cards incorrectos o traducciones absurdas.
-//
-// 2. KEYWORDS: parámetro de Deepgram para mejorar accuracy en vocabulario
-//    específico. Puedes customizarlo según el dominio (médico, legal, etc.).
-//    Deepgram boostea el reconocimiento de estas palabras específicas.
-//    Sintaxis: "palabra:boost" donde boost es 1-10 (default 1).
-//
-// 3. LANGUAGE CONFIDENCE: solo procesar si el idioma detectado tiene al
-//    menos un canal de alternativas. Deepgram's nova-3 multi es muy bueno
-//    pero en silencio o ruido puede emitir resultados con idioma extraño.
-//
-// 4. Mantenidos: endpointing 300ms, no_delay, timeslice 50ms,
-//    stale-closure fix, speechFinal signal, API key trim.
+// SIMPLIFICADO por pedido explícito: solo capturamos audio en Inglés
+// y Español (Nova-3 los detecta automáticamente en vivo, sin necesidad
+// de elegir cuál se está hablando). Criollo Haitiano NUNCA se captura
+// aquí — no puede ser: Deepgram no reconoce 'ht' en NINGÚN modelo con
+// streaming (nova-2, nova-3, Flux). Solo Whisper Cloud lo reconoce, y
+// Whisper Cloud no soporta streaming — por eso quedó fuera del alcance,
+// tal como pediste.
 
 import { useCallback, useRef, useState } from 'react'
 
 const DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen'
-
-// ── NUEVO: keywords para mejorar accuracy ────────────────────────────────
-// Agrega términos de tu dominio aquí. Formato: "término:peso" (peso 1-10).
-// Ejemplos para uso médico: 'paciente:2', 'diagnóstico:2', 'tratamiento:2'
-// Para uso general puedes dejarlo vacío o customizarlo.
-
 
 const buildWsUrl = () => {
   const params = new URLSearchParams({
@@ -44,22 +27,16 @@ const buildWsUrl = () => {
     vad_events:       'true',
     diarize:          'false',
   })
-
-  // FIX #2: Agregar keywords
-  
-
   return `${DEEPGRAM_URL}?${params}`
 }
 
-// ── FIX #1: Solo aceptar EN y ES ─────────────────────────────────────────
-const ALLOWED_LANGS = new Set(['en', 'es', 'en-US', 'en-GB', 'es-419', 'es-ES'])
+// Solo Inglés y Español — es lo único que este hook necesita capturar.
+const ALLOWED_LANGS = new Set(['en', 'es'])
 
 function isAllowedLang(lang) {
   if (!lang) return false
-  if (ALLOWED_LANGS.has(lang)) return true
-  // Revisar prefijo de 2 letras
   const prefix = lang.slice(0, 2).toLowerCase()
-  return prefix === 'en' || prefix === 'es'
+  return ALLOWED_LANGS.has(prefix)
 }
 
 export function useTranscription({ onFinal, onInterim, onError } = {}) {
@@ -67,7 +44,6 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
   const recorderRef = useRef(null)
   const activoRef   = useRef(false)
 
-  // Refs para stale-closure fix — siempre apuntan a la versión más reciente
   const onFinalRef   = useRef(onFinal)
   const onInterimRef = useRef(onInterim)
   const onErrorRef   = useRef(onError)
@@ -100,15 +76,14 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
     if (!texto || texto.length < 2)          return
     if (!data.is_final && confidence < 0.50) return
 
-    // FIX #1 + #3: Descartar si el idioma detectado no es EN ni ES
     if (!isAllowedLang(detectedLang)) {
-      console.debug(`[Deepgram] Idioma descartado: "${detectedLang}" — "${texto.slice(0, 30)}"`)
+      console.debug(`[Deepgram] Idioma descartado (solo en/es): "${detectedLang}" — "${texto.slice(0, 30)}"`)
       return
     }
 
     const payload = {
       text:        texto,
-      lang:        detectedLang,
+      lang:        detectedLang.slice(0, 2).toLowerCase(),
       confidence,
       speechFinal: data.speech_final ?? data.is_final,
     }
@@ -146,13 +121,12 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
       ? 'audio/webm;codecs=opus'
       : 'audio/webm'
 
-    console.log('[Deepgram] Connecting…')
     const ws = new WebSocket(buildWsUrl(), ['token', API_KEY])
     wsRef.current = ws
     ws.binaryType = 'arraybuffer'
 
     ws.onopen = () => {
-      console.log('[Deepgram] ✅ Connected — nova-3 / multi / EN+ES only / no_delay')
+      console.log('[Deepgram] ✅ Connected — nova-3 / multi (en+es only)')
       activoRef.current = true
       setActive(true)
       setError(null)
@@ -168,7 +142,7 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
         }
       }
 
-      recorder.start(50)  // 50ms timeslice — doble de frecuente que antes
+      recorder.start(50)
       recorderRef.current = recorder
     }
 

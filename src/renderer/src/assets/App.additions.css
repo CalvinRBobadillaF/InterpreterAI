@@ -1,0 +1,47 @@
+/* ════════════════════════════════════════════════════════════════════
+   ADICIONES — agrega esto al FINAL de tu App.css existente.
+   Reutiliza tus tokens ya definidos (--surface, --border, --text,
+   --accent, --text-faint, --text-muted, --radius-sm).
+════════════════════════════════════════════════════════════════════ */
+
+/* Etiqueta fija en el header: "EN/ES → 🇭🇹 Kreyòl" */
+.hdr-lang-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Pastilla pequeña EN/ES sobre cada card de original */
+.cv-src-pill {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  color: var(--text-faint);
+  margin-bottom: 3px;
+  user-select: none;
+}
+
+/* Botón de reintentar traducción fallida (por si tu CSS no lo tenía) */
+.cv-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.cv-retry-btn:hover {
+  background: var(--surface-hover, var(--surface-soft));
+  color: var(--text);
+  border-color: var(--accent-ring);
+}
