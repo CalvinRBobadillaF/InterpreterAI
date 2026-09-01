@@ -1,12 +1,12 @@
 // hooks/useTranscription.js
 //
-// SIMPLIFICADO por pedido explícito: solo capturamos audio en Inglés
-// y Español (Nova-3 los detecta automáticamente en vivo, sin necesidad
-// de elegir cuál se está hablando). Criollo Haitiano NUNCA se captura
-// aquí — no puede ser: Deepgram no reconoce 'ht' en NINGÚN modelo con
-// streaming (nova-2, nova-3, Flux). Solo Whisper Cloud lo reconoce, y
-// Whisper Cloud no soporta streaming — por eso quedó fuera del alcance,
-// tal como pediste.
+// RESTAURADO tal cual funcionaba antes de introducir Gladia — Deepgram
+// nunca tuvo bugs reportados en EN/ES, así que no hay razón para
+// reinventarlo. Vuelve a ser el pipeline para inglés/español.
+//
+// Solo captura EN y ES — Criollo Haitiano nunca pasa por aquí, porque
+// Deepgram no lo reconoce en NINGÚN modelo de streaming. Para eso está
+// useGladiaTranscription.js.
 
 import { useCallback, useRef, useState } from 'react'
 
@@ -30,7 +30,6 @@ const buildWsUrl = () => {
   return `${DEEPGRAM_URL}?${params}`
 }
 
-// Solo Inglés y Español — es lo único que este hook necesita capturar.
 const ALLOWED_LANGS = new Set(['en', 'es'])
 
 function isAllowedLang(lang) {

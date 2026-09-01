@@ -1,19 +1,21 @@
 /**
  * components/Header.jsx
  *
- * NUEVO: si el modo Kreyòl está activo pero no hay una Google API key
- * guardada, el botón muestra un pequeño ícono de advertencia — así te
- * enteras ANTES de grabar, en vez de descubrirlo cuando la traducción
- * falla en silencio.
+ * NUEVO: botón "¿quién va a hablar?" — decide si el próximo Play usa
+ * Deepgram (EN/ES) o Gladia (Kreyòl). Es manual porque no hay forma de
+ * autodetectar Kreyòl de forma confiable mezclado con otros 100+ idiomas
+ * (por eso fallaba antes) — Gladia necesita que le digamos explícitamente
+ * "escucha Kreyòl", así que el usuario indica el turno, como un walkie-talkie.
  *
- * (Se mantiene: botón real de modo Kreyòl/EN⇄ES reutilizando .hdr-btn,
- * layout responsive para móvil vía App.css.)
+ * El botón de Kreyòl/EN⇄ES (htMode) sigue existiendo pero se desactiva
+ * visualmente cuando captureKreyol está activo, porque en ese caso no
+ * aplica — el destino de la traducción de Kreyòl es siempre adaptativo.
  */
 
 import { useState, useEffect, useRef } from 'react'
 import {
   Play, Square, ChevronDown,
-  Mic, Globe, Sun, Moon, Captions, Languages, LogOut, Monitor, AlertTriangle
+  Mic, Globe, Sun, Moon, Captions, Languages, LogOut, Monitor
 } from 'lucide-react'
 import { isElectron } from '../hooks/isElectron'
 
@@ -74,6 +76,8 @@ export function Header({
   onLogout,
   htMode,
   onToggleHtMode,
+  captureKreyol,
+  onToggleCaptureKreyol,
 }) {
   const timer   = useTimer(playing)
   const dropRef = useRef(null)
@@ -81,10 +85,6 @@ export function Header({
   const [lightTheme, setLightTheme] = useState(() => localStorage.getItem('theme') === 'light')
 
   const FUENTES = isElectron() ? FUENTES_ELECTRON : FUENTES_WEB
-
-  // ¿Hay una Google API key guardada? Solo importa si htMode está activo.
-  const hasGoogleKey = !!localStorage.getItem('google_key')?.trim()
-  const missingGoogleKey = htMode && !hasGoogleKey
 
   useEffect(() => {
     document.documentElement.classList.toggle('light', lightTheme)
@@ -140,19 +140,33 @@ export function Header({
 
         <Sep />
 
+        {/* NUEVO: ¿quién va a hablar? decide Deepgram vs Gladia */}
         <button
-          className={`hdr-btn ${htMode ? 'hdr-btn--active' : ''}`}
-          onClick={onToggleHtMode}
+          className={`hdr-btn ${captureKreyol ? 'hdr-btn--active' : ''}`}
+          onClick={onToggleCaptureKreyol}
           disabled={playing}
-          title={
-            missingGoogleKey
-              ? 'Falta tu Google Translate API key — agrégala en el login para que este modo funcione'
-              : htMode
-                ? 'Modo Kreyòl activo — clic para traducir EN ⇄ ES como siempre'
-                : 'Modo normal EN ⇄ ES — clic para traducir hacia Kreyòl'
-          }
+          title={captureKreyol
+            ? 'Escuchando en Kreyòl (Gladia) — clic para volver a EN/ES (Deepgram)'
+            : 'Escuchando EN/ES (Deepgram) — clic para cambiar a alguien hablando Kreyòl'}
         >
-          {missingGoogleKey && <AlertTriangle size={11} className="hdr-warn-icon" />}
+          <span className="hdr-btn-label">
+            {captureKreyol ? '🇭🇹 Kreyòl mic' : '🇺🇸🇪🇸 EN/ES mic'}
+          </span>
+        </button>
+
+        <Sep />
+
+        {/* Solo aplica cuando NO se está capturando Kreyòl */}
+        <button
+          className={`hdr-btn ${htMode && !captureKreyol ? 'hdr-btn--active' : ''}`}
+          onClick={onToggleHtMode}
+          disabled={playing || captureKreyol}
+          title={captureKreyol
+            ? 'No aplica mientras capturas Kreyòl — el destino se elige solo'
+            : htMode
+              ? 'EN/ES se traduce a Kreyòl — clic para EN ⇄ ES normal'
+              : 'Modo normal EN ⇄ ES — clic para traducir hacia Kreyòl'}
+        >
           <span className="hdr-btn-label">
             {htMode ? '🇺🇸🇪🇸→🇭🇹 Kreyòl' : '🇺🇸⇄🇪🇸 EN/ES'}
           </span>

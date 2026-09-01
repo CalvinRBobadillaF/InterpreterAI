@@ -121,8 +121,6 @@ export const startBrowserCapture = async ({ onTrackEnded } = {}) => {
   }
 
   // ── Limpiar pistas de video INMEDIATAMENTE ────────────────────────────
-  // Importante: parar ANTES de inspeccionar las pistas de audio
-  // para liberar el indicador de grabación de pantalla lo antes posible
   stream.getVideoTracks().forEach((t) => {
     t.stop()
     stream.removeTrack(t)
@@ -143,7 +141,6 @@ export const startBrowserCapture = async ({ onTrackEnded } = {}) => {
   }
 
   // ── Registrar listener para cuando el usuario detiene la captura ──────
-  // Esto ocurre cuando el usuario hace clic en "Dejar de compartir" del navegador
   if (typeof onTrackEnded === 'function') {
     audioTracks.forEach((track) => {
       track.addEventListener('ended', onTrackEnded, { once: true })

@@ -1,24 +1,36 @@
 /**
  * components/ConversationView.jsx
  *
- * NUEVO en esta versión:
- * - Auto-scroll inteligente: si el usuario se desplaza hacia arriba para
- *   leer el historial, ya NO lo empuja de vuelta al fondo con cada
- *   frase nueva. Solo hace auto-scroll si ya estaba cerca del final.
- * - Botón flotante "↓ Jump to latest" que aparece cuando no estás al
- *   final, para volver con un toque.
+ * CAMBIOS para Gladia (ahora hay 3 idiomas de origen posibles, y el
+ * idioma de traducción varía según el caso — ya no es un valor fijo):
+ * - Se agregó una bandera pequeñita junto al timestamp (no una pastilla
+ *   separada arriba del texto, que era lo que se veía forzado antes).
+ *   Formato: "🇭🇹 · 14:32" — discreto, no compite con el texto.
+ * - La columna de traducción ahora dice "Translation" genérico en vez
+ *   de un idioma fijo, porque el destino cambia según quién habla.
  *
- * (Se mantiene de la versión anterior: sin pastilla EN/ES, columna de
- * traducción con etiqueta según htMode.)
+ * (Se mantiene: auto-scroll inteligente, botón "Jump to latest", retry
+ * de traducciones fallidas, puntitos mientras se traduce.)
  */
 
 import { useEffect, useRef, useState } from 'react'
 import { Trash2, RefreshCw, ArrowDown } from 'lucide-react'
 
+const FLAGS = { en: '🇺🇸', es: '🇪🇸', ht: '🇭🇹' }
+
 const fmtTime = (date) =>
   date instanceof Date
     ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
     : ''
+
+function MetaLine({ lang, timestamp }) {
+  if (!timestamp) return null
+  return (
+    <time className="cv-timestamp">
+      {FLAGS[lang] ? `${FLAGS[lang]} · ` : ''}{fmtTime(timestamp)}
+    </time>
+  )
+}
 
 function Dots() {
   return (
@@ -45,7 +57,6 @@ export function ConversationView({
   const isNearBottomRef = useRef(true)
   const [showJumpBtn, setShowJumpBtn] = useState(false)
 
-  // Detecta si el usuario está cerca del final del scroll
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -60,7 +71,6 @@ export function ConversationView({
     return () => el.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Auto-scroll SOLO si ya estábamos cerca del final
   useEffect(() => {
     if (isNearBottomRef.current) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -74,14 +84,13 @@ export function ConversationView({
   }
 
   const isEmpty = utterances.length === 0 && !interimText
-  const transColLabel = htMode ? '🇭🇹 Kreyòl' : 'EN ⇄ ES'
 
   return (
     <div className="cv-root">
 
       <div className="cv-toolbar">
         <span className="cv-toolbar-col">Original</span>
-        {!subtitleOnly && <span className="cv-toolbar-col">{transColLabel}</span>}
+        {!subtitleOnly && <span className="cv-toolbar-col">Translation</span>}
         <button className="cv-clear-btn" onClick={onClear} title="Clear conversation">
           <Trash2 size={12} />
         </button>
@@ -91,7 +100,7 @@ export function ConversationView({
 
         {isEmpty && (
           <p className="cv-empty">
-            {playing ? 'Listening…' : 'Press ▶ to start'}
+            {playing ? 'Listening — EN / ES / 🇭🇹 Kreyòl…' : 'Press ▶ to start'}
           </p>
         )}
 
@@ -100,7 +109,7 @@ export function ConversationView({
 
             <div className="cv-card cv-card--orig">
               <p className="cv-text">{u.text}</p>
-              {u.timestamp && <time className="cv-timestamp">{fmtTime(u.timestamp)}</time>}
+              <MetaLine lang={u.lang} timestamp={u.timestamp} />
             </div>
 
             {!subtitleOnly && (
@@ -115,7 +124,7 @@ export function ConversationView({
                 ) : u.translation ? (
                   <>
                     <p className="cv-text cv-text--trans">{u.translation}</p>
-                    {u.timestamp && <time className="cv-timestamp">{fmtTime(u.timestamp)}</time>}
+                    <MetaLine lang={u.targetLang} timestamp={u.timestamp} />
                   </>
                 ) : (
                   <span className="cv-dash">—</span>

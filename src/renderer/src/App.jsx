@@ -5,8 +5,9 @@ import { LogIn }             from './components/LogIn'
 import { Header }            from './components/Header'
 import { Footer }            from './components/Footer'
 import { ConversationView }  from './components/ConversationView'
-import { useTranscription }  from './hooks/useTranscription'
-import { translateText, prewarmTranslation } from './hooks/useTranslation'
+import { useTranscription }        from './hooks/useTranscription'        // Deepgram: EN/ES
+import { useGladiaTranscription }  from './hooks/useGladiaTranscription'  // Gladia: Kreyòl
+import { translateText, prewarmTranslation } from './hooks/useTranslation' // misma ruta para TODAS las traducciones
 import { startBrowserCapture }  from './client/startBrowserCapture'
 import { startElectronCapture } from './client/startElectronCapture'
 import { isElectron }           from './hooks/isElectron'
@@ -14,23 +15,31 @@ import { isElectron }           from './hooks/isElectron'
 let _uid = 0
 const uid = () => `u${++_uid}`
 
-const MERGE_WINDOW_MS     = 250
-const TERMINAL_PUNCT      = /[.!?…]$/
-const PREWARM_DEBOUNCE_MS = 100
-const HT_MODE_STORAGE_KEY = 'ht_mode' // NUEVO: persiste tu elección entre sesiones
+const MERGE_WINDOW_MS      = 250
+const TERMINAL_PUNCT       = /[.!?…]$/
+const PREWARM_DEBOUNCE_MS  = 100
+const HT_MODE_STORAGE_KEY  = 'ht_mode'
 
 function normLang(lang = '') {
   return lang.slice(0, 2).toLowerCase() || 'en'
 }
 
-const TRANSLATION_CONTEXT = null
-
-function getTargetLang(sourceLang, htMode) {
+// A qué idioma se traduce cada utterance, según quién habló y los modos:
+//   - Habló en Kreyòl → se traduce al ÚLTIMO idioma no-Kreyòl que se usó
+//     (adaptativo: si el otro lado viene en español, criollo→español;
+//     si viene en inglés, criollo→inglés — sin elegir manualmente)
+//   - Habló en inglés/español → Kreyòl si htMode está activo, si no,
+//     el otro de los dos (bilingüe de siempre)
+function pickDisplayTargetLang(sourceLang, htMode, lastNonHtLang) {
+  if (sourceLang === 'ht') return lastNonHtLang || 'en'
   if (htMode) return 'ht'
   return sourceLang === 'en' ? 'es' : 'en'
 }
 
 function App() {
+  // ── Auth ──────────────────────────────────────────────────────────────
+  // Deepgram vuelve a ser la key requerida (EN/ES nunca falló). Gladia es
+  // opcional — solo hace falta si usas el botón de captura en Kreyòl.
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => !!localStorage.getItem('app_key')?.trim() && !!localStorage.getItem('app_name')
   )
@@ -40,18 +49,19 @@ function App() {
     setIsLoggedIn(false)
   }, [])
 
+  // ── Playback ───────────────────────────────────────────────────────────
   const [playing, setPlaying] = useState(false)
   const [source,  setSource]  = useState('mic')
   const streamRef    = useRef(null)
   const abortCtrlRef = useRef(null)
 
-  const [subtitleOnly, setSubtitleOnly] = useState(false)
-  const subtitleOnlyRef = useRef(false)
-  subtitleOnlyRef.current = subtitleOnly
+  // ── ¿Quién está por hablar? — decide qué pipeline arranca el Play ──────
+  const [captureKreyol, setCaptureKreyol] = useState(false)
+  const captureKreyolRef = useRef(false)
+  captureKreyolRef.current = captureKreyol
 
-  // NUEVO: htMode ahora se lee/guarda en localStorage — ya no se resetea
-  // a "true" cada vez que recargas la página. Primera vez (sin nada
-  // guardado todavía) sigue arrancando en modo Kreyòl por defecto.
+  // ── htMode: a qué traducir el habla en EN/ES (solo aplica si NO estás
+  // capturando Kreyòl — cuando hablan en Kreyòl, el destino es adaptativo) ─
   const [htMode, setHtMode] = useState(
     () => localStorage.getItem(HT_MODE_STORAGE_KEY) !== 'false'
   )
@@ -66,6 +76,10 @@ function App() {
     })
   }, [])
 
+  const [subtitleOnly, setSubtitleOnly] = useState(false)
+  const subtitleOnlyRef = useRef(false)
+  subtitleOnlyRef.current = subtitleOnly
+
   const [utterances,  setUtterances]  = useState([])
   const [interimText, setInterimText] = useState('')
   const [interimLang, setInterimLang] = useState('en')
@@ -73,10 +87,14 @@ function App() {
   const lastFinalTimeRef = useRef(0)
   const lastUtteranceRef = useRef(null)
   const prewarmTimerRef  = useRef(null)
+  // Último idioma NO-Kreyòl hablado — decide a qué traducir cuando llega Kreyòl
+  const lastNonHtLangRef = useRef('en')
 
   const [footerError, setFooterError] = useState(null)
   const footerStatus = useMemo(() => {
-    const modeLabel = htMode ? 'EN/ES → 🇭🇹 Kreyòl' : 'EN ⇄ ES'
+    const modeLabel = captureKreyol
+      ? '🇭🇹 Capturando Kreyòl (Gladia)'
+      : (htMode ? 'EN/ES → 🇭🇹 Kreyòl' : 'EN ⇄ ES')
     if (!playing) return `Idle — ${modeLabel}`
     const label =
       source === 'system' ? '🖥️ System Audio' :
@@ -85,7 +103,7 @@ function App() {
     return subtitleOnly
       ? `${label} — Subtitles only`
       : `${label} — ${modeLabel}`
-  }, [playing, subtitleOnly, source, htMode])
+  }, [playing, subtitleOnly, source, htMode, captureKreyol])
 
   const handleClear = useCallback(() => {
     setUtterances([])
@@ -94,42 +112,40 @@ function App() {
     lastUtteranceRef.current = null
   }, [])
 
-  // ── Retry traducción fallida ────────────────────────────────────────
+  // ── Retry — misma ruta translateText() que usa el flujo automático ─────
   const handleRetryTranslation = useCallback(async (id) => {
     let targetUtterance = null
 
     setUtterances(prev => {
       targetUtterance = prev.find(u => u.id === id) ?? null
       return prev.map(u =>
-        u.id === id && u.failed
-          ? { ...u, translating: true, failed: false }
-          : u
+        u.id === id && u.failed ? { ...u, translating: true, failed: false } : u
       )
     })
 
     await new Promise(r => setTimeout(r, 0))
     if (!targetUtterance) return
 
-    const targetLang = getTargetLang(targetUtterance.lang, htModeRef.current)
     let translation = null
     try {
       translation = await translateText({
-        text:    targetUtterance.text,
-        from:    targetUtterance.lang,
-        to:      targetLang,
-        context: TRANSLATION_CONTEXT,
-        signal:  abortCtrlRef.current?.signal ?? null,
+        text:   targetUtterance.text,
+        from:   targetUtterance.lang,
+        to:     targetUtterance.targetLang,
+        signal: abortCtrlRef.current?.signal ?? null,
       })
     } catch { /* silencioso */ }
 
     setUtterances(prev => prev.map(u =>
-      u.id === id
-        ? { ...u, translation, translating: false, failed: !translation }
-        : u
+      u.id === id ? { ...u, translation, translating: false, failed: !translation } : u
     ))
   }, [])
 
-  // ── handleFinal ───────────────────────────────────────────────────────
+  // ── handleFinal — COMPARTIDO por Deepgram (en/es) y Gladia (ht) ─────────
+  // Ambos pipelines llaman esto igual: {text, lang, speechFinal}. La
+  // traducción SIEMPRE pasa por translateText() — la misma ruta probada
+  // que usa "Retry" — nunca depende de una traducción en vivo del propio
+  // proveedor de STT.
   const handleFinal = useCallback(async ({ text, lang, speechFinal }) => {
     setInterimText('')
     if (prewarmTimerRef.current) {
@@ -137,9 +153,11 @@ function App() {
       prewarmTimerRef.current = null
     }
 
-    const now        = Date.now()
-    const l          = normLang(lang)
-    const targetLang = getTargetLang(l, htModeRef.current)
+    const now = Date.now()
+    const l   = normLang(lang)
+    if (l !== 'ht') lastNonHtLangRef.current = l
+
+    const targetLang = pickDisplayTargetLang(l, htModeRef.current, lastNonHtLangRef.current)
     const isSubOnly  = subtitleOnlyRef.current
     const endsWithP  = TERMINAL_PUNCT.test(text)
     const signal     = abortCtrlRef.current?.signal ?? null
@@ -173,10 +191,7 @@ function App() {
       if (!isSubOnly) {
         let translation = null
         try {
-          translation = await translateText({
-            text: mergedText, from: l, to: targetLang,
-            context: TRANSLATION_CONTEXT, signal,
-          })
+          translation = await translateText({ text: mergedText, from: l, to: targetLang, signal })
         } catch { /* silencioso */ }
 
         if (signal?.aborted) return
@@ -197,29 +212,24 @@ function App() {
 
     setUtterances(prev => [
       ...prev,
-      { id, text, lang: l, translation: null, translating: !isSubOnly, failed: false, timestamp },
+      { id, text, lang: l, targetLang, translation: null, translating: !isSubOnly, failed: false, timestamp },
     ])
 
     if (isSubOnly) return
 
     let translation = null
     try {
-      translation = await translateText({
-        text, from: l, to: targetLang,
-        context: TRANSLATION_CONTEXT, signal,
-      })
+      translation = await translateText({ text, from: l, to: targetLang, signal })
     } catch { /* silencioso */ }
 
     if (signal?.aborted) return
 
     setUtterances(utt => utt.map(u =>
-      u.id === id
-        ? { ...u, translation, translating: false, failed: !translation }
-        : u
+      u.id === id ? { ...u, translation, translating: false, failed: !translation } : u
     ))
   }, [])
 
-  // ── handleInterim ─────────────────────────────────────────────────────
+  // ── handleInterim — compartido también ──────────────────────────────────
   const handleInterim = useCallback(({ text, lang }) => {
     setInterimText(text)
     const l = normLang(lang)
@@ -227,7 +237,7 @@ function App() {
 
     if (subtitleOnlyRef.current) return
 
-    const targetLang = getTargetLang(l, htModeRef.current)
+    const targetLang = pickDisplayTargetLang(l, htModeRef.current, lastNonHtLangRef.current)
 
     if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current)
     prewarmTimerRef.current = setTimeout(() => {
@@ -241,11 +251,22 @@ function App() {
     setPlaying(false)
   }, [])
 
+  // ── Los dos pipelines de STT — siempre instanciados, solo uno se usa ────
   const {
-    start: startTranscription,
-    stop:  stopTranscription,
-    error: transcriptionError,
+    start: startDeepgram,
+    stop:  stopDeepgram,
+    error: deepgramError,
   } = useTranscription({
+    onFinal:   handleFinal,
+    onInterim: handleInterim,
+    onError:   handleTranscriptionError,
+  })
+
+  const {
+    start: startGladia,
+    stop:  stopGladia,
+    error: gladiaError,
+  } = useGladiaTranscription({
     onFinal:   handleFinal,
     onInterim: handleInterim,
     onError:   handleTranscriptionError,
@@ -258,15 +279,15 @@ function App() {
     }
   }, [])
 
+  // ── Audio stream ───────────────────────────────────────────────────────
+  const handleTogglePlayRef = useRef(null)
+  const playingRef = useRef(false)
+  playingRef.current = playing
+
   const getAudioStream = useCallback(async () => {
     if (source === 'mic') {
       return navigator.mediaDevices.getUserMedia({
-        audio: {
-          autoGainControl:  true,
-          noiseSuppression: true,
-          echoCancellation: true,
-          sampleRate:       16000,
-        },
+        audio: { autoGainControl: true, noiseSuppression: true, echoCancellation: true },
         video: false,
       })
     }
@@ -279,17 +300,18 @@ function App() {
       return stream
     }
     if (source === 'tab') {
-      const r = await startBrowserCapture()
+      const r = await startBrowserCapture({
+        onTrackEnded: () => {
+          if (playingRef.current) handleTogglePlayRef.current?.()
+        },
+      })
       if (!r.stream) throw new Error(r.userMessage || 'Tab capture cancelled.')
       return r.stream
     }
     throw new Error(`Unknown audio source: "${source}"`)
   }, [source])
 
-  // ── Atajo de teclado: Barra espaciadora = Play/Stop ────────────────────
-  // NUEVO. Se ignora si el foco está en un input/textarea/botón (para no
-  // interferir con el login u otros controles), y si se está escribiendo
-  // en cualquier campo editable.
+  // ── Atajo de teclado: Barra espaciadora = Play/Stop ─────────────────────
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code !== 'Space') return
@@ -303,8 +325,7 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const handleTogglePlayRef = useRef(null)
-
+  // ── Play / Stop ────────────────────────────────────────────────────────
   const handleTogglePlay = useCallback(async () => {
     if (!playing) {
       setFooterError(null)
@@ -319,8 +340,12 @@ function App() {
         setFooterError(err.message)
         return
       }
+
+      const useGladia = captureKreyolRef.current
+
       try {
-        await startTranscription(stream)
+        if (useGladia) await startGladia(stream)
+        else           await startDeepgram(stream)
         streamRef.current = stream
         setPlaying(true)
       } catch (err) {
@@ -336,13 +361,16 @@ function App() {
         prewarmTimerRef.current = null
       }
 
-      stopTranscription()
+      // Detenemos AMBOS por seguridad — el que no estaba activo, no hace nada.
+      stopDeepgram()
+      stopGladia()
+
       streamRef.current?.getTracks().forEach(t => t.stop())
       streamRef.current = null
       setInterimText('')
       setPlaying(false)
     }
-  }, [playing, getAudioStream, startTranscription, stopTranscription])
+  }, [playing, getAudioStream, startDeepgram, stopDeepgram, startGladia, stopGladia])
 
   handleTogglePlayRef.current = handleTogglePlay
 
@@ -360,6 +388,8 @@ function App() {
         onLogout={handleLogout}
         htMode={htMode}
         onToggleHtMode={() => { if (!playing) handleToggleHtMode() }}
+        captureKreyol={captureKreyol}
+        onToggleCaptureKreyol={() => { if (!playing) setCaptureKreyol(p => !p) }}
       />
       <main className="app-main">
         <ConversationView
@@ -375,7 +405,7 @@ function App() {
       </main>
       <Footer
         status={footerStatus}
-        error={footerError || (transcriptionError ? `STT: ${transcriptionError}` : null)}
+        error={footerError || (deepgramError ? `STT: ${deepgramError}` : gladiaError ? `STT: ${gladiaError}` : null)}
       />
     </div>
   )
