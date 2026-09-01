@@ -12528,27 +12528,27 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$f = [
+const __iconNode$e = [
   ["path", { d: "M12 5v14", key: "s699le" }],
   ["path", { d: "m19 12-7 7-7-7", key: "1idqje" }]
 ];
-const ArrowDown = createLucideIcon("arrow-down", __iconNode$f);
-const __iconNode$e = [
+const ArrowDown = createLucideIcon("arrow-down", __iconNode$e);
+const __iconNode$d = [
   ["rect", { width: "18", height: "14", x: "3", y: "5", rx: "2", ry: "2", key: "12ruh7" }],
   ["path", { d: "M7 15h4M15 15h2M7 11h2M13 11h4", key: "1ueiar" }]
 ];
-const Captions = createLucideIcon("captions", __iconNode$e);
-const __iconNode$d = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$d);
-const __iconNode$c = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$c);
-const __iconNode$b = [
+const Captions = createLucideIcon("captions", __iconNode$d);
+const __iconNode$c = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$c);
+const __iconNode$b = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$b);
+const __iconNode$a = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const Globe = createLucideIcon("globe", __iconNode$b);
-const __iconNode$a = [
+const Globe = createLucideIcon("globe", __iconNode$a);
+const __iconNode$9 = [
   ["path", { d: "m5 8 6 6", key: "1wu5hv" }],
   ["path", { d: "m4 14 6-6 2-3", key: "1k1g8d" }],
   ["path", { d: "M2 5h12", key: "or177f" }],
@@ -12556,26 +12556,26 @@ const __iconNode$a = [
   ["path", { d: "m22 22-5-10-5 10", key: "don7ne" }],
   ["path", { d: "M14 18h6", key: "1m8k6r" }]
 ];
-const Languages = createLucideIcon("languages", __iconNode$a);
-const __iconNode$9 = [
+const Languages = createLucideIcon("languages", __iconNode$9);
+const __iconNode$8 = [
   ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
   ["path", { d: "M21 12H9", key: "dn1m92" }],
   ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
 ];
-const LogOut = createLucideIcon("log-out", __iconNode$9);
-const __iconNode$8 = [
+const LogOut = createLucideIcon("log-out", __iconNode$8);
+const __iconNode$7 = [
   ["path", { d: "M12 19v3", key: "npa21l" }],
   ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
   ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
 ];
-const Mic = createLucideIcon("mic", __iconNode$8);
-const __iconNode$7 = [
+const Mic = createLucideIcon("mic", __iconNode$7);
+const __iconNode$6 = [
   ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2", key: "48i651" }],
   ["line", { x1: "8", x2: "16", y1: "21", y2: "21", key: "1svkeh" }],
   ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
 ];
-const Monitor = createLucideIcon("monitor", __iconNode$7);
-const __iconNode$6 = [
+const Monitor = createLucideIcon("monitor", __iconNode$6);
+const __iconNode$5 = [
   [
     "path",
     {
@@ -12584,8 +12584,8 @@ const __iconNode$6 = [
     }
   ]
 ];
-const Moon = createLucideIcon("moon", __iconNode$6);
-const __iconNode$5 = [
+const Moon = createLucideIcon("moon", __iconNode$5);
+const __iconNode$4 = [
   [
     "path",
     {
@@ -12594,19 +12594,19 @@ const __iconNode$5 = [
     }
   ]
 ];
-const Play = createLucideIcon("play", __iconNode$5);
-const __iconNode$4 = [
+const Play = createLucideIcon("play", __iconNode$4);
+const __iconNode$3 = [
   ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
   ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
   ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
   ["path", { d: "M8 16H3v5", key: "1cv678" }]
 ];
-const RefreshCw = createLucideIcon("refresh-cw", __iconNode$4);
-const __iconNode$3 = [
+const RefreshCw = createLucideIcon("refresh-cw", __iconNode$3);
+const __iconNode$2 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]
 ];
-const Square = createLucideIcon("square", __iconNode$3);
-const __iconNode$2 = [
+const Square = createLucideIcon("square", __iconNode$2);
+const __iconNode$1 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -12617,30 +12617,19 @@ const __iconNode$2 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-const Sun = createLucideIcon("sun", __iconNode$2);
-const __iconNode$1 = [
+const Sun = createLucideIcon("sun", __iconNode$1);
+const __iconNode = [
   ["path", { d: "M10 11v6", key: "nco0om" }],
   ["path", { d: "M14 11v6", key: "outv1u" }],
   ["path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6", key: "miytrc" }],
   ["path", { d: "M3 6h18", key: "d0wm0j" }],
   ["path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", key: "e791ji" }]
 ];
-const Trash2 = createLucideIcon("trash-2", __iconNode$1);
-const __iconNode = [
-  [
-    "path",
-    {
-      d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3",
-      key: "wmoenq"
-    }
-  ],
-  ["path", { d: "M12 9v4", key: "juzpu7" }],
-  ["path", { d: "M12 17h.01", key: "p32p05" }]
-];
-const TriangleAlert = createLucideIcon("triangle-alert", __iconNode);
+const Trash2 = createLucideIcon("trash-2", __iconNode);
 function LogIn({ onLogin }) {
   const [name, setName] = reactExports.useState("");
   const [deepgramKey, setDeepgramKey] = reactExports.useState(localStorage.getItem("app_key") || "");
+  const [gladiaKey, setGladiaKey] = reactExports.useState(localStorage.getItem("gladia_key") || "");
   const [googleKey, setGoogleKey] = reactExports.useState(localStorage.getItem("google_key") || "");
   const [error, setError] = reactExports.useState("");
   const [showInstructions, setShowInstructions] = reactExports.useState(false);
@@ -12652,11 +12641,16 @@ function LogIn({ onLogin }) {
       return;
     }
     if (!deepgramKey.trim()) {
-      setError("Deepgram API key is required for transcription.");
+      setError("Deepgram API key is required for English/Spanish transcription.");
       return;
     }
     localStorage.setItem("app_name", name.trim());
     localStorage.setItem("app_key", deepgramKey.trim());
+    if (gladiaKey.trim()) {
+      localStorage.setItem("gladia_key", gladiaKey.trim());
+    } else {
+      localStorage.removeItem("gladia_key");
+    }
     if (googleKey.trim()) {
       localStorage.setItem("google_key", googleKey.trim());
     } else {
@@ -12672,7 +12666,7 @@ function LogIn({ onLogin }) {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "login-subtitle", children: [
       "Welcome! Enter your name and Deepgram key to start transcribing.",
       /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "0.85em", opacity: 0.8 }, children: "Professional translation is now automatically enabled." })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontSize: "0.85em", opacity: 0.8 }, children: "Add Gladia too if you'll capture Haitian Creole speech." })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { className: "login-form", onSubmit: handleSubmit, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-field", children: [
@@ -12713,7 +12707,34 @@ function LogIn({ onLogin }) {
             onChange: (e) => setDeepgramKey(e.target.value)
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Used for real-time speech-to-text (12,000 min/year free)" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Used for real-time English/Spanish speech-to-text (12,000 min/year free)" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-field", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "login-label", children: [
+          "Gladia API Key ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { fontWeight: 400, opacity: 0.65 }, children: "(optional)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              className: "login-label__link",
+              href: "https://app.gladia.io",
+              target: "_blank",
+              rel: "noreferrer",
+              children: "Get key →"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            className: "login-input login-input--mono",
+            type: "password",
+            placeholder: "gladia_xxxxxxxxxxxxxxxxxxxxxxxx",
+            value: gladiaKey,
+            onChange: (e) => setGladiaKey(e.target.value)
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: 'Only needed for the "🇭🇹 Kreyòl mic" button — captures someone speaking Haitian Creole' })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-field", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "login-label", children: [
@@ -12740,7 +12761,7 @@ function LogIn({ onLogin }) {
             onChange: (e) => setGoogleKey(e.target.value)
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Only needed for the 🇭🇹 Kreyòl Ayisyen translation mode — DeepL still handles EN ⇄ ES without it" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "login-hint", children: "Needed to translate anything involving Kreyòl Ayisyen — DeepL doesn't support that language" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "login-instructions", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -12758,17 +12779,22 @@ function LogIn({ onLogin }) {
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `instructions-content ${showInstructions ? "is-open" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
           "1. ",
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Deepgram:" }),
-          " For high-speed transcription. Get your own key at their console.",
+          " Required. Real-time transcription for English and Spanish.",
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           "2. ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DeepL:" }),
-          " Integrated via secure backend. No key required from the user.",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Gladia:" }),
+          ` Optional. Only used by the "🇭🇹 Kreyòl mic" button, to capture someone speaking Haitian Creole — Deepgram can't recognize that language.`,
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           "3. ",
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Google Translate:" }),
-          " Optional — only needed if you'll use the Kreyòl Ayisyen mode, since DeepL doesn't support that language. Requires a Google Cloud project with billing enabled (there's a free monthly quota).",
+          " Optional. Powers every translation that involves Kreyòl, regardless of which mic button captured it.",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+          "4. ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DeepL:" }),
+          " Integrated via secure backend, handles EN ⇄ ES translation. No key required from you.",
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
           "Ask Calvin Bobadilla if you need help with credentials."
@@ -12837,15 +12863,15 @@ function Header({
   onToggleSubtitleOnly,
   onLogout,
   htMode,
-  onToggleHtMode
+  onToggleHtMode,
+  captureKreyol,
+  onToggleCaptureKreyol
 }) {
   const timer = useTimer(playing);
   const dropRef = reactExports.useRef(null);
   const [dropOpen, setDropOpen] = reactExports.useState(false);
   const [lightTheme, setLightTheme] = reactExports.useState(() => localStorage.getItem("theme") === "light");
   const FUENTES = isElectron() ? FUENTES_ELECTRON : FUENTES_WEB;
-  const hasGoogleKey = !!localStorage.getItem("google_key")?.trim();
-  const missingGoogleKey = htMode && !hasGoogleKey;
   reactExports.useEffect(() => {
     document.documentElement.classList.toggle("light", lightTheme);
     localStorage.setItem("theme", lightTheme ? "light" : "dark");
@@ -12902,17 +12928,25 @@ function Header({
         )) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
-          className: `hdr-btn ${htMode ? "hdr-btn--active" : ""}`,
-          onClick: onToggleHtMode,
+          className: `hdr-btn ${captureKreyol ? "hdr-btn--active" : ""}`,
+          onClick: onToggleCaptureKreyol,
           disabled: playing,
-          title: missingGoogleKey ? "Falta tu Google Translate API key — agrégala en el login para que este modo funcione" : htMode ? "Modo Kreyòl activo — clic para traducir EN ⇄ ES como siempre" : "Modo normal EN ⇄ ES — clic para traducir hacia Kreyòl",
-          children: [
-            missingGoogleKey && /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { size: 11, className: "hdr-warn-icon" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-btn-label", children: htMode ? "🇺🇸🇪🇸→🇭🇹 Kreyòl" : "🇺🇸⇄🇪🇸 EN/ES" })
-          ]
+          title: captureKreyol ? "Escuchando en Kreyòl (Gladia) — clic para volver a EN/ES (Deepgram)" : "Escuchando EN/ES (Deepgram) — clic para cambiar a alguien hablando Kreyòl",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-btn-label", children: captureKreyol ? "🇭🇹 Kreyòl mic" : "🇺🇸🇪🇸 EN/ES mic" })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          className: `hdr-btn ${htMode && !captureKreyol ? "hdr-btn--active" : ""}`,
+          onClick: onToggleHtMode,
+          disabled: playing || captureKreyol,
+          title: captureKreyol ? "No aplica mientras capturas Kreyòl — el destino se elige solo" : htMode ? "EN/ES se traduce a Kreyòl — clic para EN ⇄ ES normal" : "Modo normal EN ⇄ ES — clic para traducir hacia Kreyòl",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-btn-label", children: htMode ? "🇺🇸🇪🇸→🇭🇹 Kreyòl" : "🇺🇸⇄🇪🇸 EN/ES" })
         }
       )
     ] }),
@@ -12951,7 +12985,7 @@ function Header({
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 2.0" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 2.1" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -12961,7 +12995,15 @@ function Footer({ status = "Idle", error = null }) {
     ] }) })
   ] });
 }
+const FLAGS = { en: "🇺🇸", es: "🇪🇸", ht: "🇭🇹" };
 const fmtTime = (date) => date instanceof Date ? date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }) : "";
+function MetaLine({ lang, timestamp }) {
+  if (!timestamp) return null;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("time", { className: "cv-timestamp", children: [
+    FLAGS[lang] ? `${FLAGS[lang]} · ` : "",
+    fmtTime(timestamp)
+  ] });
+}
 function Dots() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-dots", "aria-label": "Translating…", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("span", {}),
@@ -13006,26 +13048,25 @@ function ConversationView({
     setShowJumpBtn(false);
   };
   const isEmpty = utterances.length === 0 && !interimText;
-  const transColLabel = htMode ? "🇭🇹 Kreyòl" : "EN ⇄ ES";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-root", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-toolbar", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: "Original" }),
-      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: transColLabel }),
+      !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-toolbar-col", children: "Translation" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "cv-clear-btn", onClick: onClear, title: "Clear conversation", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 12 }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-scroll", ref: scrollRef, children: [
-      isEmpty && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-empty", children: playing ? "Listening…" : "Press ▶ to start" }),
+      isEmpty && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-empty", children: playing ? "Listening — EN / ES / 🇭🇹 Kreyòl…" : "Press ▶ to start" }),
       utterances.map((u) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row ${subtitleOnly ? "cv-row--solo" : ""}`, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "cv-card cv-card--orig", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text", children: u.text }),
-          u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(MetaLine, { lang: u.lang, timestamp: u.timestamp })
         ] }),
         !subtitleOnly && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cv-card cv-card--trans", children: u.translating ? /* @__PURE__ */ jsxRuntimeExports.jsx(Dots, {}) : u.failed ? /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "cv-retry-btn", onClick: () => onRetry?.(u.id), title: "Retry translation", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { size: 12 }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Retry" })
         ] }) : u.translation ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "cv-text cv-text--trans", children: u.translation }),
-          u.timestamp && /* @__PURE__ */ jsxRuntimeExports.jsx("time", { className: "cv-timestamp", children: fmtTime(u.timestamp) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(MetaLine, { lang: u.targetLang, timestamp: u.timestamp })
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cv-dash", children: "—" }) })
       ] }, u.id)),
       interimText && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `cv-row cv-row--live ${subtitleOnly ? "cv-row--solo" : ""}`, children: [
@@ -13177,6 +13218,184 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
     recorderRef.current = null;
     wsRef.current?.close(1e3, "User stopped");
     wsRef.current = null;
+    setActive(false);
+    setError(null);
+  }, []);
+  return { start, stop, active, error };
+}
+const GLADIA_INIT_URL = "https://api.gladia.io/v2/live";
+const BUFFER_SIZE = 4096;
+function floatTo16BitPCM(float32Array) {
+  const int16Array = new Int16Array(float32Array.length);
+  for (let i = 0; i < float32Array.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32Array[i]));
+    int16Array[i] = s < 0 ? s * 32768 : s * 32767;
+  }
+  return int16Array;
+}
+function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
+  const wsRef = reactExports.useRef(null);
+  const audioCtxRef = reactExports.useRef(null);
+  const processorRef = reactExports.useRef(null);
+  const sourceNodeRef = reactExports.useRef(null);
+  const activoRef = reactExports.useRef(false);
+  const onFinalRef = reactExports.useRef(onFinal);
+  const onInterimRef = reactExports.useRef(onInterim);
+  const onErrorRef = reactExports.useRef(onError);
+  onFinalRef.current = onFinal;
+  onInterimRef.current = onInterim;
+  onErrorRef.current = onError;
+  const [active, setActive] = reactExports.useState(false);
+  const [error, setError] = reactExports.useState(null);
+  const emitirError = reactExports.useCallback((msg) => {
+    console.error("[Gladia]", msg);
+    setError(msg);
+    onErrorRef.current?.(msg);
+  }, []);
+  const handleMessage = reactExports.useCallback((event) => {
+    let msg;
+    try {
+      msg = JSON.parse(event.data);
+    } catch {
+      return;
+    }
+    if (msg.type === "error") {
+      emitirError(msg.data?.message || JSON.stringify(msg.data));
+      return;
+    }
+    if (msg.type !== "transcript") return;
+    const d = msg.data;
+    const utterance = d?.utterance;
+    const texto = utterance?.text?.trim();
+    if (!texto || texto.length < 2) return;
+    const payload = { text: texto, lang: "ht", confidence: utterance?.confidence ?? 1, speechFinal: true };
+    if (d.is_final) onFinalRef.current?.(payload);
+    else onInterimRef.current?.(payload);
+  }, [emitirError]);
+  const start = reactExports.useCallback(async (stream = null) => {
+    if (activoRef.current) return;
+    const API_KEY = localStorage.getItem("gladia_key")?.trim();
+    if (!API_KEY) {
+      emitirError("Missing Gladia API key");
+      return;
+    }
+    if (!stream) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { autoGainControl: true, noiseSuppression: true, echoCancellation: true }
+        });
+      } catch (e) {
+        emitirError("Microphone denied: " + e.message);
+        return;
+      }
+    }
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContextClass({ sampleRate: 16e3 });
+    audioCtxRef.current = audioCtx;
+    const actualSampleRate = audioCtx.sampleRate;
+    if (actualSampleRate !== 16e3) {
+      console.warn(`[Gladia] El navegador usó ${actualSampleRate}Hz en vez de 16000Hz — usando el valor real en la config.`);
+    }
+    let sessionUrl;
+    try {
+      const res = await fetch(GLADIA_INIT_URL, {
+        method: "POST",
+        headers: {
+          "x-gladia-key": API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          encoding: "wav/pcm",
+          sample_rate: actualSampleRate,
+          // ← el REAL, no un valor asumido
+          bit_depth: 16,
+          channels: 1,
+          model: "solaria-1",
+          endpointing: 0.3,
+          maximum_duration_without_endpointing: 10,
+          // FIX #1: idioma explícito, sin dejar que el modelo adivine
+          // entre 100+ idiomas (eso es lo que fallaba con Kreyòl)
+          language_config: {
+            languages: ["ht"],
+            code_switching: false
+          },
+          // FIX #2: sin traducción en vivo de Gladia — la traducción la
+          // hace translateText() desde App.jsx, la ruta que sí funciona
+          realtime_processing: { translation: false },
+          messages_config: {
+            receive_partial_transcripts: true,
+            receive_final_transcripts: true,
+            receive_speech_events: false,
+            receive_errors: true,
+            receive_lifecycle_events: false
+          }
+        })
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null);
+        throw new Error(errBody?.message || `HTTP ${res.status}`);
+      }
+      sessionUrl = (await res.json()).url;
+    } catch (e) {
+      emitirError("Gladia init failed: " + e.message);
+      audioCtx.close().catch(() => {
+      });
+      audioCtxRef.current = null;
+      return;
+    }
+    const ws = new WebSocket(sessionUrl);
+    wsRef.current = ws;
+    ws.onopen = () => {
+      console.log(`[Gladia] ✅ Connected — solaria-1, Kreyòl explícito, ${actualSampleRate}Hz`);
+      activoRef.current = true;
+      setActive(true);
+      setError(null);
+      const source = audioCtx.createMediaStreamSource(stream);
+      sourceNodeRef.current = source;
+      const processor = audioCtx.createScriptProcessor(BUFFER_SIZE, 1, 1);
+      processorRef.current = processor;
+      processor.onaudioprocess = (e) => {
+        if (!activoRef.current || ws.readyState !== WebSocket.OPEN) return;
+        const pcm16 = floatTo16BitPCM(e.inputBuffer.getChannelData(0));
+        ws.send(pcm16.buffer);
+      };
+      const silentGain = audioCtx.createGain();
+      silentGain.gain.value = 0;
+      source.connect(processor);
+      processor.connect(silentGain);
+      silentGain.connect(audioCtx.destination);
+    };
+    ws.onmessage = handleMessage;
+    ws.onerror = () => console.warn("[Gladia] onerror — esperando detalles en onclose");
+    ws.onclose = (e) => {
+      console.log(`[Gladia] Closed — code:${e.code} reason:"${e.reason}"`);
+      const wasActive = activoRef.current;
+      activoRef.current = false;
+      setActive(false);
+      if (wasActive && e.code !== 1e3) {
+        emitirError(e.reason || `Connection closed unexpectedly (code ${e.code})`);
+      }
+    };
+  }, [emitirError, handleMessage]);
+  const stop = reactExports.useCallback(() => {
+    activoRef.current = false;
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      try {
+        wsRef.current.send(JSON.stringify({ type: "stop_recording" }));
+      } catch {
+      }
+    }
+    wsRef.current?.close(1e3, "User stopped");
+    wsRef.current = null;
+    processorRef.current?.disconnect();
+    sourceNodeRef.current?.disconnect();
+    if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
+      audioCtxRef.current.close().catch(() => {
+      });
+    }
+    processorRef.current = null;
+    sourceNodeRef.current = null;
+    audioCtxRef.current = null;
     setActive(false);
     setError(null);
   }, []);
@@ -13614,8 +13833,8 @@ const HT_MODE_STORAGE_KEY = "ht_mode";
 function normLang(lang = "") {
   return lang.slice(0, 2).toLowerCase() || "en";
 }
-const TRANSLATION_CONTEXT = null;
-function getTargetLang(sourceLang, htMode) {
+function pickDisplayTargetLang(sourceLang, htMode, lastNonHtLang) {
+  if (sourceLang === "ht") return lastNonHtLang || "en";
   if (htMode) return "ht";
   return sourceLang === "en" ? "es" : "en";
 }
@@ -13632,9 +13851,9 @@ function App() {
   const [source, setSource] = reactExports.useState("mic");
   const streamRef = reactExports.useRef(null);
   const abortCtrlRef = reactExports.useRef(null);
-  const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
-  const subtitleOnlyRef = reactExports.useRef(false);
-  subtitleOnlyRef.current = subtitleOnly;
+  const [captureKreyol, setCaptureKreyol] = reactExports.useState(false);
+  const captureKreyolRef = reactExports.useRef(false);
+  captureKreyolRef.current = captureKreyol;
   const [htMode, setHtMode] = reactExports.useState(
     () => localStorage.getItem(HT_MODE_STORAGE_KEY) !== "false"
   );
@@ -13647,19 +13866,23 @@ function App() {
       return next;
     });
   }, []);
+  const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
+  const subtitleOnlyRef = reactExports.useRef(false);
+  subtitleOnlyRef.current = subtitleOnly;
   const [utterances, setUtterances] = reactExports.useState([]);
   const [interimText, setInterimText] = reactExports.useState("");
   const [interimLang, setInterimLang] = reactExports.useState("en");
   const lastFinalTimeRef = reactExports.useRef(0);
   const lastUtteranceRef = reactExports.useRef(null);
   const prewarmTimerRef = reactExports.useRef(null);
+  const lastNonHtLangRef = reactExports.useRef("en");
   const [footerError, setFooterError] = reactExports.useState(null);
   const footerStatus = reactExports.useMemo(() => {
-    const modeLabel = htMode ? "EN/ES → 🇭🇹 Kreyòl" : "EN ⇄ ES";
+    const modeLabel = captureKreyol ? "🇭🇹 Capturando Kreyòl (Gladia)" : htMode ? "EN/ES → 🇭🇹 Kreyòl" : "EN ⇄ ES";
     if (!playing) return `Idle — ${modeLabel}`;
     const label = source === "system" ? "🖥️ System Audio" : source === "tab" ? "🌐 Browser Tab" : "🎙️ Microphone";
     return subtitleOnly ? `${label} — Subtitles only` : `${label} — ${modeLabel}`;
-  }, [playing, subtitleOnly, source, htMode]);
+  }, [playing, subtitleOnly, source, htMode, captureKreyol]);
   const handleClear = reactExports.useCallback(() => {
     setUtterances([]);
     setInterimText("");
@@ -13676,14 +13899,12 @@ function App() {
     });
     await new Promise((r) => setTimeout(r, 0));
     if (!targetUtterance) return;
-    const targetLang = getTargetLang(targetUtterance.lang, htModeRef.current);
     let translation = null;
     try {
       translation = await translateText({
         text: targetUtterance.text,
         from: targetUtterance.lang,
-        to: targetLang,
-        context: TRANSLATION_CONTEXT,
+        to: targetUtterance.targetLang,
         signal: abortCtrlRef.current?.signal ?? null
       });
     } catch {
@@ -13700,7 +13921,8 @@ function App() {
     }
     const now = Date.now();
     const l = normLang(lang);
-    const targetLang = getTargetLang(l, htModeRef.current);
+    if (l !== "ht") lastNonHtLangRef.current = l;
+    const targetLang = pickDisplayTargetLang(l, htModeRef.current, lastNonHtLangRef.current);
     const isSubOnly = subtitleOnlyRef.current;
     const endsWithP = TERMINAL_PUNCT.test(text);
     const signal = abortCtrlRef.current?.signal ?? null;
@@ -13722,13 +13944,7 @@ function App() {
       if (!isSubOnly) {
         let translation2 = null;
         try {
-          translation2 = await translateText({
-            text: mergedText,
-            from: l,
-            to: targetLang,
-            context: TRANSLATION_CONTEXT,
-            signal
-          });
+          translation2 = await translateText({ text: mergedText, from: l, to: targetLang, signal });
         } catch {
         }
         if (signal?.aborted) return;
@@ -13743,18 +13959,12 @@ function App() {
     lastUtteranceRef.current = { id, text, lang: l, endsWithPunct: endsWithP };
     setUtterances((prev2) => [
       ...prev2,
-      { id, text, lang: l, translation: null, translating: !isSubOnly, failed: false, timestamp }
+      { id, text, lang: l, targetLang, translation: null, translating: !isSubOnly, failed: false, timestamp }
     ]);
     if (isSubOnly) return;
     let translation = null;
     try {
-      translation = await translateText({
-        text,
-        from: l,
-        to: targetLang,
-        context: TRANSLATION_CONTEXT,
-        signal
-      });
+      translation = await translateText({ text, from: l, to: targetLang, signal });
     } catch {
     }
     if (signal?.aborted) return;
@@ -13767,7 +13977,7 @@ function App() {
     const l = normLang(lang);
     setInterimLang(l);
     if (subtitleOnlyRef.current) return;
-    const targetLang = getTargetLang(l, htModeRef.current);
+    const targetLang = pickDisplayTargetLang(l, htModeRef.current, lastNonHtLangRef.current);
     if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current);
     prewarmTimerRef.current = setTimeout(() => {
       prewarmTranslation({ text, from: l, to: targetLang });
@@ -13779,10 +13989,19 @@ function App() {
     setPlaying(false);
   }, []);
   const {
-    start: startTranscription,
-    stop: stopTranscription,
-    error: transcriptionError
+    start: startDeepgram,
+    stop: stopDeepgram,
+    error: deepgramError
   } = useTranscription({
+    onFinal: handleFinal,
+    onInterim: handleInterim,
+    onError: handleTranscriptionError
+  });
+  const {
+    start: startGladia,
+    stop: stopGladia,
+    error: gladiaError
+  } = useGladiaTranscription({
     onFinal: handleFinal,
     onInterim: handleInterim,
     onError: handleTranscriptionError
@@ -13793,15 +14012,13 @@ function App() {
       if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current);
     };
   }, []);
+  const handleTogglePlayRef = reactExports.useRef(null);
+  const playingRef = reactExports.useRef(false);
+  playingRef.current = playing;
   const getAudioStream = reactExports.useCallback(async () => {
     if (source === "mic") {
       return navigator.mediaDevices.getUserMedia({
-        audio: {
-          autoGainControl: true,
-          noiseSuppression: true,
-          echoCancellation: true,
-          sampleRate: 16e3
-        },
+        audio: { autoGainControl: true, noiseSuppression: true, echoCancellation: true },
         video: false
       });
     }
@@ -13814,7 +14031,11 @@ function App() {
       return stream;
     }
     if (source === "tab") {
-      const r = await startBrowserCapture();
+      const r = await startBrowserCapture({
+        onTrackEnded: () => {
+          if (playingRef.current) handleTogglePlayRef.current?.();
+        }
+      });
       if (!r.stream) throw new Error(r.userMessage || "Tab capture cancelled.");
       return r.stream;
     }
@@ -13832,7 +14053,6 @@ function App() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-  const handleTogglePlayRef = reactExports.useRef(null);
   const handleTogglePlay = reactExports.useCallback(async () => {
     if (!playing) {
       setFooterError(null);
@@ -13845,8 +14065,10 @@ function App() {
         setFooterError(err.message);
         return;
       }
+      const useGladia = captureKreyolRef.current;
       try {
-        await startTranscription(stream);
+        if (useGladia) await startGladia(stream);
+        else await startDeepgram(stream);
         streamRef.current = stream;
         setPlaying(true);
       } catch (err) {
@@ -13860,13 +14082,14 @@ function App() {
         clearTimeout(prewarmTimerRef.current);
         prewarmTimerRef.current = null;
       }
-      stopTranscription();
+      stopDeepgram();
+      stopGladia();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
       setInterimText("");
       setPlaying(false);
     }
-  }, [playing, getAudioStream, startTranscription, stopTranscription]);
+  }, [playing, getAudioStream, startDeepgram, stopDeepgram, startGladia, stopGladia]);
   handleTogglePlayRef.current = handleTogglePlay;
   if (!isLoggedIn) return /* @__PURE__ */ jsxRuntimeExports.jsx(LogIn, { onLogin: () => setIsLoggedIn(true) });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "app-shell", children: [
@@ -13885,6 +14108,10 @@ function App() {
         htMode,
         onToggleHtMode: () => {
           if (!playing) handleToggleHtMode();
+        },
+        captureKreyol,
+        onToggleCaptureKreyol: () => {
+          if (!playing) setCaptureKreyol((p) => !p);
         }
       }
     ),
@@ -13905,7 +14132,7 @@ function App() {
       Footer,
       {
         status: footerStatus,
-        error: footerError || (transcriptionError ? `STT: ${transcriptionError}` : null)
+        error: footerError || (deepgramError ? `STT: ${deepgramError}` : gladiaError ? `STT: ${gladiaError}` : null)
       }
     )
   ] });
