@@ -147,6 +147,13 @@ export function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
           },
           // FIX #2: sin traducción en vivo de Gladia — la traducción la
           // hace translateText() desde App.jsx, la ruta que sí funciona
+          // NUEVO: limpieza de audio antes de transcribir — ayuda justo en
+          // los casos que describiste (mic de teléfono, conversación en
+          // persona con ruido de fondo). Viene apagado por defecto en la
+          // API, así que hay que activarlo explícitamente.
+          pre_processing: {
+            audio_enhancer: true,
+          },
           realtime_processing: { translation: false },
           messages_config: {
             receive_partial_transcripts: true,
