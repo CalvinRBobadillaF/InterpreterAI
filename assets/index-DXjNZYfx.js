@@ -12528,20 +12528,26 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$e = [
+const __iconNode$f = [
   ["path", { d: "M12 5v14", key: "s699le" }],
   ["path", { d: "m19 12-7 7-7-7", key: "1idqje" }]
 ];
-const ArrowDown = createLucideIcon("arrow-down", __iconNode$e);
-const __iconNode$d = [
+const ArrowDown = createLucideIcon("arrow-down", __iconNode$f);
+const __iconNode$e = [
   ["rect", { width: "18", height: "14", x: "3", y: "5", rx: "2", ry: "2", key: "12ruh7" }],
   ["path", { d: "M7 15h4M15 15h2M7 11h2M13 11h4", key: "1ueiar" }]
 ];
-const Captions = createLucideIcon("captions", __iconNode$d);
-const __iconNode$c = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$c);
-const __iconNode$b = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$b);
+const Captions = createLucideIcon("captions", __iconNode$e);
+const __iconNode$d = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$d);
+const __iconNode$c = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$c);
+const __iconNode$b = [
+  ["circle", { cx: "12", cy: "12", r: "1", key: "41hilf" }],
+  ["circle", { cx: "12", cy: "5", r: "1", key: "gxeob9" }],
+  ["circle", { cx: "12", cy: "19", r: "1", key: "lyex9k" }]
+];
+const EllipsisVertical = createLucideIcon("ellipsis-vertical", __iconNode$b);
 const __iconNode$a = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
@@ -12868,8 +12874,10 @@ function Header({
   onToggleCaptureKreyol
 }) {
   const timer = useTimer(playing);
-  const dropRef = reactExports.useRef(null);
+  const headerRef = reactExports.useRef(null);
   const [dropOpen, setDropOpen] = reactExports.useState(false);
+  const [menuOpen, setMenuOpen] = reactExports.useState(false);
+  const [mobileSourceOpen, setMobileSourceOpen] = reactExports.useState(false);
   const [lightTheme, setLightTheme] = reactExports.useState(() => localStorage.getItem("theme") === "light");
   const FUENTES = isElectron() ? FUENTES_ELECTRON : FUENTES_WEB;
   reactExports.useEffect(() => {
@@ -12878,21 +12886,25 @@ function Header({
   }, [lightTheme]);
   reactExports.useEffect(() => {
     const fn = (e) => {
-      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false);
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
+        setDropOpen(false);
+        setMenuOpen(false);
+        setMobileSourceOpen(false);
+      }
     };
     document.addEventListener("mousedown", fn);
     return () => document.removeEventListener("mousedown", fn);
   }, []);
   const fuenteActiva = FUENTES.find((f) => f.id === source) || FUENTES[0];
   const username = localStorage.getItem("app_name") || "Guest";
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "hdr no-drag", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "hdr no-drag", ref: headerRef, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-left", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "hdr-brand", children: [
         "Interpreter ",
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-brand-ai", children: "AI" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-source-wrap", ref: dropRef, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-source-wrap", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
           {
@@ -12980,6 +12992,85 @@ function Header({
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: () => setLightTheme((t) => !t), title: "Toggle theme", children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 13, strokeWidth: 2 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 13, strokeWidth: 2 }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-username", children: username }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: onLogout, title: "Log out", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 13, strokeWidth: 2 }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-mobile-controls", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "hdr-mobile-brand", children: [
+        "Interpreter ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-brand-ai", children: "AI" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-mobile-playback", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            className: `hdr-play ${playing ? "hdr-play--stop" : ""}`,
+            onClick: onTogglePlay,
+            title: playing ? "Stop" : "Start",
+            "aria-label": playing ? "Stop transcription" : "Start transcription",
+            children: playing ? /* @__PURE__ */ jsxRuntimeExports.jsx(Square, { size: 15, fill: "currentColor", strokeWidth: 0 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { size: 15, fill: "currentColor", strokeWidth: 0, style: { marginLeft: 1 } })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-timer", children: timer })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-mobile-menu-wrap", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            className: `hdr-icon hdr-mobile-menu-button ${menuOpen ? "is-active" : ""}`,
+            onClick: () => {
+              setMenuOpen((open) => !open);
+              setMobileSourceOpen(false);
+            },
+            title: "Options",
+            "aria-label": "Open options",
+            "aria-expanded": menuOpen,
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(EllipsisVertical, { size: 20, strokeWidth: 2 })
+          }
+        ),
+        menuOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-mobile-menu", role: "menu", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hdr-mobile-source-wrap", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "hdr-mobile-menu-item", onClick: () => !playing && setMobileSourceOpen((open) => !open), disabled: playing, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(fuenteActiva.Icon, { size: 16 }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                "Audio: ",
+                fuenteActiva.label
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { size: 15, className: "hdr-mobile-menu-chevron" })
+            ] }),
+            mobileSourceOpen && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-mobile-source-dropdown", children: FUENTES.map(({ id, label, Icon: Icon2 }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: `hdr-mobile-menu-item ${id === source ? "is-active" : ""}`, onClick: () => {
+              onSourceChange?.(id);
+              setMobileSourceOpen(false);
+            }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { size: 16 }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: label }),
+              id === source && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-dropdown-check", children: "✓" })
+            ] }, id)) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: `hdr-mobile-menu-item ${captureKreyol ? "is-active" : ""}`, onClick: onToggleCaptureKreyol, disabled: playing, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Mic, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: captureKreyol ? "Kreyòl microphone" : "EN/ES microphone" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: `hdr-mobile-menu-item ${htMode && !captureKreyol ? "is-active" : ""}`, onClick: onToggleHtMode, disabled: playing || captureKreyol, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Languages, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: htMode ? "Translate EN/ES to Kreyòl" : "Translate EN ⇄ ES" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: `hdr-mobile-menu-item ${subtitleOnly ? "is-active" : ""}`, onClick: onToggleSubtitleOnly, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Captions, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: subtitleOnly ? "Subtitles only" : "Show translations" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-mobile-menu-divider" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "hdr-mobile-menu-item", onClick: () => setLightTheme((t) => !t), children: [
+            lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 16 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: lightTheme ? "Dark theme" : "Light theme" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "hdr-mobile-menu-item", onClick: onLogout, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+              "Log out ",
+              username
+            ] })
+          ] })
+        ] })
+      ] })
     ] })
   ] });
 }
@@ -13155,11 +13246,11 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
     else onInterimRef.current?.(payload);
   }, []);
   const start = reactExports.useCallback(async (stream = null) => {
-    if (activoRef.current) return;
+    if (activoRef.current) return true;
     const API_KEY = localStorage.getItem("app_key")?.trim();
     if (!API_KEY) {
       emitirError("Missing Deepgram API key");
-      return;
+      return false;
     }
     if (!stream) {
       try {
@@ -13173,7 +13264,7 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
         });
       } catch (e) {
         emitirError("Microphone denied: " + e.message);
-        return;
+        return false;
       }
     }
     const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
@@ -13211,6 +13302,7 @@ function useTranscription({ onFinal, onInterim, onError } = {}) {
         emitirError(msg);
       }
     };
+    return true;
   }, [emitirError, handleMessage]);
   const stop = reactExports.useCallback(() => {
     activoRef.current = false;
@@ -13273,11 +13365,11 @@ function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
     else onInterimRef.current?.(payload);
   }, [emitirError]);
   const start = reactExports.useCallback(async (stream = null) => {
-    if (activoRef.current) return;
+    if (activoRef.current) return true;
     const API_KEY = localStorage.getItem("gladia_key")?.trim();
     if (!API_KEY) {
       emitirError("Missing Gladia API key");
-      return;
+      return false;
     }
     if (!stream) {
       try {
@@ -13286,7 +13378,7 @@ function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
         });
       } catch (e) {
         emitirError("Microphone denied: " + e.message);
-        return;
+        return false;
       }
     }
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -13348,7 +13440,7 @@ function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
       audioCtx.close().catch(() => {
       });
       audioCtxRef.current = null;
-      return;
+      return false;
     }
     const ws = new WebSocket(sessionUrl);
     wsRef.current = ws;
@@ -13383,6 +13475,7 @@ function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
         emitirError(e.reason || `Connection closed unexpectedly (code ${e.code})`);
       }
     };
+    return true;
   }, [emitirError, handleMessage]);
   const stop = reactExports.useCallback(() => {
     activoRef.current = false;
@@ -14014,6 +14107,13 @@ function App() {
     onError: handleTranscriptionError
   });
   reactExports.useEffect(() => {
+    if (!deepgramError && !gladiaError) return;
+    abortCtrlRef.current?.abort();
+    abortCtrlRef.current = null;
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }, [deepgramError, gladiaError]);
+  reactExports.useEffect(() => {
     return () => {
       abortCtrlRef.current?.abort();
       if (prewarmTimerRef.current) clearTimeout(prewarmTimerRef.current);
@@ -14063,6 +14163,8 @@ function App() {
   const handleTogglePlay = reactExports.useCallback(async () => {
     if (!playing) {
       setFooterError(null);
+      lastFinalTimeRef.current = 0;
+      lastUtteranceRef.current = null;
       abortCtrlRef.current?.abort();
       abortCtrlRef.current = new AbortController();
       let stream;
@@ -14074,8 +14176,11 @@ function App() {
       }
       const useGladia = captureKreyolRef.current;
       try {
-        if (useGladia) await startGladia(stream);
-        else await startDeepgram(stream);
+        const started = useGladia ? await startGladia(stream) : await startDeepgram(stream);
+        if (!started) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
         streamRef.current = stream;
         setPlaying(true);
       } catch (err) {
@@ -14094,6 +14199,8 @@ function App() {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
       setInterimText("");
+      lastFinalTimeRef.current = 0;
+      lastUtteranceRef.current = null;
       setPlaying(false);
     }
   }, [playing, getAudioStream, startDeepgram, stopDeepgram, startGladia, stopGladia]);

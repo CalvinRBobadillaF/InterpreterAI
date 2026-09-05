@@ -1,14 +1,20 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
     font-family: "roboto", sans-serif;
-}@tailwind base;
+}
+
+@tailwind base;
+
 @tailwind components;
+
 @tailwind utilities;
+
 /* ════════════════════════════════════════════════════
    TOKENS
 ════════════════════════════════════════════════════ */
+
 :root {
   --bg:            #09090b;
   --surface:       #111115;
@@ -31,6 +37,7 @@
   --radius-md:     10px;
   --radius-lg:     14px;
 }
+
 html.light {
   --bg:            #f0f0f3;
   --surface:       #ffffff;
@@ -50,10 +57,13 @@ html.light {
   --waveform:      #c4c4d0;
   --shadow-md:     0 6px 24px rgba(0,0,0,.10);
 }
+
 /* ════════════════════════════════════════════════════
    RESET
 ════════════════════════════════════════════════════ */
+
 *,*::before,*::after { box-sizing: border-box; }
+
 body {
   margin: 0;
   overflow: hidden;
@@ -62,17 +72,27 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
+
 .drag    { -webkit-app-region: drag; }
+
 .no-drag { -webkit-app-region: no-drag; }
+
 ::-webkit-scrollbar       { width: 4px; }
+
 ::-webkit-scrollbar-track { background: transparent; }
+
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
 @keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0} }
+
 @keyframes dotPulse { 0%,80%,100%{transform:scale(0);opacity:0} 40%{transform:scale(1);opacity:1} }
+
 @keyframes waveBar  { 0%,100%{opacity:.2} 50%{opacity:.9} }
+
 /* ════════════════════════════════════════════════════
    SHELL
 ════════════════════════════════════════════════════ */
+
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -81,15 +101,18 @@ body {
   overflow: hidden;
   background: var(--bg);
 }
+
 .app-main {
   flex: 1;
   display: flex;
   overflow: hidden;
   min-height: 0; /* necesario para que el scroll interno funcione bien dentro de flex en iOS */
 }
+
 /* ════════════════════════════════════════════════════
    HEADER
 ════════════════════════════════════════════════════ */
+
 .hdr {
   display: flex;
   align-items: center;
@@ -101,6 +124,7 @@ body {
   flex-shrink: 0;
   -webkit-app-region: drag;
 }
+
 .hdr-left {
   display: flex;
   align-items: center;
@@ -108,6 +132,7 @@ body {
   flex-shrink: 0;
   -webkit-app-region: no-drag;
 }
+
 .hdr-center {
   flex: 1;
   display: flex;
@@ -118,6 +143,7 @@ body {
   overflow: hidden;
   -webkit-app-region: no-drag;
 }
+
 .hdr-right {
   display: flex;
   align-items: center;
@@ -125,9 +151,13 @@ body {
   flex-shrink: 0;
   -webkit-app-region: no-drag;
 }
+
 .hdr-brand    { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -.3px; white-space: nowrap; }
+
 .hdr-brand-ai { color: var(--accent); }
+
 /* Play button */
+
 .hdr-play {
   width: 30px; height: 30px;
   background: var(--green);
@@ -137,27 +167,40 @@ body {
   box-shadow: 0 2px 8px var(--green-soft);
   transition: opacity .15s, transform .1s;
 }
+
 .hdr-play:hover     { opacity: .85; transform: scale(1.05); }
+
 .hdr-play--stop     { background: var(--red); }
+
 /* Waveform */
+
 .hdr-wave {
   display: flex; align-items: center; gap: 2px;
   height: 18px; flex: 1; max-width: 200px;
 }
+
 .hdr-wave__bar {
   display: block; width: 2px; height: var(--h, 4px);
   background: var(--waveform); border-radius: 99px; flex-shrink: 0;
 }
+
 .hdr-wave--on .hdr-wave__bar             { animation: waveBar 1.3s ease-in-out infinite; }
+
 .hdr-wave--on .hdr-wave__bar:nth-child(2n) { animation-delay: .10s; }
+
 .hdr-wave--on .hdr-wave__bar:nth-child(3n) { animation-delay: .22s; }
+
 .hdr-wave--on .hdr-wave__bar:nth-child(5n) { animation-delay: .38s; }
+
 .hdr-wave--on .hdr-wave__bar:nth-child(7n) { animation-delay: .55s; }
+
 .hdr-timer {
   font-size: 11px; font-weight: 600; color: var(--text-muted);
   letter-spacing: 1.4px; font-variant-numeric: tabular-nums; white-space: nowrap;
 }
+
 /* Pill button */
+
 .hdr-btn {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 5px 10px;
@@ -168,14 +211,23 @@ body {
   white-space: nowrap;
   transition: background .15s, color .15s, border-color .15s;
 }
+
 .hdr-btn:hover     { background: var(--surface-hover); color: var(--text); }
+
 .hdr-btn--active   { background: var(--accent-soft); border-color: var(--accent-ring); color: var(--accent); }
+
 .hdr-btn:disabled  { opacity: .45; cursor: not-allowed; }
+
 .hdr-btn-label     { line-height: 1; }
+
 .hdr-chevron       { color: var(--text-faint); }
+
 /* Ícono de advertencia dentro del botón de modo (falta la key de Google) */
+
 .hdr-warn-icon { color: var(--red); flex-shrink: 0; }
+
 /* Icon button */
+
 .hdr-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px;
@@ -183,12 +235,17 @@ body {
   border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted);
   transition: background .15s, color .15s;
 }
+
 .hdr-icon:hover { background: var(--surface-hover); color: var(--text); }
+
 .hdr-sep {
   width: 1px; height: 18px; background: var(--border); flex-shrink: 0; margin: 0 2px;
 }
+
 .hdr-source-wrap { position: relative; }
+
 .hdr-source-btn  { min-width: 110px; }
+
 .hdr-dropdown {
   position: absolute; top: calc(100% + 6px); left: 0; z-index: 200;
   background: var(--surface); border: 1px solid var(--border);
@@ -197,6 +254,7 @@ body {
   /* Nunca se sale del viewport, ni en pantallas angostas */
   max-width: min(300px, calc(100vw - 24px));
 }
+
 .hdr-dropdown-item {
   display: flex; align-items: center; gap: 10px;
   width: 100%; padding: 8px 12px;
@@ -204,35 +262,50 @@ body {
   color: var(--text); text-align: left;
   transition: background .12s;
 }
+
 .hdr-dropdown-item:hover    { background: var(--surface-soft); }
+
 .hdr-dropdown-item.is-active { background: var(--accent-soft); }
+
 .hdr-dropdown-icon {
   width: 26px; height: 26px; background: var(--surface-soft);
   border: 1px solid var(--border); border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
   color: var(--accent); flex-shrink: 0;
 }
+
 .hdr-dropdown-item.is-active .hdr-dropdown-icon {
   background: var(--accent-soft); border-color: var(--accent);
 }
+
 .hdr-dropdown-text  { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+
 .hdr-dropdown-label { font-size: 12px; font-weight: 600; color: var(--text); }
+
 .hdr-dropdown-sub   { font-size: 10px; color: var(--text-faint); }
+
 .hdr-dropdown-check { font-size: 12px; color: var(--accent); font-weight: 700; }
+
 .hdr-username {
   font-size: 11px; font-weight: 500; color: var(--text-faint);
   max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+.hdr-mobile-controls { display: none; }
+
 /* ════════════════════════════════════════════════════
    CONVERSATION VIEW
 ════════════════════════════════════════════════════ */
+
 .cv-root {
   flex: 1; display: flex; flex-direction: column;
   overflow: hidden; background: var(--bg);
   min-height: 0;
   position: relative; /* ancla el botón flotante "Jump to latest" */
 }
+
 /* ── Thin toolbar ── */
+
 .cv-toolbar {
   display: flex; align-items: center;
   height: 34px; padding: 0 20px;
@@ -240,12 +313,14 @@ body {
   border-bottom: 1px solid var(--border-soft);
   flex-shrink: 0; gap: 0;
 }
+
 .cv-toolbar-col {
   flex: 1;
   font-size: 10px; font-weight: 700; text-transform: uppercase;
   letter-spacing: .9px; color: var(--text-faint);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
 .cv-clear-btn {
   display: flex; align-items: center; justify-content: center;
   width: 24px; height: 24px;
@@ -254,8 +329,11 @@ body {
   transition: color .15s, background .15s;
   flex-shrink: 0;
 }
+
 .cv-clear-btn:hover { color: var(--text); background: var(--surface-hover); }
+
 /* ── Scroll area ── */
+
 .cv-scroll {
   flex: 1; overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -263,22 +341,30 @@ body {
   display: flex; flex-direction: column;
   gap: 10px;
 }
+
 /* ── Empty state ── */
+
 .cv-empty {
   margin: 0; padding: 60px 0;
   font-size: 14px; color: var(--text-faint);
   text-align: center; flex: 1;
 }
+
 /* ── Row ── */
+
 .cv-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   align-items: start;
 }
+
 .cv-row--solo   { grid-template-columns: 1fr; }
+
 .cv-row--live   { opacity: .72; }
+
 /* ── Card ── */
+
 .cv-card {
   position: relative;
   padding: 12px 14px 22px 14px;
@@ -290,30 +376,38 @@ body {
   align-items: flex-start;
   transition: border-color .2s;
 }
+
 .cv-card--orig { background: var(--surface-soft); }
+
 .cv-card--trans {
   background: var(--surface);
   align-items: center;
 }
+
 .cv-card--trans:has(.cv-text) { align-items: flex-start; }
+
 .cv-card--live {
   border-style: dashed;
   border-color: var(--border-soft);
   background: transparent;
 }
+
 .cv-card--trans.cv-card--live {
   background: transparent;
   border-color: transparent;
   min-height: 0;
   padding: 0;
 }
+
 .cv-text {
   margin: 0;
   font-size: 14px; line-height: 1.65;
   color: var(--text);
   word-break: break-word; white-space: pre-wrap;
 }
+
 .cv-text--trans { font-weight: 500; }
+
 .cv-timestamp {
   position: absolute;
   bottom: 7px; right: 11px;
@@ -324,27 +418,34 @@ body {
   user-select: none;
   pointer-events: none;
 }
+
 .cv-dash {
   font-size: 18px; color: var(--text-faint); line-height: 1;
   align-self: center;
 }
+
 .cv-cursor {
   display: inline-block;
   width: 2px; height: 13px; background: var(--accent);
   border-radius: 1px; margin-left: 2px; vertical-align: middle;
   animation: blink 1s step-end infinite;
 }
+
 .cv-dots {
   display: flex; gap: 4px; align-items: center;
   padding: 4px 0; align-self: center;
 }
+
 .cv-dots span {
   display: block; width: 5px; height: 5px; border-radius: 50%;
   background: var(--text-faint);
   animation: dotPulse 1.4s ease-in-out infinite;
 }
+
 .cv-dots span:nth-child(2) { animation-delay: .2s; }
+
 .cv-dots span:nth-child(3) { animation-delay: .4s; }
+
 .cv-retry-btn {
   display: inline-flex;
   align-items: center;
@@ -360,12 +461,15 @@ body {
   align-self: flex-start;
   transition: background .15s, color .15s, border-color .15s;
 }
+
 .cv-retry-btn:hover {
   background: var(--surface-hover);
   color: var(--text);
   border-color: var(--accent-ring);
 }
+
 /* ── Botón flotante "ir al final" (aparece al scrollear hacia arriba) ── */
+
 .cv-jump-btn {
   position: absolute;
   bottom: 16px;
@@ -385,10 +489,13 @@ body {
   cursor: pointer;
   z-index: 10;
 }
+
 .cv-jump-btn:hover { background: var(--surface-hover); }
+
 /* ════════════════════════════════════════════════════
    FOOTER
 ════════════════════════════════════════════════════ */
+
 .app-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 16px; height: 22px;
@@ -396,58 +503,98 @@ body {
   flex-shrink: 0;
   gap: 8px;
 }
+
 .app-footer__text    { font-size: 10px; color: var(--text-faint); letter-spacing: .2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .app-footer__status  { font-size: 10px; flex-shrink: 0; }
+
 .app-footer__state   { color: var(--text-faint); }
+
 .app-footer__state.is-active { color: var(--green); font-weight: 600; }
+
 .app-footer__error   { color: var(--red); font-size: 10px; font-weight: 600; }
+
 /* ════════════════════════════════════════════════════
    MOBILE — TABLET (≤768px)
 ════════════════════════════════════════════════════ */
+
 @media (max-width: 768px) {
   .hdr-wave     { display: none; }
   .hdr-username { display: none; }
   .cv-scroll    { padding: 14px 12px 24px; gap: 8px; }
   .cv-toolbar   { padding: 0 12px; }
 }
+
 /* ════════════════════════════════════════════════════
    MOBILE — PHONE (≤600px)
-   El header ya no cabe en una sola fila con todos los
-   controles — se apila en 3 filas: idiomas arriba,
-   play/timer en medio, ajustes/usuario abajo. Así TODO
-   sigue siendo alcanzable, nada queda oculto ni cortado.
+   Los ajustes viven detrás del menú de tres puntos para
+   reservar casi toda la pantalla a los subtítulos.
 ════════════════════════════════════════════════════ */
+
 @media (max-width: 600px) {
   .cv-row { grid-template-columns: 1fr; }
   .cv-card--trans.cv-card--live { display: none; }
 
   .hdr {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: 48px;
-    padding: 8px 10px;
-    gap: 8px;
+    height: 58px;
+    min-height: 58px;
+    padding: 0 10px;
   }
-  .hdr-left {
-    flex: 1 1 100%;
-    flex-wrap: wrap;
-    gap: 8px;
+  .hdr-left, .hdr-center, .hdr-right { display: none; }
+  .hdr-mobile-controls {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    -webkit-app-region: no-drag;
   }
-  .hdr-center {
-    flex: 1 1 100%;
+  .hdr-mobile-brand { font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .hdr-mobile-playback { display: flex; align-items: center; gap: 8px; }
+  .hdr-mobile-playback .hdr-play { width: 40px; height: 40px; border-radius: 10px; }
+  .hdr-mobile-playback .hdr-timer { font-size: 10px; letter-spacing: 1px; }
+  .hdr-mobile-menu-wrap { position: relative; justify-self: end; }
+  .hdr-mobile-menu-button { width: 42px; height: 42px; border-color: var(--border); }
+  .hdr-mobile-menu-button.is-active { background: var(--surface-hover); color: var(--text); }
+  .hdr-mobile-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 200;
+    width: min(280px, calc(100vw - 20px));
+    padding: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
   }
-  .hdr-right {
-    flex: 1 1 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
+  .hdr-mobile-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 42px;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    font: 600 12px 'DM Sans', sans-serif;
+    text-align: left;
+    cursor: pointer;
   }
-
-  /* Objetivos táctiles más grandes — más fácil de tocar con el dedo */
-  .hdr-play  { width: 38px; height: 38px; }
-  .hdr-icon  { width: 34px; height: 34px; }
-  .hdr-btn   { padding: 7px 12px; font-size: 12px; }
-  .hdr-wave  { display: flex; max-width: 140px; } /* la recuperamos: en el layout apilado sí hay espacio */
+  .hdr-mobile-menu-item:hover, .hdr-mobile-menu-item.is-active { background: var(--accent-soft); color: var(--accent); }
+  .hdr-mobile-menu-item:disabled { opacity: .45; cursor: not-allowed; }
+  .hdr-mobile-menu-chevron { margin-left: auto; }
+  .hdr-mobile-menu-divider { height: 1px; margin: 5px 4px; background: var(--border); }
+  .hdr-mobile-source-wrap { position: relative; }
+  .hdr-mobile-source-dropdown {
+    margin: 2px 4px 5px;
+    padding: 3px;
+    border-left: 1px solid var(--border);
+    background: var(--surface-soft);
+    border-radius: var(--radius-sm);
+  }
 
   .cv-clear-btn  { width: 30px; height: 30px; }
   .cv-retry-btn  { padding: 7px 12px; font-size: 12px; }
@@ -459,15 +606,15 @@ body {
   }
   .app-footer__text, .app-footer__status { font-size: 11px; }
 }
+
 /* ════════════════════════════════════════════════════
    MOBILE — TELÉFONOS MUY ANGOSTOS (≤400px, ej. SE)
 ════════════════════════════════════════════════════ */
+
 @media (max-width: 400px) {
-  .hdr-btn-label  { display: none; }
-  .hdr-btn        { padding: 7px 9px; min-width: unset; }
-  .hdr-source-btn { min-width: unset; }
-  .hdr-brand      { display: none; }
-  .hdr-wave       { display: none; }
+  .hdr-mobile-brand { font-size: 12px; }
+  .hdr-mobile-controls { gap: 6px; }
+  .hdr-mobile-playback .hdr-timer { display: none; }
 }
 /* ════════════════════════════════════════════════════
    LOGIN  —  add these rules to the bottom of App.css
