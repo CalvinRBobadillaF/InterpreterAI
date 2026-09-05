@@ -15,7 +15,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   Play, Square, ChevronDown, MoreVertical,
-  Mic, Globe, Sun, Moon, Captions, Languages, LogOut, Monitor
+  Mic, Globe, Sun, Moon, Captions, Languages, LogOut, Monitor, BookOpen
 } from 'lucide-react'
 import { isElectron } from '../hooks/isElectron'
 
@@ -78,6 +78,7 @@ export function Header({
   onToggleHtMode,
   captureKreyol,
   onToggleCaptureKreyol,
+  onOpenGlossary,
 }) {
   const timer   = useTimer(playing)
   const headerRef = useRef(null)
@@ -213,6 +214,10 @@ export function Header({
           {lightTheme ? <Moon size={13} strokeWidth={2} /> : <Sun size={13} strokeWidth={2} />}
         </button>
 
+        <button className="hdr-icon" onClick={onOpenGlossary} title="Kreyòl accuracy glossary">
+          <BookOpen size={13} strokeWidth={2} />
+        </button>
+
         <span className="hdr-username">{username}</span>
 
         <button className="hdr-icon" onClick={onLogout} title="Log out">
@@ -269,6 +274,9 @@ export function Header({
               </button>
               <button className={`hdr-mobile-menu-item ${subtitleOnly ? 'is-active' : ''}`} onClick={onToggleSubtitleOnly}>
                 <Captions size={16} /><span>{subtitleOnly ? 'Subtitles only' : 'Show translations'}</span>
+              </button>
+              <button className="hdr-mobile-menu-item" onClick={() => { setMenuOpen(false); onOpenGlossary?.() }}>
+                <BookOpen size={16} /><span>Kreyòl accuracy glossary</span>
               </button>
               <div className="hdr-mobile-menu-divider" />
               <button className="hdr-mobile-menu-item" onClick={() => setLightTheme(t => !t)}>

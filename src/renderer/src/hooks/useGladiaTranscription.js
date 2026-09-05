@@ -33,6 +33,7 @@
 // webm/opus como Deepgram.
 
 import { useCallback, useRef, useState } from 'react'
+import { getGladiaGlossaryProcessing } from './kreyolGlossary'
 
 const GLADIA_INIT_URL = 'https://api.gladia.io/v2/live'
 const BUFFER_SIZE     = 4096 // muestras por callback (~256ms a 16kHz)
@@ -154,7 +155,10 @@ export function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
           pre_processing: {
             audio_enhancer: true,
           },
-          realtime_processing: { translation: false },
+          realtime_processing: {
+            translation: false,
+            ...getGladiaGlossaryProcessing(),
+          },
           messages_config: {
             receive_partial_transcripts: true,
             receive_final_transcripts:   true,

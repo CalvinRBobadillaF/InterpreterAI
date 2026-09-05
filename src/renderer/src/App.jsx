@@ -5,6 +5,7 @@ import { LogIn }             from './components/LogIn'
 import { Header }            from './components/Header'
 import { Footer }            from './components/Footer'
 import { ConversationView }  from './components/ConversationView'
+import { KreyolGlossary } from './components/KreyolGlossary'
 import { useTranscription }        from './hooks/useTranscription'        // Deepgram: EN/ES
 import { useGladiaTranscription }  from './hooks/useGladiaTranscription'  // Gladia: Kreyòl
 import { translateText, prewarmTranslation } from './hooks/useTranslation' // misma ruta para TODAS las traducciones
@@ -77,6 +78,7 @@ function App() {
   }, [])
 
   const [subtitleOnly, setSubtitleOnly] = useState(false)
+  const [isGlossaryOpen, setIsGlossaryOpen] = useState(false)
   const subtitleOnlyRef = useRef(false)
   subtitleOnlyRef.current = subtitleOnly
 
@@ -409,6 +411,7 @@ function App() {
         onToggleHtMode={() => { if (!playing) handleToggleHtMode() }}
         captureKreyol={captureKreyol}
         onToggleCaptureKreyol={() => { if (!playing) setCaptureKreyol(p => !p) }}
+        onOpenGlossary={() => setIsGlossaryOpen(true)}
       />
       <main className="app-main">
         <ConversationView
@@ -426,6 +429,7 @@ function App() {
         status={footerStatus}
         error={footerError || (deepgramError ? `STT: ${deepgramError}` : gladiaError ? `STT: ${gladiaError}` : null)}
       />
+      {isGlossaryOpen && <KreyolGlossary onClose={() => setIsGlossaryOpen(false)} />}
     </div>
   )
 }
