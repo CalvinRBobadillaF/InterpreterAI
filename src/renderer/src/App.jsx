@@ -272,6 +272,16 @@ function App() {
     onError:   handleTranscriptionError,
   })
 
+  // A provider can fail after its socket opened. Stop the browser capture too;
+  // otherwise its audio track keeps running even though the UI says "Idle".
+  useEffect(() => {
+    if (!deepgramError && !gladiaError) return
+    abortCtrlRef.current?.abort()
+    abortCtrlRef.current = null
+    streamRef.current?.getTracks().forEach(track => track.stop())
+    streamRef.current = null
+  }, [deepgramError, gladiaError])
+
   useEffect(() => {
     return () => {
       abortCtrlRef.current?.abort()
@@ -329,6 +339,8 @@ function App() {
   const handleTogglePlay = useCallback(async () => {
     if (!playing) {
       setFooterError(null)
+      lastFinalTimeRef.current = 0
+      lastUtteranceRef.current = null
 
       abortCtrlRef.current?.abort()
       abortCtrlRef.current = new AbortController()
@@ -344,8 +356,13 @@ function App() {
       const useGladia = captureKreyolRef.current
 
       try {
-        if (useGladia) await startGladia(stream)
-        else           await startDeepgram(stream)
+        const started = useGladia
+          ? await startGladia(stream)
+          : await startDeepgram(stream)
+        if (!started) {
+          stream.getTracks().forEach(t => t.stop())
+          return
+        }
         streamRef.current = stream
         setPlaying(true)
       } catch (err) {
@@ -368,6 +385,8 @@ function App() {
       streamRef.current?.getTracks().forEach(t => t.stop())
       streamRef.current = null
       setInterimText('')
+      lastFinalTimeRef.current = 0
+      lastUtteranceRef.current = null
       setPlaying(false)
     }
   }, [playing, getAudioStream, startDeepgram, stopDeepgram, startGladia, stopGladia])

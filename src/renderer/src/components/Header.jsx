@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import {
-  Play, Square, ChevronDown,
+  Play, Square, ChevronDown, MoreVertical,
   Mic, Globe, Sun, Moon, Captions, Languages, LogOut, Monitor
 } from 'lucide-react'
 import { isElectron } from '../hooks/isElectron'
@@ -80,8 +80,10 @@ export function Header({
   onToggleCaptureKreyol,
 }) {
   const timer   = useTimer(playing)
-  const dropRef = useRef(null)
+  const headerRef = useRef(null)
   const [dropOpen,   setDropOpen]   = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileSourceOpen, setMobileSourceOpen] = useState(false)
   const [lightTheme, setLightTheme] = useState(() => localStorage.getItem('theme') === 'light')
 
   const FUENTES = isElectron() ? FUENTES_ELECTRON : FUENTES_WEB
@@ -93,7 +95,11 @@ export function Header({
 
   useEffect(() => {
     const fn = (e) => {
-      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false)
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
+        setDropOpen(false)
+        setMenuOpen(false)
+        setMobileSourceOpen(false)
+      }
     }
     document.addEventListener('mousedown', fn)
     return () => document.removeEventListener('mousedown', fn)
@@ -103,11 +109,11 @@ export function Header({
   const username     = localStorage.getItem('app_name') || 'Guest'
 
   return (
-    <header className="hdr no-drag">
+    <header className="hdr no-drag" ref={headerRef}>
       <div className="hdr-left">
         <span className="hdr-brand">Interpreter <span className="hdr-brand-ai">AI</span></span>
         <Sep />
-        <div className="hdr-source-wrap" ref={dropRef}>
+        <div className="hdr-source-wrap">
           <button
             className="hdr-btn hdr-source-btn"
             onClick={() => !playing && setDropOpen(o => !o)}
@@ -212,6 +218,68 @@ export function Header({
         <button className="hdr-icon" onClick={onLogout} title="Log out">
           <LogOut size={13} strokeWidth={2} />
         </button>
+      </div>
+
+      <div className="hdr-mobile-controls">
+        <span className="hdr-mobile-brand">Interpreter <span className="hdr-brand-ai">AI</span></span>
+        <div className="hdr-mobile-playback">
+          <button
+            className={`hdr-play ${playing ? 'hdr-play--stop' : ''}`}
+            onClick={onTogglePlay}
+            title={playing ? 'Stop' : 'Start'}
+            aria-label={playing ? 'Stop transcription' : 'Start transcription'}
+          >
+            {playing ? <Square size={15} fill="currentColor" strokeWidth={0} /> : <Play size={15} fill="currentColor" strokeWidth={0} style={{ marginLeft: 1 }} />}
+          </button>
+          <span className="hdr-timer">{timer}</span>
+        </div>
+        <div className="hdr-mobile-menu-wrap">
+          <button
+            className={`hdr-icon hdr-mobile-menu-button ${menuOpen ? 'is-active' : ''}`}
+            onClick={() => { setMenuOpen(open => !open); setMobileSourceOpen(false) }}
+            title="Options"
+            aria-label="Open options"
+            aria-expanded={menuOpen}
+          >
+            <MoreVertical size={20} strokeWidth={2} />
+          </button>
+          {menuOpen && (
+            <div className="hdr-mobile-menu" role="menu">
+              <div className="hdr-mobile-source-wrap">
+                <button className="hdr-mobile-menu-item" onClick={() => !playing && setMobileSourceOpen(open => !open)} disabled={playing}>
+                  <fuenteActiva.Icon size={16} />
+                  <span>Audio: {fuenteActiva.label}</span>
+                  <ChevronDown size={15} className="hdr-mobile-menu-chevron" />
+                </button>
+                {mobileSourceOpen && (
+                  <div className="hdr-mobile-source-dropdown">
+                    {FUENTES.map(({ id, label, Icon }) => (
+                      <button key={id} className={`hdr-mobile-menu-item ${id === source ? 'is-active' : ''}`} onClick={() => { onSourceChange?.(id); setMobileSourceOpen(false) }}>
+                        <Icon size={16} /><span>{label}</span>{id === source && <span className="hdr-dropdown-check">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button className={`hdr-mobile-menu-item ${captureKreyol ? 'is-active' : ''}`} onClick={onToggleCaptureKreyol} disabled={playing}>
+                <Mic size={16} /><span>{captureKreyol ? 'Kreyòl microphone' : 'EN/ES microphone'}</span>
+              </button>
+              <button className={`hdr-mobile-menu-item ${htMode && !captureKreyol ? 'is-active' : ''}`} onClick={onToggleHtMode} disabled={playing || captureKreyol}>
+                <Languages size={16} /><span>{htMode ? 'Translate EN/ES to Kreyòl' : 'Translate EN ⇄ ES'}</span>
+              </button>
+              <button className={`hdr-mobile-menu-item ${subtitleOnly ? 'is-active' : ''}`} onClick={onToggleSubtitleOnly}>
+                <Captions size={16} /><span>{subtitleOnly ? 'Subtitles only' : 'Show translations'}</span>
+              </button>
+              <div className="hdr-mobile-menu-divider" />
+              <button className="hdr-mobile-menu-item" onClick={() => setLightTheme(t => !t)}>
+                {lightTheme ? <Moon size={16} /> : <Sun size={16} />}<span>{lightTheme ? 'Dark theme' : 'Light theme'}</span>
+              </button>
+              <button className="hdr-mobile-menu-item" onClick={onLogout}>
+                <LogOut size={16} /><span>Log out {username}</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )

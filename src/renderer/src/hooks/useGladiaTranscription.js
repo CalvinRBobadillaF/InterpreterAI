@@ -93,12 +93,12 @@ export function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
   }, [emitirError])
 
   const start = useCallback(async (stream = null) => {
-    if (activoRef.current) return
+    if (activoRef.current) return true
 
     const API_KEY = localStorage.getItem('gladia_key')?.trim()
     if (!API_KEY) {
       emitirError('Missing Gladia API key')
-      return
+      return false
     }
 
     if (!stream) {
@@ -108,7 +108,7 @@ export function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
         })
       } catch (e) {
         emitirError('Microphone denied: ' + e.message)
-        return
+        return false
       }
     }
 
@@ -174,7 +174,7 @@ export function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
       emitirError('Gladia init failed: ' + e.message)
       audioCtx.close().catch(() => {})
       audioCtxRef.current = null
-      return
+      return false
     }
 
     const ws = new WebSocket(sessionUrl)
@@ -217,6 +217,8 @@ export function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
         emitirError(e.reason || `Connection closed unexpectedly (code ${e.code})`)
       }
     }
+
+    return true
   }, [emitirError, handleMessage])
 
   const stop = useCallback(() => {

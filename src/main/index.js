@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, desktopCapturer } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -16,6 +16,13 @@ function createWindow() {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
+  })
+
+  mainWindow.webContents.session.setPermissionCheckHandler((_webContents, permission) =>
+    ['media', 'microphone', 'display-capture'].includes(permission)
+  )
+  mainWindow.webContents.session.setPermissionRequestHandler((_webContents, permission, callback) => {
+    callback(['media', 'microphone', 'display-capture'].includes(permission))
   })
 
   mainWindow.on('ready-to-show', () => {
@@ -50,8 +57,18 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('get-audio-source', async () => {
+    try {
+      const sources = await desktopCapturer.getSources({
+        types: ['screen'],
+        thumbnailSize: { width: 0, height: 0 }
+      })
+      return sources.find((source) => source.id.startsWith('screen:')) ?? sources[0] ?? null
+    } catch (error) {
+      console.error('[Main] Could not get an audio source:', error)
+      return null
+    }
+  })
 
   createWindow()
 

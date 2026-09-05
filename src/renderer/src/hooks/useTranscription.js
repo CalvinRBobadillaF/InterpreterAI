@@ -92,12 +92,12 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
   }, [])
 
   const start = useCallback(async (stream = null) => {
-    if (activoRef.current) return
+    if (activoRef.current) return true
 
     const API_KEY = localStorage.getItem('app_key')?.trim()
     if (!API_KEY) {
       emitirError('Missing Deepgram API key')
-      return
+      return false
     }
 
     if (!stream) {
@@ -112,7 +112,7 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
         })
       } catch (e) {
         emitirError('Microphone denied: ' + e.message)
-        return
+        return false
       }
     }
 
@@ -167,6 +167,8 @@ export function useTranscription({ onFinal, onInterim, onError } = {}) {
         emitirError(msg)
       }
     }
+
+    return true
   }, [emitirError, handleMessage])
 
   const stop = useCallback(() => {
