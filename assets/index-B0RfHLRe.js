@@ -12528,33 +12528,44 @@ const createLucideIcon = (iconName, iconNode) => {
   Component.displayName = toPascalCase(iconName);
   return Component;
 };
-const __iconNode$f = [
+const __iconNode$i = [
   ["path", { d: "M12 5v14", key: "s699le" }],
   ["path", { d: "m19 12-7 7-7-7", key: "1idqje" }]
 ];
-const ArrowDown = createLucideIcon("arrow-down", __iconNode$f);
-const __iconNode$e = [
+const ArrowDown = createLucideIcon("arrow-down", __iconNode$i);
+const __iconNode$h = [
+  ["path", { d: "M12 7v14", key: "1akyts" }],
+  [
+    "path",
+    {
+      d: "M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z",
+      key: "ruj8y"
+    }
+  ]
+];
+const BookOpen = createLucideIcon("book-open", __iconNode$h);
+const __iconNode$g = [
   ["rect", { width: "18", height: "14", x: "3", y: "5", rx: "2", ry: "2", key: "12ruh7" }],
   ["path", { d: "M7 15h4M15 15h2M7 11h2M13 11h4", key: "1ueiar" }]
 ];
-const Captions = createLucideIcon("captions", __iconNode$e);
-const __iconNode$d = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$d);
-const __iconNode$c = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-const ChevronUp = createLucideIcon("chevron-up", __iconNode$c);
-const __iconNode$b = [
+const Captions = createLucideIcon("captions", __iconNode$g);
+const __iconNode$f = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$f);
+const __iconNode$e = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+const ChevronUp = createLucideIcon("chevron-up", __iconNode$e);
+const __iconNode$d = [
   ["circle", { cx: "12", cy: "12", r: "1", key: "41hilf" }],
   ["circle", { cx: "12", cy: "5", r: "1", key: "gxeob9" }],
   ["circle", { cx: "12", cy: "19", r: "1", key: "lyex9k" }]
 ];
-const EllipsisVertical = createLucideIcon("ellipsis-vertical", __iconNode$b);
-const __iconNode$a = [
+const EllipsisVertical = createLucideIcon("ellipsis-vertical", __iconNode$d);
+const __iconNode$c = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20", key: "13o1zl" }],
   ["path", { d: "M2 12h20", key: "9i4pu4" }]
 ];
-const Globe = createLucideIcon("globe", __iconNode$a);
-const __iconNode$9 = [
+const Globe = createLucideIcon("globe", __iconNode$c);
+const __iconNode$b = [
   ["path", { d: "m5 8 6 6", key: "1wu5hv" }],
   ["path", { d: "m4 14 6-6 2-3", key: "1k1g8d" }],
   ["path", { d: "M2 5h12", key: "or177f" }],
@@ -12562,26 +12573,26 @@ const __iconNode$9 = [
   ["path", { d: "m22 22-5-10-5 10", key: "don7ne" }],
   ["path", { d: "M14 18h6", key: "1m8k6r" }]
 ];
-const Languages = createLucideIcon("languages", __iconNode$9);
-const __iconNode$8 = [
+const Languages = createLucideIcon("languages", __iconNode$b);
+const __iconNode$a = [
   ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
   ["path", { d: "M21 12H9", key: "dn1m92" }],
   ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
 ];
-const LogOut = createLucideIcon("log-out", __iconNode$8);
-const __iconNode$7 = [
+const LogOut = createLucideIcon("log-out", __iconNode$a);
+const __iconNode$9 = [
   ["path", { d: "M12 19v3", key: "npa21l" }],
   ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
   ["rect", { x: "9", y: "2", width: "6", height: "13", rx: "3", key: "s6n7sd" }]
 ];
-const Mic = createLucideIcon("mic", __iconNode$7);
-const __iconNode$6 = [
+const Mic = createLucideIcon("mic", __iconNode$9);
+const __iconNode$8 = [
   ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2", key: "48i651" }],
   ["line", { x1: "8", x2: "16", y1: "21", y2: "21", key: "1svkeh" }],
   ["line", { x1: "12", x2: "12", y1: "17", y2: "21", key: "vw1qmm" }]
 ];
-const Monitor = createLucideIcon("monitor", __iconNode$6);
-const __iconNode$5 = [
+const Monitor = createLucideIcon("monitor", __iconNode$8);
+const __iconNode$7 = [
   [
     "path",
     {
@@ -12590,8 +12601,8 @@ const __iconNode$5 = [
     }
   ]
 ];
-const Moon = createLucideIcon("moon", __iconNode$5);
-const __iconNode$4 = [
+const Moon = createLucideIcon("moon", __iconNode$7);
+const __iconNode$6 = [
   [
     "path",
     {
@@ -12600,19 +12611,24 @@ const __iconNode$4 = [
     }
   ]
 ];
-const Play = createLucideIcon("play", __iconNode$4);
-const __iconNode$3 = [
+const Play = createLucideIcon("play", __iconNode$6);
+const __iconNode$5 = [
+  ["path", { d: "M5 12h14", key: "1ays0h" }],
+  ["path", { d: "M12 5v14", key: "s699le" }]
+];
+const Plus = createLucideIcon("plus", __iconNode$5);
+const __iconNode$4 = [
   ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
   ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
   ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
   ["path", { d: "M8 16H3v5", key: "1cv678" }]
 ];
-const RefreshCw = createLucideIcon("refresh-cw", __iconNode$3);
-const __iconNode$2 = [
+const RefreshCw = createLucideIcon("refresh-cw", __iconNode$4);
+const __iconNode$3 = [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]
 ];
-const Square = createLucideIcon("square", __iconNode$2);
-const __iconNode$1 = [
+const Square = createLucideIcon("square", __iconNode$3);
+const __iconNode$2 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -12623,15 +12639,20 @@ const __iconNode$1 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-const Sun = createLucideIcon("sun", __iconNode$1);
-const __iconNode = [
+const Sun = createLucideIcon("sun", __iconNode$2);
+const __iconNode$1 = [
   ["path", { d: "M10 11v6", key: "nco0om" }],
   ["path", { d: "M14 11v6", key: "outv1u" }],
   ["path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6", key: "miytrc" }],
   ["path", { d: "M3 6h18", key: "d0wm0j" }],
   ["path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", key: "e791ji" }]
 ];
-const Trash2 = createLucideIcon("trash-2", __iconNode);
+const Trash2 = createLucideIcon("trash-2", __iconNode$1);
+const __iconNode = [
+  ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+  ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+];
+const X = createLucideIcon("x", __iconNode);
 function LogIn({ onLogin }) {
   const [name, setName] = reactExports.useState("");
   const [deepgramKey, setDeepgramKey] = reactExports.useState(localStorage.getItem("app_key") || "");
@@ -12871,7 +12892,8 @@ function Header({
   htMode,
   onToggleHtMode,
   captureKreyol,
-  onToggleCaptureKreyol
+  onToggleCaptureKreyol,
+  onOpenGlossary
 }) {
   const timer = useTimer(playing);
   const headerRef = reactExports.useRef(null);
@@ -12990,6 +13012,7 @@ function Header({
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Sep, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: () => setLightTheme((t) => !t), title: "Toggle theme", children: lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 13, strokeWidth: 2 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 13, strokeWidth: 2 }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: onOpenGlossary, title: "Kreyòl accuracy glossary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(BookOpen, { size: 13, strokeWidth: 2 }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hdr-username", children: username }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "hdr-icon", onClick: onLogout, title: "Log out", children: /* @__PURE__ */ jsxRuntimeExports.jsx(LogOut, { size: 13, strokeWidth: 2 }) })
     ] }),
@@ -13057,6 +13080,13 @@ function Header({
             /* @__PURE__ */ jsxRuntimeExports.jsx(Captions, { size: 16 }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: subtitleOnly ? "Subtitles only" : "Show translations" })
           ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "hdr-mobile-menu-item", onClick: () => {
+            setMenuOpen(false);
+            onOpenGlossary?.();
+          }, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(BookOpen, { size: 16 }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Kreyòl accuracy glossary" })
+          ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "hdr-mobile-menu-divider" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { className: "hdr-mobile-menu-item", onClick: () => setLightTheme((t) => !t), children: [
             lightTheme ? /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { size: 16 }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { size: 16 }),
@@ -13076,7 +13106,7 @@ function Header({
 }
 function Footer({ status = "Idle", error = null }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("footer", { className: "app-footer", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 2.1" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "app-footer__text", children: "Interpreter AI release 2.3" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "app-footer__status", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "app-footer__error", children: [
       "⚠ ",
       error
@@ -13174,6 +13204,158 @@ function ConversationView({
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Jump to latest" })
     ] })
   ] });
+}
+const STORAGE_KEY = "kreyol_glossary_v1";
+const emptyGlossary = () => ({
+  defaultIntensity: 0.4,
+  vocabulary: [],
+  spelling: []
+});
+const cleanList = (items, mapper) => (Array.isArray(items) ? items : []).map(mapper).filter(Boolean);
+function readKreyolGlossary() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (!parsed || typeof parsed !== "object") return emptyGlossary();
+    return {
+      defaultIntensity: Number.isFinite(Number(parsed.defaultIntensity)) ? Math.min(1, Math.max(0, Number(parsed.defaultIntensity))) : 0.4,
+      vocabulary: cleanList(parsed.vocabulary, (entry) => {
+        const value = entry?.value?.trim();
+        if (!value) return null;
+        return {
+          id: entry.id || crypto.randomUUID(),
+          value,
+          pronunciations: cleanList(entry.pronunciations, (item) => item?.trim() || null),
+          intensity: Number.isFinite(Number(entry.intensity)) ? Math.min(1, Math.max(0, Number(entry.intensity))) : null,
+          enabled: entry.enabled !== false
+        };
+      }),
+      spelling: cleanList(parsed.spelling, (entry) => {
+        const value = entry?.value?.trim();
+        const variants = cleanList(entry?.variants, (item) => item?.trim() || null);
+        if (!value || !variants.length) return null;
+        return { id: entry.id || crypto.randomUUID(), value, variants, enabled: entry.enabled !== false };
+      })
+    };
+  } catch {
+    return emptyGlossary();
+  }
+}
+function saveKreyolGlossary(glossary) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(glossary));
+}
+function getGladiaGlossaryProcessing() {
+  const glossary = readKreyolGlossary();
+  const vocabulary = glossary.vocabulary.filter((entry) => entry.enabled).map(({ value, pronunciations, intensity }) => ({
+    value,
+    ...pronunciations.length ? { pronunciations } : {},
+    ...intensity === null ? {} : { intensity },
+    language: "ht"
+  }));
+  const spellingDictionary = Object.fromEntries(
+    glossary.spelling.filter((entry) => entry.enabled).map(({ value, variants }) => [value, variants])
+  );
+  const hasSpelling = Object.keys(spellingDictionary).length > 0;
+  return {
+    custom_vocabulary: vocabulary.length > 0,
+    ...vocabulary.length ? {
+      custom_vocabulary_config: {
+        vocabulary,
+        default_intensity: glossary.defaultIntensity
+      }
+    } : {},
+    custom_spelling: hasSpelling,
+    ...hasSpelling ? { custom_spelling_config: { spelling_dictionary: spellingDictionary } } : {}
+  };
+}
+const newId = () => crypto.randomUUID();
+const splitItems = (value) => value.split(",").map((item) => item.trim()).filter(Boolean);
+function KreyolGlossary({ onClose }) {
+  const [glossary, setGlossary] = reactExports.useState(readKreyolGlossary);
+  const [term, setTerm] = reactExports.useState("");
+  const [soundsLike, setSoundsLike] = reactExports.useState("");
+  const [preferred, setPreferred] = reactExports.useState("");
+  const [variants, setVariants] = reactExports.useState("");
+  const update = (next) => {
+    setGlossary(next);
+    saveKreyolGlossary(next);
+  };
+  const addVocabulary = (event) => {
+    event.preventDefault();
+    if (!term.trim()) return;
+    update({ ...glossary, vocabulary: [...glossary.vocabulary, {
+      id: newId(),
+      value: term.trim(),
+      pronunciations: splitItems(soundsLike),
+      intensity: null,
+      enabled: true
+    }] });
+    setTerm("");
+    setSoundsLike("");
+  };
+  const addSpelling = (event) => {
+    event.preventDefault();
+    const cleanVariants = splitItems(variants);
+    if (!preferred.trim() || !cleanVariants.length) return;
+    update({ ...glossary, spelling: [...glossary.spelling, {
+      id: newId(),
+      value: preferred.trim(),
+      variants: cleanVariants,
+      enabled: true
+    }] });
+    setPreferred("");
+    setVariants("");
+  };
+  const remove = (type, id) => update({ ...glossary, [type]: glossary[type].filter((entry) => entry.id !== id) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "glossary-backdrop", role: "presentation", onMouseDown: onClose, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "glossary-dialog", role: "dialog", "aria-modal": "true", "aria-labelledby": "glossary-title", onMouseDown: (event) => event.stopPropagation(), children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "glossary-header", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { id: "glossary-title", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(BookOpen, { size: 18 }),
+          " Kreyòl accuracy glossary"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Changes apply when the next Kreyòl session starts." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "glossary-close", onClick: onClose, "aria-label": "Close glossary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { size: 18 }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "glossary-content", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "glossary-section", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Sounds-like vocabulary" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "For names or terms Gladia hears as a different word. Add comma-separated ways the term sounds when spoken." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { className: "glossary-form", onSubmit: addVocabulary, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { value: term, onChange: (event) => setTerm(event.target.value), placeholder: "Correct term, e.g. Pétion-Ville" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { value: soundsLike, onChange: (event) => setSoundsLike(event.target.value), placeholder: "Sounds like (optional), e.g. Petion vil" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "submit", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
+            " Add term"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(GlossaryList, { entries: glossary.vocabulary, empty: "No vocabulary terms yet.", detail: (entry) => entry.pronunciations.join(", "), onRemove: (id) => remove("vocabulary", id) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "glossary-section", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Exact spelling corrections" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "For words Gladia recognizes but spells consistently wrong. The variants are replaced exactly." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { className: "glossary-form", onSubmit: addSpelling, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { value: preferred, onChange: (event) => setPreferred(event.target.value), placeholder: "Preferred spelling, e.g. Ayiti" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("input", { value: variants, onChange: (event) => setVariants(event.target.value), placeholder: "Replace variants, comma-separated" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "submit", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { size: 15 }),
+            " Add correction"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(GlossaryList, { entries: glossary.spelling, empty: "No spelling corrections yet.", detail: (entry) => entry.variants.join(", "), onRemove: (id) => remove("spelling", id) })
+      ] })
+    ] })
+  ] }) });
+}
+function GlossaryList({ entries, empty, detail, onRemove }) {
+  if (!entries.length) return /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "glossary-empty", children: empty });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "glossary-list", children: entries.map((entry) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: entry.value }),
+      detail(entry) && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: detail(entry) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => onRemove(entry.id), "aria-label": `Remove ${entry.value}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { size: 15 }) })
+  ] }, entry.id)) });
 }
 const DEEPGRAM_URL = "wss://api.deepgram.com/v1/listen";
 const buildWsUrl = () => {
@@ -13420,7 +13602,10 @@ function useGladiaTranscription({ onFinal, onInterim, onError } = {}) {
           pre_processing: {
             audio_enhancer: true
           },
-          realtime_processing: { translation: false },
+          realtime_processing: {
+            translation: false,
+            ...getGladiaGlossaryProcessing()
+          },
           messages_config: {
             receive_partial_transcripts: true,
             receive_final_transcripts: true,
@@ -13967,6 +14152,7 @@ function App() {
     });
   }, []);
   const [subtitleOnly, setSubtitleOnly] = reactExports.useState(false);
+  const [isGlossaryOpen, setIsGlossaryOpen] = reactExports.useState(false);
   const subtitleOnlyRef = reactExports.useRef(false);
   subtitleOnlyRef.current = subtitleOnly;
   const [utterances, setUtterances] = reactExports.useState([]);
@@ -14226,7 +14412,8 @@ function App() {
         captureKreyol,
         onToggleCaptureKreyol: () => {
           if (!playing) setCaptureKreyol((p) => !p);
-        }
+        },
+        onOpenGlossary: () => setIsGlossaryOpen(true)
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "app-main", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -14248,7 +14435,8 @@ function App() {
         status: footerStatus,
         error: footerError || (deepgramError ? `STT: ${deepgramError}` : gladiaError ? `STT: ${gladiaError}` : null)
       }
-    )
+    ),
+    isGlossaryOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(KreyolGlossary, { onClose: () => setIsGlossaryOpen(false) })
   ] });
 }
 clientExports.createRoot(document.getElementById("root")).render(
